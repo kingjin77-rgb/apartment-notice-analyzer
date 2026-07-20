@@ -1,0 +1,185 @@
+/* Notion design language applied to Streamlit chrome.
+   Source: DESIGN-notion.md — warm paper canvas, near-black Inter type,
+   single blue accent, pill CTAs, hairline + soft-shadow cards. */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --nt-primary: #0075de;
+  --nt-primary-active: #005bab;
+  --nt-secondary: #213183;
+  --nt-on-primary: #ffffff;
+  --nt-canvas: #ffffff;
+  --nt-canvas-soft: #f6f5f4;
+  --nt-ink: #000000;
+  --nt-ink-secondary: #31302e;
+  --nt-ink-muted: #615d59;
+  --nt-ink-faint: #a39e98;
+  --nt-hairline: #e6e6e6;
+  --nt-accent-green: #1aae39;
+  --nt-accent-orange: #dd5b00;
+  --nt-accent-pink: #ff64c8;
+  --nt-accent-sky: #62aef0;
+
+  --nt-radius-xs: 4px;
+  --nt-radius-sm: 5px;
+  --nt-radius-md: 8px;
+  --nt-radius-lg: 12px;
+  --nt-radius-xl: 16px;
+  --nt-radius-full: 9999px;
+
+  --nt-shadow-1:
+    0 0.175px 1.041px rgba(0, 0, 0, 0.01),
+    0 0.8px 2.925px rgba(0, 0, 0, 0.02),
+    0 2.025px 7.847px rgba(0, 0, 0, 0.027),
+    0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+html, body, [class*="css"] {
+  font-family: 'Inter', -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* ── Canvas ── */
+[data-testid="stApp"], [data-testid="stMain"] {
+  background-color: var(--nt-canvas-soft);
+  color: var(--nt-ink);
+}
+
+[data-testid="stSidebar"] {
+  background-color: var(--nt-canvas);
+  border-right: 1px solid var(--nt-hairline);
+}
+
+/* ── Headings ── */
+h1 {
+  font-weight: 700 !important;
+  letter-spacing: -1px;
+  color: var(--nt-ink);
+}
+h2 {
+  font-weight: 700 !important;
+  letter-spacing: -0.625px;
+  color: var(--nt-ink);
+}
+h3, h4 {
+  font-weight: 700 !important;
+  letter-spacing: -0.25px;
+  color: var(--nt-ink);
+}
+p, span, label, div {
+  color: var(--nt-ink-secondary);
+}
+
+/* ── Buttons ── */
+.stButton > button, .stDownloadButton > button {
+  border-radius: var(--nt-radius-full);
+  font-weight: 500;
+  border: 1px solid transparent;
+  transition: transform 0.08s ease, background-color 0.15s ease;
+}
+.stButton > button:active, .stDownloadButton > button:active {
+  transform: scale(0.96);
+}
+
+.stButton > button[kind="primary"], .stDownloadButton > button[kind="primary"] {
+  background-color: var(--nt-primary);
+  color: var(--nt-on-primary);
+}
+.stButton > button[kind="primary"]:hover, .stDownloadButton > button[kind="primary"]:hover {
+  background-color: var(--nt-primary-active);
+}
+
+.stButton > button[kind="secondary"], .stDownloadButton > button[kind="secondary"] {
+  background-color: var(--nt-canvas);
+  color: var(--nt-ink);
+  border: 1px solid var(--nt-hairline);
+  box-shadow: var(--nt-shadow-1);
+}
+
+/* ── Inputs ── */
+.stTextInput input, .stTextArea textarea, .stNumberInput input {
+  border-radius: var(--nt-radius-xs) !important;
+  border: 1px solid var(--nt-hairline) !important;
+  background-color: var(--nt-canvas) !important;
+}
+.stTextInput input:focus, .stTextArea textarea:focus {
+  box-shadow: var(--nt-shadow-1);
+  border-color: var(--nt-primary) !important;
+}
+
+[data-testid="stFileUploaderDropzone"] {
+  border-radius: var(--nt-radius-lg) !important;
+  border: 1px dashed var(--nt-hairline) !important;
+  background-color: var(--nt-canvas) !important;
+}
+
+/* ── Checkboxes: tint the check to brand blue ── */
+.stCheckbox [role="checkbox"][aria-checked="true"] {
+  background-color: var(--nt-primary) !important;
+  border-color: var(--nt-primary) !important;
+}
+
+/* ── Cards: st.container(border=True) and st.expander ── */
+[data-testid="stVerticalBlockBorderWrapper"] > div:first-child {
+  border-radius: var(--nt-radius-lg) !important;
+  border-color: var(--nt-hairline) !important;
+  background-color: var(--nt-canvas);
+}
+
+[data-testid="stExpander"] {
+  border-radius: var(--nt-radius-lg) !important;
+  border: 1px solid var(--nt-hairline) !important;
+  background-color: var(--nt-canvas);
+  overflow: hidden;
+}
+[data-testid="stExpander"] summary {
+  font-weight: 600;
+}
+
+/* ── Alerts: sticker-palette tint by kind, quiet left accent ── */
+[data-testid="stAlertContainer"] {
+  border-radius: var(--nt-radius-lg) !important;
+  border: none !important;
+  border-left-width: 3px !important;
+  border-left-style: solid !important;
+  box-shadow: var(--nt-shadow-1);
+}
+[data-testid="stAlertContainer"] p {
+  color: var(--nt-ink);
+}
+
+[data-testid="stAlertContainer"]:has(svg[data-icon-name="Check"]) {
+  border-left-color: var(--nt-accent-green) !important;
+  background-color: rgba(26, 174, 57, 0.06) !important;
+}
+[data-testid="stAlertContainer"]:has(svg[data-icon-name="Info"]) {
+  border-left-color: var(--nt-accent-sky) !important;
+  background-color: rgba(98, 174, 240, 0.08) !important;
+}
+[data-testid="stAlertContainer"]:has(svg[data-icon-name="Warning"]) {
+  border-left-color: var(--nt-accent-orange) !important;
+  background-color: rgba(221, 91, 0, 0.06) !important;
+}
+[data-testid="stAlertContainer"]:has(svg[data-icon-name="Error"]) {
+  border-left-color: var(--nt-accent-pink) !important;
+  background-color: rgba(255, 100, 200, 0.06) !important;
+}
+
+/* ── Tables ── */
+[data-testid="stTable"] thead th {
+  background-color: var(--nt-canvas-soft) !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.125px;
+  color: var(--nt-ink-muted) !important;
+}
+[data-testid="stTable"] td, [data-testid="stTable"] th {
+  border-color: var(--nt-hairline) !important;
+}
+
+/* ── Badges: st.caption reads like the eyebrow token ── */
+[data-testid="stCaptionContainer"] {
+  color: var(--nt-ink-faint) !important;
+  font-size: 13px;
+}

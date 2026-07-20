@@ -1,0 +1,47 @@
+{
+  "_note": "이 매핑 테이블은 개발 착수용 초안입니다. 실제 서비스 전에 이지훈/하혜용 변호사 검증 필수. requires_verification=true 항목은 조문 번호 재확인 필요.",
+  "categories": [
+    {
+      "category": "계약금/중도금/잔금 조건",
+      "keywords": ["계약금", "중도금", "잔금", "납부일정"],
+      "law_name": "주택공급에 관한 규칙",
+      "article_ref": "제59조 (확인 필요)",
+      "requires_verification": true
+    },
+    {
+      "category": "청약 자격 및 순위",
+      "keywords": ["청약자격", "1순위", "2순위", "무주택세대"],
+      "law_name": "주택공급에 관한 규칙",
+      "article_ref": "제4조~제10조 (확인 필요)",
+      "requires_verification": true
+    },
+    {
+      "category": "하자담보책임",
+      "keywords": ["하자담보책임", "하자보수", "담보책임기간"],
+      "law_name": "공동주택관리법 시행령",
+      "article_ref": "제36조, 별표4 - 기존 '하자담보책임기간 계산기' 확장프로그램의 22개 카테고리 데이터 재사용 검토",
+      "requires_verification": true
+    },
+    {
+      "category": "분양가 및 발코니 확장비",
+      "keywords": ["분양가", "발코니 확장", "옵션 품목", "추가비용"],
+      "law_name": "주택법",
+      "article_ref": "제57조 (분양가상한제) 등 - 확인 필요",
+      "requires_verification": true
+    },
+    {
+      "category": "마감재/사양 변경",
+      "keywords": ["마감재", "사양", "동등 이상", "변경될 수 있음"],
+      "law_name": "표준공급계약서 (국토부 고시)",
+      "article_ref": "공식 API 없음 - 참고 텍스트 DB 별도 구축 필요",
+      "requires_verification": true
+    },
+    {
+      "category": "계약 해제/위약금",
+      "keywords": ["계약해제", "위약금", "환급", "귀책사유"],
+      "law_name": "주택공급에 관한 규칙 / 표준공급계약서",
+      "article_ref": "확인 필요",
+      "requires_verification": true
+    }
+  ]
+}
