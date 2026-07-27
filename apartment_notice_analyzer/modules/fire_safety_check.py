@@ -35,7 +35,7 @@ MANDATORY_ITEMS: list[dict[str, Any]] = [
         "code": "KITCHEN-EXT-01",
         "name": "주거용 주방자동소화장치(세대별)",
         "condition": "아파트등은 모든 층(세대) 주방에 자동소화장치 설치 의무",
-        "keywords": ["주방자동소화장치", "주방 자동소화장치", "자동소화장치"],
+        "keywords": ["주방자동소화장치", "주방 자동소화장치", "자동소화장치", "자동식소화기"],
     },
     {
         "code": "DETECTOR-01",
