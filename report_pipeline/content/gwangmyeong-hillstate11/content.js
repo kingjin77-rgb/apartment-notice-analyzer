@@ -140,7 +140,7 @@ module.exports = {
             ["유의시설", "주의", "예지원 장례식장 약 609m — 반경 1km 이내 소재"],
           ] },
         { type: "image", path: path.join(ASSETS, "chart_location_map.png"), width: 468, height: 430, imgType: "png",
-          caption: "단지 주변 시설 위치관계도 (실제 지도)", source: "배경지도 © OpenStreetMap 기여자, 시설 위치·거리 카카오 로컬 API 실측" },
+          caption: "단지 주변 시설 위치관계도 (카카오맵)", source: "배경지도 ⓒ Kakao, 시설 위치·거리 카카오 로컬 API 실측" },
         { type: "image", path: path.join(ASSETS, "chart_landuse_map.png"), width: 468, height: 430, imgType: "png",
           caption: "단지 주변 용도지역 현황 (반경 500m)", source: "V-World 2D 데이터 API 실측 폴리곤" },
         { type: "quote", text:
