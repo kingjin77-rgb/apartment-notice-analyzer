@@ -21,9 +21,19 @@ const COLORS = {
   NAVY: "1F3864", NAVY2: "2E5395", GOLD: "C89B3C",
   RED: "C00000", ORANGE: "B45309", GREEN: "2E7D32",
   GRAY: "595959", LIGHTGRAY: "F2F2F2", CREAM: "F7F3EA",
+  LINE: "E2DED4", REDBG: "FBEAEA", ORANGEBG: "FBF1E3", GREENBG: "EAF3EA",
 };
 const FONT = "맑은 고딕";
 const RATING_COLOR = { "양호": COLORS.GREEN, "보통": COLORS.ORANGE, "주의": COLORS.RED };
+const SEV_COLOR = { "상": COLORS.RED, "중": COLORS.ORANGE, "하": COLORS.GREEN,
+  "주의": COLORS.RED, "확인필요": COLORS.ORANGE, "양호": COLORS.GREEN };
+const SEV_BG = { "상": COLORS.REDBG, "중": COLORS.ORANGEBG, "하": COLORS.GREENBG,
+  "주의": COLORS.REDBG, "확인필요": COLORS.ORANGEBG, "양호": COLORS.GREENBG };
+const LINE_BORDER = { style: BorderStyle.SINGLE, size: 4, color: COLORS.LINE };
+const TABLE_BORDERS = {
+  top: LINE_BORDER, bottom: LINE_BORDER, left: LINE_BORDER, right: LINE_BORDER,
+  insideHorizontal: LINE_BORDER, insideVertical: LINE_BORDER,
+};
 
 let figCount = 0;
 
@@ -68,14 +78,27 @@ function p(text, opts = {}) {
   return new Paragraph({ keepLines: true, children: [new TextRun({ text, ...opts })], spacing: { after: 120, line: 276, lineRule: "auto" } });
 }
 function quoteBox(text) {
-  return new Paragraph({
-    keepNext: true, keepLines: true,
-    children: [new TextRun({ text: `"${text}"`, italics: true, color: COLORS.GRAY, size: 20 })],
-    shading: { type: ShadingType.CLEAR, fill: COLORS.LIGHTGRAY },
-    border: { left: { style: BorderStyle.SINGLE, size: 16, color: "999999", space: 8 } },
-    indent: { left: 100 },
-    spacing: { before: 100, after: 100, line: 276, lineRule: "auto" },
-  });
+  // "원문 인용" 라벨 + 크림색 박스(4방향 얇은 테두리) — 항상 라벨을 먼저 붙여 원문임을 명시한다.
+  return [
+    new Paragraph({
+      keepNext: true, keepLines: true,
+      spacing: { before: 160, after: 60, line: 276, lineRule: "auto" },
+      children: [new TextRun({ text: "원문 인용", bold: true, color: COLORS.GRAY, size: 16 })],
+    }),
+    new Paragraph({
+      keepNext: true, keepLines: true,
+      shading: { type: ShadingType.CLEAR, fill: COLORS.CREAM },
+      border: {
+        top: { style: BorderStyle.SINGLE, size: 4, color: COLORS.LINE },
+        bottom: { style: BorderStyle.SINGLE, size: 4, color: COLORS.LINE },
+        left: { style: BorderStyle.SINGLE, size: 4, color: COLORS.LINE },
+        right: { style: BorderStyle.SINGLE, size: 4, color: COLORS.LINE },
+      },
+      indent: { left: 160, right: 160 },
+      spacing: { before: 100, after: 160, line: 288, lineRule: "auto" },
+      children: [new TextRun({ text: `“${text}”`, color: "2B2E33", size: 20 })],
+    }),
+  ];
 }
 function commentBox(text, label = "법무법인제이엘 검토") {
   return new Paragraph({
@@ -83,8 +106,12 @@ function commentBox(text, label = "법무법인제이엘 검토") {
     shading: { type: ShadingType.CLEAR, fill: "EDF1F8" },
     border: { left: { style: BorderStyle.SINGLE, size: 28, color: COLORS.NAVY2 } },
     indent: { left: 140 },
-    spacing: { before: 100, after: 240, line: 276, lineRule: "auto" },
-    children: [new TextRun({ text: label + "   ", bold: true, color: COLORS.NAVY2 }), new TextRun({ text })],
+    spacing: { before: 40, after: 260, line: 280, lineRule: "auto" },
+    children: [
+      new TextRun({ text: "✓  ", bold: true, color: COLORS.NAVY }),
+      new TextRun({ text: label + "   ", bold: true, color: COLORS.NAVY2 }),
+      new TextRun({ text }),
+    ],
   });
 }
 function figCaption(text, source) {
@@ -113,6 +140,7 @@ function simpleTable(rows, widths, opts = {}) {
   return new Table({
     width: { size: widths.reduce((a, b) => a + b, 0), type: WidthType.DXA },
     columnWidths: widths,
+    borders: TABLE_BORDERS,
     rows: rows.map((r, i) => new TableRow({
       cantSplit: true,
       children: r.map((val, ci) => cell(val, {
@@ -130,6 +158,7 @@ function scoreCard(rows, widths) {
   return new Table({
     width: { size: widths.reduce((a, b) => a + b, 0), type: WidthType.DXA },
     columnWidths: widths,
+    borders: TABLE_BORDERS,
     rows: rows.map((r, i) => {
       if (i === 0) {
         return new TableRow({
@@ -138,12 +167,13 @@ function scoreCard(rows, widths) {
         });
       }
       const [category, rating, summary] = r;
+      const sevBg = SEV_BG[rating];
       return new TableRow({
         cantSplit: true,
         children: [
-          cell(category, { bold: true, width: widths[0], shade: i % 2 ? COLORS.CREAM : null, size: 20 }),
-          cell(`● ${rating}`, { bold: true, color: RATING_COLOR[rating] || "000000", width: widths[1], align: AlignmentType.CENTER, shade: i % 2 ? COLORS.CREAM : null, size: 20 }),
-          cell(summary, { width: widths[2], shade: i % 2 ? COLORS.CREAM : null, size: 19 }),
+          cell(category, { bold: true, width: widths[0], shade: sevBg || (i % 2 ? COLORS.CREAM : null), size: 20 }),
+          cell(`● ${rating}`, { bold: true, color: RATING_COLOR[rating] || "000000", width: widths[1], align: AlignmentType.CENTER, shade: sevBg || (i % 2 ? COLORS.CREAM : null), size: 20 }),
+          cell(summary, { width: widths[2], shade: sevBg || (i % 2 ? COLORS.CREAM : null), size: 19 }),
         ],
       });
     }),
@@ -204,7 +234,7 @@ function renderBlock(block) {
   switch (block.type) {
     case "p": return [p(block.text, block.opts || {})];
     case "h2": return [h2(block.text, block.color ? COLORS[block.color] : undefined)];
-    case "quote": return [quoteBox(block.text)];
+    case "quote": return quoteBox(block.text);
     case "comment": return [commentBox(block.text, block.label)];
     case "table": return [simpleTable(block.rows, block.widths, block.opts || {})];
     case "scoreCard": return [scoreCard(block.rows, block.widths)];
@@ -213,15 +243,55 @@ function renderBlock(block) {
       if (block.caption) out.push(figCaption(block.caption, block.source));
       return out;
     }
-    case "toxicItem": {
-      const out = [h2(`${block.index}. [${block.cat}]`, COLORS.RED)];
-      out.push(quoteBox(block.text));
-      out.push(commentBox(`개선요청: ${block.fix}`));
-      return out;
-    }
+    case "toxicItem": return [itemCard(block)];
     default:
       throw new Error(`Unknown block type: ${block.type}`);
   }
+}
+
+/**
+ * toxicItem 카드 — 왼쪽에 중요도색 굵은 라인, 안에 [번호+카테고리+중요도 배지] →
+ * "원문 인용" 박스 → 개선요청 줄. 단일 셀 표로 감싸 카드처럼 보이게 한다(docx는
+ * div/box-shadow가 없어 1x1 표가 가장 안정적인 "카드" 구현 방식).
+ */
+function itemCard(block) {
+  const severity = block.severity || "상";
+  const sevColor = SEV_COLOR[severity] || COLORS.RED;
+  return new Table({
+    width: { size: 9350, type: WidthType.DXA },
+    columnWidths: [9350],
+    rows: [new TableRow({
+      cantSplit: true,
+      children: [new TableCell({
+        width: { size: 9350, type: WidthType.DXA },
+        margins: { top: 180, bottom: 200, left: 240, right: 220 },
+        borders: {
+          top: LINE_BORDER, bottom: LINE_BORDER, right: LINE_BORDER,
+          left: { style: BorderStyle.SINGLE, size: 32, color: sevColor },
+        },
+        children: [
+          new Paragraph({
+            keepNext: true, keepLines: true,
+            spacing: { after: 40, line: 276, lineRule: "auto" },
+            children: [
+              new TextRun({ text: `${String(block.index).padStart(2, "0")}   `, bold: true, color: "8A8F99", size: 18 }),
+              new TextRun({ text: block.cat, bold: true, color: COLORS.NAVY, size: 23 }),
+              new TextRun({ text: `   ［${severity}］`, bold: true, color: sevColor, size: 18 }),
+            ],
+          }),
+          ...quoteBox(block.text),
+          new Paragraph({
+            keepLines: true,
+            spacing: { before: 20, after: 40, line: 280, lineRule: "auto" },
+            children: [
+              new TextRun({ text: "✓  개선요청   ", bold: true, color: COLORS.NAVY2, size: 20 }),
+              new TextRun({ text: block.fix, size: 20 }),
+            ],
+          }),
+        ],
+      })],
+    })],
+  });
 }
 
 async function renderToFile(content, outPath) {
