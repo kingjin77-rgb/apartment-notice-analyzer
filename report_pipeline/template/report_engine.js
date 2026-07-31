@@ -46,9 +46,10 @@ function sectionBar(num, text) {
       children: [new TableCell({
         width: { size: 9350, type: WidthType.DXA },
         shading: { type: ShadingType.CLEAR, fill: COLORS.NAVY },
-        margins: { top: 140, bottom: 140, left: 200, right: 200 },
+        margins: { top: 260, bottom: 260, left: 200, right: 200 },
         borders: { bottom: { style: BorderStyle.SINGLE, size: 24, color: COLORS.GOLD } },
         children: [new Paragraph({
+          spacing: { before: 0, after: 0 },
           children: [
             new TextRun({ text: num ? `${num}   ` : "", bold: true, color: COLORS.GOLD, size: 24 }),
             new TextRun({ text, bold: true, color: "FFFFFF", size: 24 }),
@@ -59,11 +60,9 @@ function sectionBar(num, text) {
   });
 }
 function h1(num, text) {
-  return [
-    new Paragraph({ keepNext: true, spacing: { before: 420, after: 0 }, children: [new TextRun({ text: "" })] }),
-    sectionBar(num, text),
-    new Paragraph({ keepNext: true, spacing: { before: 160, after: 0 }, children: [new TextRun({ text: "" })] }),
-  ];
+  // 표(sectionBar) 앞뒤에 빈 Paragraph로 여백을 주면 Word에서 문단부호가 점처럼 보이는
+  // 경우가 있어, 여백은 표 셀 margins(top/bottom 260)로만 준다 — 빈 문단을 만들지 않는다.
+  return [sectionBar(num, text)];
 }
 function h2(text, color = COLORS.NAVY) {
   return new Paragraph({
