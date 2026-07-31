@@ -196,7 +196,6 @@ function buildDocument(content) {
 
   // ---- 표지 ----
   children.push(
-    new Paragraph({ spacing: { before: 600, after: 0 }, children: [new TextRun({ text: "" })] }),
     new Paragraph({
       shading: { type: ShadingType.CLEAR, fill: COLORS.NAVY }, spacing: { before: 0, after: 0 },
       children: [new TextRun({ text: "  " })],

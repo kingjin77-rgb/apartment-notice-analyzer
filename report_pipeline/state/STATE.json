@@ -77,6 +77,12 @@
       "outPath": "D:\\DDownloads\\apartment_notice_analyzer\\report_pipeline\\content\\platinum-sky-heron\\platinum-sky-heron.docx",
       "verifyPassed": true,
       "timestamp_note": "타임스탬프는 실행 환경에서 채워 넣을 것 (스크립트는 Date.now() 사용 안 함)"
+    },
+    {
+      "slug": "gwangmyeong-hillstate11",
+      "outPath": "D:\\DDownloads\\apartment_notice_analyzer\\report_pipeline\\content\\gwangmyeong-hillstate11\\gwangmyeong-hillstate11.docx",
+      "verifyPassed": true,
+      "timestamp_note": "타임스탬프는 실행 환경에서 채워 넣을 것 (스크립트는 Date.now() 사용 안 함)"
     }
   ]
 }
