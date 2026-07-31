@@ -367,6 +367,78 @@ def render_facility_map(site_lat: float, site_lon: float, site_name: str,
     return out_path
 
 
+# ─────────────────────────────────────────────────────────────
+# 6) 확대 크롭(돋보기) — 단지배치도/평면배치도 등에서 특정 구간만 확대
+# ─────────────────────────────────────────────────────────────
+
+def render_zoom_crop(source_path: str, crop_box: tuple[float, float, float, float],
+                      out_path: str, zoom: float = 2.5, label: str | None = None,
+                      context_thumb: bool = True, box_color: str = RED) -> str:
+    """
+    source_path: 원본 이미지(단지배치도, 평면배치도 등) 경로.
+    crop_box: (x0, y0, x1, y1). 네 값 모두 1.0 이하면 원본 크기 대비 비율로,
+              하나라도 1.0을 넘으면 픽셀 좌표로 해석한다.
+    zoom: 크롭 영역을 몇 배로 확대할지.
+    label: 크롭 이미지 상단 배너에 표시할 설명(예: "3층 세대창고 부분 확대"). 생략 가능.
+    context_thumb: True면 좌상단에 원본 축소본 + 빨간 박스로 크롭 위치를 함께 표시해
+                   "전체 도면 중 어디를 확대한 것인지"를 한눈에 알 수 있게 한다.
+    반환값: out_path (report_engine.js의 image 블록에 그대로 넘기면 됨).
+    """
+    from PIL import Image, ImageDraw, ImageFont
+
+    def hx(c):
+        c = c.lstrip("#")
+        return tuple(int(c[i:i + 2], 16) for i in (0, 2, 4))
+
+    def font(sz, bold=False):
+        try:
+            return ImageFont.truetype("C:/Windows/Fonts/malgunbd.ttf" if bold else "C:/Windows/Fonts/malgun.ttf", sz)
+        except Exception:
+            return ImageFont.load_default()
+
+    img = Image.open(source_path).convert("RGB")
+    W, H = img.size
+    x0, y0, x1, y1 = crop_box
+    if max(x0, y0, x1, y1) <= 1.0:
+        x0, x1 = x0 * W, x1 * W
+        y0, y1 = y0 * H, y1 * H
+
+    crop = img.crop((int(x0), int(y0), int(x1), int(y1)))
+    crop = crop.resize((max(1, int(crop.width * zoom)), max(1, int(crop.height * zoom))), Image.LANCZOS)
+
+    banner_h = 44 if label else 0
+    canvas = Image.new("RGB", (crop.width, crop.height + banner_h), "white")
+    canvas.paste(crop, (0, banner_h))
+    draw = ImageDraw.Draw(canvas)
+
+    if label:
+        draw.rectangle([0, 0, canvas.width, banner_h], fill=hx(NAVY))
+        # 돋보기 아이콘(유니코드 이모지는 malgun 폰트에 글리프가 없어 직접 그림)
+        icx, icy, icr = 24, banner_h // 2 - 2, 7
+        draw.ellipse([icx - icr, icy - icr, icx + icr, icy + icr], outline="white", width=3)
+        draw.line([icx + icr * 0.7, icy + icr * 0.7, icx + icr * 1.7, icy + icr * 1.7], fill="white", width=3)
+        draw.text((44, banner_h // 2), label, fill="white", font=font(17, bold=True), anchor="lm")
+
+    draw.rectangle([0, banner_h, canvas.width - 1, canvas.height - 1], outline=hx(box_color), width=4)
+
+    if context_thumb:
+        thumb_w = max(80, int(canvas.width * 0.24))
+        thumb = img.copy()
+        thumb.thumbnail((thumb_w, thumb_w))
+        scale = thumb.width / W
+        tdraw = ImageDraw.Draw(thumb)
+        tdraw.rectangle([x0 * scale, y0 * scale, x1 * scale, y1 * scale], outline=hx(box_color), width=3)
+        pad = 5
+        framed = Image.new("RGB", (thumb.width + 2 * pad, thumb.height + 2 * pad), "white")
+        framed.paste(thumb, (pad, pad))
+        fd = ImageDraw.Draw(framed)
+        fd.rectangle([0, 0, framed.width - 1, framed.height - 1], outline=hx(GRAY), width=1)
+        canvas.paste(framed, (12, banner_h + 12))
+
+    canvas.save(out_path, "PNG")
+    return out_path
+
+
 if __name__ == "__main__":
     # 간단한 자체 점검 — 실제 데이터 없이 그리기 로직만 확인
     import fire_safety_check, indoor_air_quality
