@@ -137,6 +137,12 @@
       "outPath": "D:\\DDownloads\\apartment_notice_analyzer\\report_pipeline\\content\\anyang-ipark-sujain\\anyang-ipark-sujain.docx",
       "verifyPassed": true,
       "timestamp_note": "타임스탬프는 실행 환경에서 채워 넣을 것 (스크립트는 Date.now() 사용 안 함)"
+    },
+    {
+      "slug": "paragon3-dongtan-rental",
+      "outPath": "D:\\DDownloads\\apartment_notice_analyzer\\report_pipeline\\content\\paragon3-dongtan-rental\\paragon3-dongtan-rental.docx",
+      "verifyPassed": true,
+      "timestamp_note": "타임스탬프는 실행 환경에서 채워 넣을 것 (스크립트는 Date.now() 사용 안 함)"
     }
   ]
 }
