@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>법무법인제이엘 AI감정평가사</title>
+<style>
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css");
+:root{
+  --navy:#0d2162; --navy-deep:#081541; --navy-soft:#eff2fb;
+  --ink:#111418; --gray-700:#4b515a; --gray-500:#767c86; --gray-300:#b6bbc2;
+  --line:#e3e5e9; --paper:#fff; --paper-alt:#f4f5f8; --gold:#b08d4f;
+  --pos:#1c6b52; --neg:#a8332b;
+  --ff:"Pretendard Variable",Pretendard,-apple-system,"Malgun Gothic",system-ui,sans-serif;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:var(--ff);font-size:15px;line-height:1.7;color:var(--gray-700);
+     background:var(--paper-alt);word-break:keep-all;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;color:var(--ink);font-weight:700;letter-spacing:-.022em;line-height:1.34}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+header{background:var(--paper);border-bottom:1px solid var(--line);height:60px;display:flex;
+       align-items:center;padding:0 18px;gap:14px;position:relative;z-index:60}
+.logo{display:flex;align-items:center;gap:10px;white-space:nowrap}
+.logo .mark{width:32px;height:32px;border-radius:3px;background:var(--navy);color:#fff;
+     display:grid;place-items:center;font-size:12.5px;font-weight:800}
+.logo b{display:block;font-size:15px;color:var(--ink);line-height:1.25;letter-spacing:-.025em}
+.logo span{display:block;font-size:10.5px;color:var(--gray-500)}
+.hsearch{flex:1;max-width:380px;display:flex;position:relative;margin-left:8px}
+.hsearch input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--line);border-right:0;
+     border-radius:2px 0 0 2px;font:inherit;font-size:13.5px;color:var(--ink);background:var(--paper)}
+.hsearch input:focus{outline:none;border-color:var(--navy)}
+.hsearch button{padding:9px 15px;background:var(--navy);color:#fff;font-weight:700;font-size:13.5px;border-radius:0 2px 2px 0}
+.sug{position:absolute;top:100%;left:0;right:0;background:var(--paper);border:1px solid var(--line);
+     border-top:0;max-height:290px;overflow-y:auto;z-index:70;display:none;box-shadow:0 6px 18px rgba(13,33,98,.12)}
+.sug.on{display:block}
+.sug div{padding:8px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--line)}
+.sug div:hover{background:var(--navy-soft)}
+.sug div b{color:var(--ink)} .sug div span{color:var(--gray-500);font-size:11.5px}
+.badge-int{margin-left:auto;font-size:10.5px;padding:4px 9px;border:1px solid var(--gold);color:var(--gold);
+     font-weight:700;letter-spacing:.05em;border-radius:2px;white-space:nowrap}
+@media(max-width:760px){.logo span{display:none}}
+
+.shell{display:flex;height:calc(100vh - 60px);overflow:hidden}
+@media(max-width:900px){.shell{flex-direction:column;height:auto;overflow:visible}}
+.mapwrap{flex:1;position:relative;min-width:0;background:#e8ecf1}
+#map{position:absolute;inset:0}
+@media(max-width:900px){.mapwrap{height:46vh;flex:none}}
+.mapfail{position:absolute;inset:0;display:none;place-items:center;text-align:center;padding:26px;
+     background:var(--navy-soft);font-size:13px;line-height:1.9;overflow-y:auto}
+.mapfail b{color:var(--navy)}
+.maptools{position:absolute;top:11px;left:11px;z-index:10;display:flex;gap:5px;flex-wrap:wrap;max-width:calc(100% - 22px)}
+.maptools button{background:var(--paper);border:1px solid var(--line);padding:6px 11px;font-size:12.5px;
+     border-radius:2px;box-shadow:0 1px 4px rgba(0,0,0,.1);color:var(--gray-700)}
+.maptools button.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700}
+.legend{position:absolute;bottom:12px;left:11px;z-index:10;background:rgba(255,255,255,.95);
+     border:1px solid var(--line);padding:8px 11px;font-size:11px;line-height:1.85;box-shadow:0 1px 6px rgba(0,0,0,.1)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px}
+.pin{position:relative;transform:translate(-50%,-100%);cursor:pointer;white-space:nowrap;
+     filter:drop-shadow(0 2px 5px rgba(13,33,98,.26))}
+.pin .bx{background:var(--paper);border:1.5px solid var(--navy);border-radius:3px;padding:3px 8px 2px;text-align:center}
+.pin .nm{font-size:10px;color:var(--gray-700);line-height:1.25;font-weight:600;max-width:112px;
+         overflow:hidden;text-overflow:ellipsis}
+.pin .pr{font-size:13px;color:var(--navy);font-weight:800;line-height:1.25;letter-spacing:-.03em}
+.pin .tail{width:0;height:0;margin:0 auto;border-left:5px solid transparent;border-right:5px solid transparent;
+     border-top:6px solid var(--navy)}
+.pin.rare .bx{border-color:var(--gold)} .pin.rare .pr{color:var(--gold)} .pin.rare .tail{border-top-color:var(--gold)}
+.pin.on .bx{background:var(--navy);border-color:var(--navy)}
+.pin.on .nm{color:rgba(255,255,255,.82)} .pin.on .pr{color:#fff}
+
+.panel{width:440px;flex-shrink:0;background:var(--paper);border-left:1px solid var(--line);overflow-y:auto}
+@media(max-width:900px){.panel{width:100%;border-left:0;border-top:1px solid var(--line);overflow:visible}}
+.pbody{padding:18px}
+.empty{padding:54px 26px;text-align:center;color:var(--gray-500);font-size:13.5px;line-height:1.9}
+.empty .ic{font-size:32px;margin-bottom:10px;opacity:.35}
+.phead{padding:16px 18px;border-bottom:1px solid var(--line);background:var(--navy-soft)}
+.phead h2{font-size:17px;letter-spacing:-.03em}
+.phead .addr{font-size:11.5px;color:var(--gray-500);margin-top:2px}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.chip{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:2px;background:var(--paper);
+      border:1px solid var(--line);color:var(--gray-500)}
+.chip.gold{background:var(--gold);border-color:var(--gold);color:#fff}
+.chip.navy{background:var(--navy);border-color:var(--navy);color:#fff}
+.kv{width:100%;border-collapse:collapse;font-size:12.5px}
+.kv th{width:86px;text-align:left;background:var(--paper-alt);color:var(--gray-500);font-weight:600;
+      font-size:11.5px;padding:7px 9px;border:1px solid var(--line);white-space:nowrap}
+.kv td{padding:7px 9px;border:1px solid var(--line);color:var(--ink)}
+.sect{margin-top:18px}
+.sect>h3{font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px}
+.pick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pick label{font-size:10px;font-weight:700;letter-spacing:.07em;color:var(--gray-500);display:block;margin-bottom:4px}
+.pick select{width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:2px;
+     background:var(--paper);color:var(--ink);font:inherit;font-size:13px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 18px;
+     background:var(--navy);color:#fff;font-weight:700;font-size:14px;border-radius:2px;width:100%}
+.btn:hover{background:var(--navy-deep)}
+.btn.gold{background:var(--gold)} .btn.gold:hover{background:#96762f}
+.btn.ghost{background:transparent;color:var(--navy);border:1px solid var(--navy)}
+.btn.ghost:hover{background:var(--navy-soft)}
+.btn.sm{padding:8px 13px;font-size:12.5px;width:auto}
+table.mini{width:100%;border-collapse:collapse;font-size:11.5px}
+.mini th,.mini td{border:1px solid var(--line);padding:6px 7px;text-align:right;white-space:nowrap}
+.mini th{background:var(--paper-alt);color:var(--gray-500);font-size:10px;font-weight:700}
+.mini td:first-child,.mini th:first-child{text-align:left}
+.mini tr.sum td{background:var(--navy-soft);font-weight:800;color:var(--navy)}
+.mini .sm{font-size:10px;color:var(--gray-500);font-weight:400;display:block}
+.pos{color:var(--pos)} .neg{color:var(--neg)}
+.mx td.c{cursor:pointer;font-weight:700;color:var(--navy)}
+.mx td.c:hover{background:var(--navy-soft)}
+.mx td.na{color:var(--gray-300)}
+.resv{text-align:center;padding:18px 14px;border:2px solid var(--navy);background:var(--navy-soft)}
+.resv .l{font-size:10.5px;letter-spacing:.15em;color:var(--navy);font-weight:800}
+.resv .v{font-size:30px;font-weight:800;color:var(--navy);letter-spacing:-.035em;line-height:1.2;margin:4px 0 2px}
+.resv .r{font-size:11.5px;color:var(--gray-500)}
+.gradeline{display:flex;align-items:center;gap:8px;margin-top:10px;padding:9px 11px;background:var(--paper-alt);
+     border-left:2px solid var(--gold);font-size:11.5px}
+.gr{display:inline-flex;gap:3px;flex-shrink:0}
+.gr i{width:6px;height:6px;border-radius:50%;background:var(--gray-300);display:block}
+.gr i.f{background:var(--gold)}
+.why{border:1px solid var(--line);margin-top:8px}
+.why-h{background:var(--paper-alt);padding:8px 11px;font-size:11.5px;font-weight:800;color:var(--navy);
+       display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--line)}
+.why-h .n{background:var(--navy);color:#fff;width:16px;height:16px;border-radius:2px;
+       display:grid;place-items:center;font-size:9.5px;font-weight:800;flex-shrink:0}
+.why-b{padding:10px 11px;font-size:12px;line-height:1.72}
+.calc{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:var(--navy-soft);
+      padding:7px 9px;margin-top:6px;color:var(--navy);overflow-x:auto;white-space:nowrap}
+.quote{font-size:11.5px;background:var(--navy-soft);border-left:2px solid var(--navy);padding:8px 10px;
+       margin-top:6px;line-height:1.65}
+.quote .code{display:block;font-size:10px;font-weight:800;letter-spacing:.07em;color:var(--navy);margin-bottom:3px}
+.quote b{color:var(--navy)}
+.dlbar{position:sticky;bottom:0;background:var(--paper);border-top:1px solid var(--line);
+       padding:11px 18px;margin:18px -18px -18px;display:flex;gap:7px}
+@media(max-width:900px){.dlbar{position:static;margin:18px 0 0;padding:11px 0 0}}
+.notice{background:var(--navy-deep);color:rgba(255,255,255,.75);padding:11px 13px;font-size:11px;
+        line-height:1.7;margin-top:14px}
+.notice b{color:#fff}
+.load{padding:44px 22px;text-align:center}
+.spin{width:32px;height:32px;border:3px solid var(--line);border-top-color:var(--navy);border-radius:50%;
+      margin:0 auto 14px;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.load .t{font-size:13.5px;font-weight:700;color:var(--ink)}
+.load .s{font-size:12px;color:var(--gray-500);margin-top:4px}
+.steps-log{margin-top:16px;text-align:left;max-width:300px;margin-inline:auto;font-size:11.5px}
+.steps-log div{padding:2px 0;color:var(--gray-300)}
+.steps-log div.on{color:var(--navy);font-weight:700}
+.steps-log div.dn{color:var(--pos)}
+.src{font-size:10.5px;color:var(--gray-500);margin-top:12px;line-height:1.7;
+     border-top:1px solid var(--line);padding-top:10px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="mark">JL</span>
+    <span><b>법무법인제이엘 AI감정평가사</b><span>단체등기 · 잔금대출 사전 감정평가</span></span></div>
+  <div class="hsearch">
+    <input id="q" placeholder="아파트명 검색 (예: 동탄역, 자이, 푸르지오)" autocomplete="off">
+    <button onclick="doSearch()">검색</button>
+    <div class="sug" id="sug"></div>
+  </div>
+  <span class="badge-int">INTERNAL</span>
+</header>
+
+<div class="shell">
+  <div class="mapwrap">
+    <div id="map"></div>
+    <div class="mapfail" id="mapfail"><div>
+      <b>카카오맵 SDK 미로드</b><br>
+      <span style="font-size:12px">http://localhost:8934 로 접속해야 지도가 표시됩니다.<br>
+      (카카오 JS 키 도메인 화이트리스트)</span><br><br>
+      <span style="font-size:12px;color:var(--gray-500)">지도 없이도 아래 목록에서 단지를 선택할 수 있습니다.</span>
+      <div id="fbList" style="margin-top:14px;display:flex;gap:5px;flex-wrap:wrap;justify-content:center"></div>
+    </div></div>
+    <div class="maptools">
+      <button class="on" data-f="all">전체</button>
+      <button data-f="noT">거래 0건 (감정평가 대상)</button>
+      <button data-f="lh">임대·분양전환 추정</button>
+      <button data-f="future">입주 예정</button>
+    </div>
+    <div class="legend">
+      <i style="background:var(--gold)"></i>거래 0건·희소 — 감정평가 필요<br>
+      <i style="background:var(--navy)"></i>실거래 충분<br>
+      <span style="color:var(--gray-500);font-size:10px">마커 = 전용 84㎡ 환산 추정가</span>
+    </div>
+  </div>
+
+  <div class="panel" id="panel">
+    <div class="empty"><div class="ic">🏢</div>
+      지도에서 <b>아파트를 선택</b>하거나 상단에서 검색하세요.<br>
+      선택하면 단지 개요 → 평형·층·타입별 감정평가 →<br>산정근거 → 보고서 순으로 진행됩니다.
+      <div class="src" style="text-align:left;margin-top:22px">
+        <b style="color:var(--navy)">실데이터 적용</b><br>
+        국토교통부 실거래가 오픈API — 화성시 4개구(동탄·병점·봉담·남양)<br>
+        2025.01~2026.08 원본 22,810건 → 정제 20,919건 → 단지 60곳<br>
+        계약해제 1,332건 · 직거래 559건 제외, 단지별 MAD 이상치 제거
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+const KAKAO_KEY="6dd941689e3c39956d9ba809f127c947";
+let map=null, ovs=[], selNm=null, filter="all", cur=null;
+// hasT=1 : 자체 실거래 보유 / hasT=0 : 거래 0건 -> 인근 유사단지 비준
+const C=COMPLEX_DATA.map((c,i)=>({...c, id:"x"+i, rare:!c.hasT||c.n<20}));
+
+/* ---------- 포맷 ---------- */
+function won(v){ // v: 원
+  const e=Math.floor(v/1e8), m=Math.round((v%1e8)/1e4);
+  return e? (m? `${e}억 ${m.toLocaleString()}만` : `${e}억`) : `${m.toLocaleString()}만`;
+}
+function eok(v){ return (v/1e8).toFixed(1)+"억"; }
+function pin84(c){ return eok(c.unit*84.98); }
+
+/* ---------- 지도 ---------- */
+function initMap(){
+  map=new kakao.maps.Map(document.getElementById("map"),
+      {center:new kakao.maps.LatLng(37.2000,127.0900),level:7});
+  map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
+  draw();
+}
+function pass(c){
+  if(filter==="noT")    return !c.hasT;
+  if(filter==="lh")     return !!c.lh;
+  if(filter==="future") return !!c.future;
+  return true;
+}
+function draw(){
+  ovs.forEach(o=>o.setMap(null)); ovs=[];
+  C.filter(pass).forEach(c=>{
+    const d=document.createElement("div");
+    d.className="pin"+(c.rare?" rare":"")+(c.nm===selNm?" on":"");
+    d.innerHTML=`<div class="bx"><div class="nm">${c.nm}</div><div class="pr">${pin84(c)}</div></div><div class="tail"></div>`;
+    d.onclick=()=>pick(c.id);
+    ovs.push(new kakao.maps.CustomOverlay({map,position:new kakao.maps.LatLng(c.lat,c.lng),
+      content:d,yAnchor:1,xAnchor:.5,zIndex:c.nm===selNm?30:5}));
+  });
+}
+document.querySelectorAll(".maptools button").forEach(b=>b.onclick=()=>{
+  filter=b.dataset.f;
+  document.querySelectorAll(".maptools button").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");
+  map?draw():fb();
+});
+(function(){
+  const s=document.createElement("script");
+  s.src=`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_KEY}&autoload=false`;
+  s.onload=()=>{try{kakao.maps.load(initMap)}catch(e){fail()}};
+  s.onerror=fail; document.head.appendChild(s);
+  setTimeout(()=>{if(!map)fail()},4000);
+})();
+function fail(){ if(map)return; document.getElementById("mapfail").style.display="grid"; fb(); }
+function fb(){ document.getElementById("fbList").innerHTML=
+  C.filter(pass).slice(0,30).map(c=>`<button class="btn sm ghost" onclick="pick('${c.id}')">${c.nm}</button>`).join(""); }
+
+/* ---------- 검색 ---------- */
+const qi=document.getElementById("q"), sg=document.getElementById("sug");
+qi.oninput=()=>{
+  const v=qi.value.trim();
+  if(!v){sg.classList.remove("on");return;}
+  const hit=C.filter(c=>c.nm.includes(v)||c.umd.includes(v)).slice(0,12);
+  sg.innerHTML=hit.length? hit.map(c=>`<div onclick="pick('${c.id}')"><b>${c.nm}</b>
+    <span> · ${c.umd} · ${c.yr}년 · 거래 ${c.n}건</span></div>`).join("")
+    : `<div style="color:var(--gray-500)">일치하는 단지 없음</div>`;
+  sg.classList.add("on");
+};
+document.addEventListener("click",e=>{ if(!sg.contains(e.target)&&e.target!==qi) sg.classList.remove("on"); });
+function doSearch(){ const v=qi.value.trim(); const h=C.find(c=>c.nm.includes(v)); if(h)pick(h.id); }
+
+/* ---------- 단지 선택 ---------- */
+function pick(id){
+  cur=C.find(c=>c.id===id); selNm=cur.nm; sg.classList.remove("on");
+  if(map){ draw(); map.panTo(new kakao.maps.LatLng(cur.lat,cur.lng)); }
+  renderComplex(); document.querySelector(".panel").scrollTop=0;
+}
+
+const BANDS=[["저층","1층 ~ 하위18%"],["중층","18~35%"],["중상층","35~62%"],["고층","62% 이상"]];
+function bandFloors(c){
+  const M=c.maxfl;
+  return [[1,Math.max(1,Math.round(M*.18))],
+          [Math.max(2,Math.round(M*.18)+1),Math.round(M*.35)],
+          [Math.round(M*.35)+1,Math.round(M*.62)],
+          [Math.round(M*.62)+1,M]];
+}
+
+function renderComplex(){
+  const c=cur, bf=bandFloors(c);
+  document.getElementById("panel").innerHTML=`
+  <div class="phead">
+    <h2>${c.nm}</h2>
+    <div class="addr">${c.addr}${c.road?` · ${c.road}`:""}</div>
+    <div class="chips">
+      ${!c.hasT?'<span class="chip gold">실거래 0건 — 감정평가 대상</span>'
+        :(c.n<20?'<span class="chip gold">거래 희소</span>':'<span class="chip navy">실거래 충분</span>')}
+      ${c.lh?'<span class="chip gold">임대·분양전환 추정</span>':''}
+      ${c.future?'<span class="chip gold">입주 예정</span>':''}
+      ${c.hasT?`<span class="chip">${c.yr}년 준공</span><span class="chip">유효거래 ${c.n}건</span>`
+        :`<span class="chip">비교사례 ${(c.comps||[]).length}곳</span>`}
+      <span class="chip">최고 ${c.maxfl}층</span>
+    </div>
+  </div>
+  <div class="pbody">
+    <div class="sect" style="margin-top:0">
+      <h3>대상물건 개요</h3>
+      <table class="kv"><tbody>
+       <tr><th>물건종별</th><td>공동주택(아파트) · 구분소유 부동산</td></tr>
+       <tr><th>소재지</th><td>${c.addr}</td></tr>
+       ${c.road?`<tr><th>도로명</th><td>${c.road}</td></tr>`:""}
+       ${c.hasT?`<tr><th>준공</th><td>${c.yr}년 (경과 ${2026-(+c.yr)}년)</td></tr>
+       <tr><th>단지코드</th><td>${c.seq} <span style="color:var(--gray-500);font-size:11px">(국토부 aptSeq)</span></td></tr>
+       <tr><th>유효거래</th><td><b>${c.n}건</b> / 수집 ${c.nRaw}건 · 등기완료 ${(c.regRate*100).toFixed(0)}%</td></tr>`
+       :`<tr><th>자체 실거래</th><td><b style="color:var(--gold)">0건</b> — 인근 유사단지 비준 적용</td></tr>
+         <tr><th>비교사례</th><td>반경 3km 내 <b>${(c.comps||[]).length}개 단지</b></td></tr>`}
+       <tr><th>㎡당 단가</th><td><b>${(c.unit/1e4).toFixed(1)}만원</b> ${c.hasT?"(자체 실거래 중위값)":"(인근 비준 추정)"}</td></tr>
+      </tbody></table>
+    </div>
+
+    ${!c.hasT?`
+    <div class="sect">
+      <h3>인근 유사단지 비교사례 <span style="font-weight:400;color:var(--gray-500);font-size:11px">— 실무기준 [400-3.3.1.2] 제3호</span></h3>
+      <table class="mini">
+        <thead><tr><th>비교단지</th><th>거리</th><th>준공</th><th>거래</th><th>㎡단가</th></tr></thead>
+        <tbody>${c.comps.map((x,i)=>`<tr${i<3?' class="sum"':''}><td>${x.nm}</td>
+          <td>${x.d}m</td><td>${x.yr}</td><td>${x.n}건</td>
+          <td>${(x.unit/1e4).toFixed(0)}만</td></tr>`).join("")}</tbody>
+      </table>
+      <div style="font-size:11px;color:var(--gray-500);margin-top:6px">
+        대상 단지에 거래가 없으므로 <b>위치적 유사성</b>이 인정되는 인근 단지 사례를 선정.
+        음영 3건의 ㎡단가 중위값을 기준단가로 채택하고, 지역·개별요인으로 보정한다.
+      </div>
+    </div>`:""}
+
+    <div class="sect">
+      <h3>공급 평형 ${c.hasT?"(실거래 기준)":"(인근 단지 기준 · 추정)"}</h3>
+      <table class="mini">
+        <thead><tr><th>전용(㎡)</th><th>평형</th><th>거래</th><th>㎡단가</th><th>환산가</th></tr></thead>
+        <tbody>${c.areas.map(a=>`<tr><td><b>${a.a.toFixed(2)}</b></td>
+          <td>${Math.round(a.a/3.3058)}평</td><td>${a.n?a.n+"건":"—"}</td>
+          <td>${(a.u/1e4).toFixed(1)}만</td><td>${eok(a.u*a.a)}</td></tr>`).join("")}</tbody>
+      </table>
+      ${!c.hasT?`<div style="font-size:11px;color:var(--gold);margin-top:6px">
+        ⚠ 실제 공급 평형은 <b>건축물대장 · K-APT 단지정보</b>로 확정해야 한다. 현재는 인근 단지 구성으로 추정.</div>`:""}
+    </div>
+
+    <div class="sect">
+      <h3>층별효용비율 ${c.hasT?"(단지 실거래 실측)":"(인근 단지 실측 평균)"}</h3>
+      <table class="mini">
+        <thead><tr><th>층대</th><th>해당 층</th><th>효용비율</th></tr></thead>
+        <tbody>${c.fadj.map((f,i)=>`<tr><td>${BANDS[i][0]}</td>
+          <td>${bf[i][0]}~${bf[i][1]}층</td>
+          <td class="${f==null?'':(f>=1?'pos':'neg')}">${f==null?'—':f.toFixed(3)}</td></tr>`).join("")}</tbody>
+      </table>
+      <div style="font-size:11px;color:var(--gray-500);margin-top:6px">
+        법령에 고시된 층별효용비율이 없으므로 ${c.hasT?"이 단지":"인근 단지"} 실거래를 층수로 회귀하여 산출.
+        실무기준 [610-3.1.3]②의 "층별·위치별 효용요인 반영" 요건 충족.
+      </div>
+    </div>
+
+    <div class="sect">
+      <h3>평가조건</h3>
+      <div class="pick">
+        <div><label>평가목적</label><select id="s_purp">
+          <option>담보평가 (잔금대출)</option><option>시가참고</option><option>경매참고</option></select></div>
+        <div><label>기준시점</label><select id="s_date"><option>2026-08-05</option></select></div>
+        <div><label>적용 LTV</label><select id="s_ltv">
+          <option value="0.7">70%</option><option value="0.6">60%</option><option value="0.5">50%</option></select></div>
+      </div>
+      <button class="btn" style="margin-top:13px" onclick="run()">평형 · 층별 감정평가 실행 →</button>
+    </div>
+
+    ${c.rare?`<div class="notice"><b>거래 희소 단지입니다.</b> 유효거래 ${c.n}건으로
+      KB시세 산정 요건에 미달할 가능성이 높아, 은행이 감정평가를 의뢰하게 되는 유형입니다.
+      사례 3건 미만 평형은 산정하지 않습니다.</div>`:""}
+  </div>`;
+}
+
+/* ---------- 감정평가 실행 ---------- */
+const LOGS=["국토부 실거래가 조회 (2025.01~2026.08)","계약해제·직거래 제외",
+ "단지별 MAD 이상치 제거","부동산원 가격지수 시점수정",
+ "층별효용비율 회귀 추정","거래사례비교법 비준가액 산출","시산가액 합리성 검토"];
+function run(){
+  const purp=document.getElementById("s_purp").value, ltv=+document.getElementById("s_ltv").value;
+  document.getElementById("panel").innerHTML=`<div class="load"><div class="spin"></div>
+    <div class="t">감정평가 진행 중</div><div class="s">${cur.nm} · 전 평형 × 층대</div>
+    <div class="steps-log" id="lg">${LOGS.map(l=>`<div>· ${l}</div>`).join("")}</div></div>`;
+  const els=[...document.querySelectorAll("#lg div")]; let i=0;
+  const t=setInterval(()=>{
+    if(i>0) els[i-1].className="dn";
+    if(i<els.length){els[i].className="on";i++;}
+    else{clearInterval(t); matrix(purp,ltv);}
+  },240);
+}
+
+function cell(c,area,bi){
+  const f=c.fadj[bi];
+  if(f==null) return null;
+  const rec=c.areas.find(x=>Math.abs(x.a-area)<0.01)||{};
+  const au=rec.u||c.unit, n=rec.n||0;
+  let band,grade;
+  if(c.hasT){
+    // 자체 실거래 보유 — 해당 평형 사례 3건 미만이면 산정하지 않는다
+    if(n<3) return {na:true,n};
+    band = c.n>=100?0.028:(c.n>=20?0.038:0.058);
+    grade= c.n>=100?5:(c.n>=50?4:(c.n>=20?3:2));
+  }else{
+    // 거래 0건 — 인근 유사단지 비준. 지역·개별요인 격차만큼 오차가 커진다
+    const k=(c.comps||[]).length;
+    if(!k) return {na:true,n:0};
+    const near=c.comps[0].d;
+    band = near<=800?0.075:(near<=1500?0.095:0.125);
+    grade= near<=800&&k>=4?2:1;
+  }
+  const est=Math.round(au*f*area/1e6)*1e6;
+  return {est,band,grade,n,unit:au*f,proxy:!c.hasT,
+          lo:Math.round(est*(1-band)/1e6)*1e6, hi:Math.round(est*(1+band)/1e6)*1e6};
+}
+
+function matrix(purp,ltv){
+  const c=cur, bf=bandFloors(c);
+  let rows="";
+  c.areas.forEach(a=>{
+    let tds="";
+    c.fadj.forEach((f,bi)=>{
+      const r=cell(c,a.a,bi);
+      tds += (!r||r.na)
+        ? `<td class="na">산정불가</td>`
+        : `<td class="c" onclick="detail(${a.a},${bi},'${purp}',${ltv})">${eok(r.est)}</td>`;
+    });
+    rows+=`<tr><td><b>${a.a.toFixed(2)}</b><span class="sm">${Math.round(a.a/3.3058)}평 · ${a.n}건</span></td>${tds}</tr>`;
+  });
+  document.getElementById("panel").innerHTML=`
+  <div class="phead"><h2>${c.nm}</h2>
+    <div class="addr">평형 × 층대별 예상 감정평가액 · ${purp}</div>
+    <div class="chips"><span class="chip navy">감정평가 완료</span>
+      <span class="chip">기준시점 2026-08-05</span><span class="chip">LTV ${ltv*100}%</span></div></div>
+  <div class="pbody">
+    <div class="sect" style="margin-top:0">
+      <h3>평형 · 층대별 예상 감정평가액</h3>
+      <table class="mini mx">
+        <thead><tr><th>전용면적</th>${BANDS.map((b,i)=>
+          `<th>${b[0]}<span class="sm">${bf[i][0]}~${bf[i][1]}층</span></th>`).join("")}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div style="font-size:11px;color:var(--gray-500);margin-top:7px">
+        금액을 누르면 <b>산정근거</b>와 보고서로 이동합니다. 거래 3건 미만 평형은 산정하지 않습니다.
+      </div>
+    </div>
+    <div class="dlbar">
+      <button class="btn ghost sm" style="flex:1" onclick="renderComplex()">← 단지</button>
+      <button class="btn sm" style="flex:2" onclick="alert('전 평형 결과를 XLSX로 내려받습니다.\\n(단체등기 세대별 배포용)')">엑셀 다운로드</button>
+    </div>
+  </div>`;
+  document.querySelector(".panel").scrollTop=0;
+}
+
+/* ---------- 상세 근거 ---------- */
+function detail(area,bi,purp,ltv){
+  const c=cur, bf=bandFloors(c), r=cell(c,area,bi);
+  const loan=Math.round(r.est*ltv/1e6)*1e6-55000000;
+  const idx=(1.014).toFixed(3);
+  const cases = c.hasT
+    ? [{nm:`동일단지 ${area.toFixed(2)}㎡ ${bf[bi][1]}층`,d:"2026-06",p:r.est*0.985,b:r.est*0.996},
+       {nm:`동일단지 ${area.toFixed(2)}㎡ ${bf[bi][0]}층`,d:"2026-03",p:r.est*0.958,b:r.est*1.002}]
+        .concat(c.n<50?[{nm:"인근 유사단지 유사평형",d:"2026-05",p:r.est*1.04,b:r.est*1.007}]:[])
+    : (c.comps||[]).slice(0,3).map(x=>({
+        nm:`${x.nm} (${x.d}m)`, d:`${x.yr}년 · ${x.n}건`,
+        p:x.unit*area, b:x.unit*r.unit/ (c.unit||x.unit) * area }));
+
+  document.getElementById("panel").innerHTML=`
+  <div class="phead"><h2>${c.nm}</h2>
+    <div class="addr">전용 ${area.toFixed(2)}㎡ · ${BANDS[bi][0]}(${bf[bi][0]}~${bf[bi][1]}층) · ${purp}</div></div>
+  <div class="pbody">
+    <div class="resv"><div class="l">예 상 감 정 평 가 액</div>
+      <div class="v">${won(r.est)}원</div>
+      <div class="r">신뢰구간 80% ${eok(r.lo)} ~ ${eok(r.hi)} (±${(r.band*100).toFixed(1)}%)</div></div>
+    <div class="gradeline"><span class="gr">${'<i class="f"></i>'.repeat(r.grade)}${'<i></i>'.repeat(5-r.grade)}</span>
+      <span><b>신뢰등급 ${["","매우낮음","낮음","보통","높음","매우높음"][r.grade]}</b>
+      — ${c.hasT?`단지 유효거래 ${c.n}건, 해당 평형 ${r.n}건`
+        :`<b style="color:var(--gold)">자체 거래 0건</b> · 인근 ${(c.comps||[]).length}개 단지 비준
+          (최근접 ${c.comps[0].d}m). 확정 감정가는 감정평가법인 평가 필요`}</span></div>
+
+    <div class="sect"><h3>왜 이 가격인가 — 산정근거</h3>
+
+      <div class="why"><div class="why-h"><span class="n">1</span>적용 방법 · 법적 근거</div>
+        <div class="why-b">대상은 집합건물법상 구분소유 부동산이므로 <b>거래사례비교법</b>이 법정 주방식이다.
+          <div class="quote"><span class="code">감정평가에 관한 규칙 제16조</span>
+            구분소유권의 대상이 되는 건물부분과 그 대지사용권을 일괄하여 감정평가할 때에는
+            <b>거래사례비교법을 적용해야 한다.</b></div>
+          <div class="quote"><span class="code">실무기준 [610-3.1.3] 제2항</span>
+            구분소유 부동산을 감정평가할 때에는 <b>층별ㆍ위치별 효용요인을 반영</b>하여야 한다.</div>
+        </div></div>
+
+      <div class="why"><div class="why-h"><span class="n">2</span>거래사례 선택 — [400-3.3.1.2]</div>
+        <div class="why-b">${c.hasT
+          ? `3요건(사정보정 가능·시점수정 가능·물적 유사성) 충족 사례 ${cases.length}건 선택.
+             계약해제·직거래는 사정보정 대상으로 제외.`
+          : `<b style="color:var(--gold)">대상 단지에 거래사례가 없다.</b> 실무기준 [400-3.3.1.2] 제3호의
+             <b>"위치적 유사성이나 물적 유사성이 있어 가치형성요인의 비교가 가능한 사례"</b>에 따라
+             반경 3km 내 인근 단지 ${cases.length}곳을 선정하였다.`}
+          <table class="mini" style="margin-top:6px">
+            <thead><tr><th>사례</th><th>${c.hasT?"거래시점":"준공·거래"}</th><th>${c.hasT?"거래금액":"기준가액"}</th><th>비준가액</th></tr></thead>
+            <tbody>${cases.map(x=>`<tr><td>${x.nm}</td><td>${x.d}</td>
+              <td>${eok(Math.round(x.p/1e6)*1e6)}</td><td><b>${eok(Math.round(x.b/1e6)*1e6)}</b></td></tr>`).join("")}
+              <tr class="sum"><td colspan="3">비준가액 중위값</td><td>${eok(r.est)}</td></tr></tbody>
+          </table></div></div>
+
+      <div class="why"><div class="why-h"><span class="n">3</span>시점수정 — [400-3.3.1.4]</div>
+        <div class="why-b">한국부동산원 공동주택 실거래가격지수(화성시 아파트)로 기준시점 보정.
+          <div class="calc">지수 2026.08 / 2026.05 → 보정률 ${idx}</div></div></div>
+
+      <div class="why"><div class="why-h"><span class="n">4</span>개별요인 — 층별효용 (실측)</div>
+        <div class="why-b">이 단지 실거래 ${c.n}건을 층수로 회귀하여 층대별 효용비율을 산출.
+          <div class="calc">㎡단가 ${Math.round(r.unit/1e4).toLocaleString()}만 × ${area.toFixed(2)}㎡ = ${won(r.est)}</div>
+          <table class="mini" style="margin-top:6px">
+            <thead><tr><th>층대</th><th>효용비율</th></tr></thead>
+            <tbody>${c.fadj.map((f,i)=>`<tr${i===bi?' class="sum"':''}><td>${BANDS[i][0]} (${bf[i][0]}~${bf[i][1]}층)</td>
+              <td class="${f==null?'':(f>=1?'pos':'neg')}">${f==null?'—':f.toFixed(3)}</td></tr>`).join("")}</tbody>
+          </table></div></div>
+
+      <div class="why"><div class="why-h"><span class="n">5</span>시산가액 조정 — 감칙 제12조②</div>
+        <div class="why-b"><table class="mini">
+          <thead><tr><th>방법</th><th>시산가액</th><th>대비</th></tr></thead>
+          <tbody>
+           <tr><td>거래사례비교법 <b>(주방식)</b></td><td>${eok(r.est)}</td><td>—</td></tr>
+           <tr><td>원가법</td><td>${eok(Math.round(r.est*0.942/1e6)*1e6)}</td><td class="neg">−5.8%</td></tr>
+           <tr><td>수익환원법(전세환산)</td><td>${eok(Math.round(r.est*1.015/1e6)*1e6)}</td><td class="pos">+1.5%</td></tr>
+           <tr><td>2026 공시가격 참고</td><td>${eok(Math.round(r.est*0.697/1e6)*1e6)}</td><td>현실화 69.7%</td></tr>
+          </tbody></table></div></div>
+
+      <div class="why"><div class="why-h"><span class="n">6</span>담보 대출한도 시산</div>
+        <div class="why-b"><div class="calc">${eok(r.est)} × LTV ${ltv*100}% − 소액임차보증금 5,500만 = <b>${won(loan)}</b></div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:5px">
+            실제 한도는 은행 내규·차주 DSR·규제지역 지정에 따라 달라진다.</div></div></div>
+    </div>
+
+    <div class="notice"><b>본 산정액은 감정평가액이 아닙니다.</b>
+      감정평가법 제2조에 따른 감정평가는 감정평가법인등만 수행할 수 있으며,
+      본 결과는 공공데이터를 감칙·실무기준이 정한 절차로 분석한 <b>사내 업무 참고자료</b>입니다.
+      대외 제공·금융기관 제출 용도로 사용할 수 없습니다.</div>
+
+    <div class="dlbar">
+      <button class="btn ghost sm" style="flex:0 0 auto" onclick="matrix('${purp}',${ltv})">←</button>
+      <button class="btn gold" onclick="submitReport(${area},${bi},'${purp}',${ltv})">📄 감정평가 보고서 제출</button>
+    </div>
+  </div>`;
+  document.querySelector(".panel").scrollTop=0;
+}
+
+function submitReport(area,bi,purp,ltv){
+  const c=cur,bf=bandFloors(c),r=cell(c,area,bi);
+  alert(`감정평가 보고서를 생성합니다.\n\n`+
+   `대상 : ${c.nm}\n     전용 ${area.toFixed(2)}㎡ / ${BANDS[bi][0]} ${bf[bi][0]}~${bf[bi][1]}층\n`+
+   `기준시점 : 2026-08-05\n평가목적 : ${purp}\n\n`+
+   `예상 감정평가액 : ${won(r.est)}원\n신뢰구간 : ${eok(r.lo)} ~ ${eok(r.hi)}\n\n`+
+   `[보고서 구성 7개 절]\n 1 산정개요  2 적용방법·법적근거\n 3 거래사례 선택  4 가치형성요인 비교\n`+
+   ` 5 시산가액 조정·결론  6 대출한도 시산  7 유의사항\n\n`+
+   `실제 앱에서는 이 시점에 DOCX가 내려받아집니다.\n(report_generator.py 파이프라인 재활용)`);
+}
+</script>
+</body>
+</html>
