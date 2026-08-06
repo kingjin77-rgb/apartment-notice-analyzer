@@ -1,38 +1,12 @@
 <title>동탄 파라곤3차 분석</title>
 <style>
   :root{
-    --paper:#eef0ee; --card:#ffffff; --ink:#1b2420; --ink-soft:#55635c;
-    --line:#d3d8d2; --line-strong:#b9c1b8;
-    --accent:#1f5c4a; --accent-soft:#e3ece8;
-    --flag:#8c2f2f; --flag-soft:#f4e4e2;
-    --gold:#a8752e; --gold-soft:#f1e6d4;
-    --shadow: 0 1px 2px rgba(20,24,20,.06), 0 8px 24px -12px rgba(20,24,20,.18);
-  }
-  @media (prefers-color-scheme: dark){
-    :root{
-      --paper:#141815; --card:#1b211d; --ink:#e7eae5; --ink-soft:#97a29a;
-      --line:#2b332e; --line-strong:#3a443d;
-      --accent:#4fbe9c; --accent-soft:#1c2c26;
-      --flag:#e2726b; --flag-soft:#2e1c1a;
-      --gold:#d9a44e; --gold-soft:#2b2318;
-      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.55);
-    }
-  }
-  :root[data-theme="dark"]{
-    --paper:#141815; --card:#1b211d; --ink:#e7eae5; --ink-soft:#97a29a;
-    --line:#2b332e; --line-strong:#3a443d;
-    --accent:#4fbe9c; --accent-soft:#1c2c26;
-    --flag:#e2726b; --flag-soft:#2e1c1a;
-    --gold:#d9a44e; --gold-soft:#2b2318;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.55);
-  }
-  :root[data-theme="light"]{
-    --paper:#eef0ee; --card:#ffffff; --ink:#1b2420; --ink-soft:#55635c;
-    --line:#d3d8d2; --line-strong:#b9c1b8;
-    --accent:#1f5c4a; --accent-soft:#e3ece8;
-    --flag:#8c2f2f; --flag-soft:#f4e4e2;
-    --gold:#a8752e; --gold-soft:#f1e6d4;
-    --shadow: 0 1px 2px rgba(20,24,20,.06), 0 8px 24px -12px rgba(20,24,20,.18);
+    --paper:#ffffff; --tint:#f5f8f6; --card:#ffffff; --ink:#14201b; --ink-soft:#5b6862;
+    --line:#dde3de; --line-strong:#bcc6bf;
+    --accent:#1f5c4a; --accent-soft:#eef4f1;
+    --flag:#8c2f2f; --flag-soft:#fbf1ef;
+    --gold:#8a6122; --gold-soft:#f9f3e6;
+    --shadow: none;
   }
 
   *{box-sizing:border-box;}
@@ -109,7 +83,7 @@
   .exhibit-head{
     display:flex; align-items:center; justify-content:space-between; gap:12px;
     padding:14px 20px; border-bottom:1px solid var(--line);
-    background:var(--paper);
+    background:var(--tint);
   }
   .exhibit-tag{
     font-size:13px; letter-spacing:.02em; color:var(--ink-soft); font-weight:700;
@@ -139,7 +113,7 @@
   .exhibit-note strong{ color:var(--ink); font-weight:700; }
 
   .exhibit-figure{
-    margin:14px 0 0; border:1px solid var(--line); border-radius:2px; overflow:hidden; background:var(--paper);
+    margin:14px 0 0; border:1px solid var(--line); border-radius:2px; overflow:hidden; background:var(--tint);
   }
   .exhibit-figure img{ display:block; width:100%; height:auto; }
   .exhibit-figure figcaption{
@@ -147,14 +121,14 @@
   }
   .figure-missing{
     margin:14px 0 0; border:1px dashed var(--line-strong); border-radius:2px;
-    padding:14px 16px; font-size:13px; color:var(--ink-soft); background:var(--paper);
+    padding:14px 16px; font-size:13px; color:var(--ink-soft); background:var(--tint);
   }
 
   /* ---------- 비교표 ---------- */
   .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:2px; box-shadow:var(--shadow); }
   table{ border-collapse:collapse; width:100%; min-width:640px; background:var(--card); font-size:14.5px; }
   thead th{
-    text-align:left; padding:12px 16px; background:var(--paper);
+    text-align:left; padding:12px 16px; background:var(--tint);
     border-bottom:1px solid var(--line-strong); font-size:12.5px;
     letter-spacing:.02em; color:var(--ink-soft); font-weight:700;
   }
@@ -216,8 +190,21 @@
   }
 
   @media print{
-    body{ background:#fff; }
+    @page{ size:A4; margin:14mm 12mm; }
+    html,body{ background:#fff !important; }
+    body{ font-size:10.5pt; line-height:1.6; }
+    .sheet{ max-width:none; padding:0; }
     .memo-head::before{ display:none; }
+    section{ break-before:page; margin-top:0; padding-top:4mm; }
+    section:first-of-type{ break-before:auto; }
+    .sec-label{ break-after:avoid; }
+    .table-wrap{ break-inside:avoid; overflow:visible; }
+    table{ min-width:0; width:100%; }
+    thead{ display:table-header-group; }
+    tr, .exhibit, .duel .card, .ask-item, .callout, blockquote, .exhibit-figure{ break-inside:avoid; }
+    .exhibit-figure img{ max-height:110mm; object-fit:contain; }
+    *{ box-shadow:none !important; }
+    a{ color:inherit; }
   }
 </style>
 
