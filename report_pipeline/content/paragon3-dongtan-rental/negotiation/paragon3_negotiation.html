@@ -1,0 +1,750 @@
+<title>동탄 파라곤3차 — 임차권 양도 협상준비자료</title>
+<style>
+  :root{
+    --paper:#eef0ee; --card:#ffffff; --ink:#1b2420; --ink-soft:#55635c;
+    --line:#d3d8d2; --line-strong:#b9c1b8;
+    --accent:#1f5c4a; --accent-soft:#e3ece8;
+    --flag:#8c2f2f; --flag-soft:#f4e4e2;
+    --gold:#a8752e; --gold-soft:#f1e6d4;
+    --shadow: 0 1px 2px rgba(20,24,20,.06), 0 8px 24px -12px rgba(20,24,20,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#141815; --card:#1b211d; --ink:#e7eae5; --ink-soft:#97a29a;
+      --line:#2b332e; --line-strong:#3a443d;
+      --accent:#4fbe9c; --accent-soft:#1c2c26;
+      --flag:#e2726b; --flag-soft:#2e1c1a;
+      --gold:#d9a44e; --gold-soft:#2b2318;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.55);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#141815; --card:#1b211d; --ink:#e7eae5; --ink-soft:#97a29a;
+    --line:#2b332e; --line-strong:#3a443d;
+    --accent:#4fbe9c; --accent-soft:#1c2c26;
+    --flag:#e2726b; --flag-soft:#2e1c1a;
+    --gold:#d9a44e; --gold-soft:#2b2318;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.55);
+  }
+  :root[data-theme="light"]{
+    --paper:#eef0ee; --card:#ffffff; --ink:#1b2420; --ink-soft:#55635c;
+    --line:#d3d8d2; --line-strong:#b9c1b8;
+    --accent:#1f5c4a; --accent-soft:#e3ece8;
+    --flag:#8c2f2f; --flag-soft:#f4e4e2;
+    --gold:#a8752e; --gold-soft:#f1e6d4;
+    --shadow: 0 1px 2px rgba(20,24,20,.06), 0 8px 24px -12px rgba(20,24,20,.18);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:"맑은 고딕","Malgun Gothic","Apple SD Gothic Neo",-apple-system,sans-serif;
+    line-height:1.75; font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--accent); color:var(--card); }
+
+  .sheet{ max-width:920px; margin:0 auto; padding:56px 28px 120px; }
+
+  /* ---------- 상단 메모 헤더 ---------- */
+  .memo-head{
+    border:1px solid var(--line-strong);
+    background:var(--card); border-radius:2px;
+    box-shadow:var(--shadow);
+    padding:32px 36px 28px;
+    position:relative;
+  }
+  .memo-head::before{
+    content:"대외비 · 내부 협상준비자료";
+    position:absolute; top:16px; right:36px;
+    font-size:11.5px; letter-spacing:.06em; color:var(--flag);
+    border:1px solid var(--flag); padding:3px 10px; border-radius:2px;
+    background:var(--flag-soft); font-weight:600;
+  }
+  .eyebrow{
+    font-size:12.5px; letter-spacing:.06em; color:var(--ink-soft);
+    margin:0 0 10px; font-weight:600;
+  }
+  h1{
+    font-weight:800; font-size:clamp(24px,4vw,30px);
+    margin:0 0 6px; text-wrap:balance; letter-spacing:-.01em;
+  }
+  .subtitle{ color:var(--ink-soft); font-size:15.5px; margin:0 0 22px; }
+  .memo-meta{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+    gap:14px 24px; border-top:1px solid var(--line); padding-top:18px;
+    font-size:14.5px;
+  }
+  .memo-meta dt{ font-size:12px; letter-spacing:.04em; color:var(--ink-soft); margin-bottom:3px;}
+  .memo-meta dd{ margin:0; font-weight:700; }
+
+  /* ---------- 섹션 골격 ---------- */
+  section{ margin-top:46px; }
+  .sec-label{
+    display:flex; align-items:baseline; gap:12px; margin-bottom:16px;
+  }
+  .sec-num{
+    font-weight:800; font-size:14.5px;
+    color:var(--accent); border:1px solid var(--accent); border-radius:50%;
+    width:26px; height:26px; display:flex; align-items:center; justify-content:center;
+    flex:none; background:var(--accent-soft);
+  }
+  .sec-title{ font-size:19.5px; font-weight:800; margin:0; letter-spacing:-.01em; }
+  .sec-sub{ color:var(--ink-soft); font-size:14.5px; margin:2px 0 0; }
+
+  p{ margin:0 0 14px; }
+  .lead{
+    background:var(--card); border:1px solid var(--line);
+    border-radius:2px; padding:22px 26px; box-shadow:var(--shadow);
+    font-size:16px;
+  }
+  .lead strong{ color:var(--accent); font-weight:700; }
+
+  /* ---------- 자료 카드 ---------- */
+  .exhibit{
+    background:var(--card); border:1px solid var(--line); border-radius:2px;
+    box-shadow:var(--shadow); overflow:hidden; margin-bottom:18px;
+  }
+  .exhibit-head{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:14px 20px; border-bottom:1px solid var(--line);
+    background:var(--paper);
+  }
+  .exhibit-tag{
+    font-size:13px; letter-spacing:.02em; color:var(--ink-soft); font-weight:700;
+  }
+  .pill{
+    font-size:12.5px; font-weight:700; padding:3px 10px; border-radius:99px;
+    letter-spacing:.01em;
+  }
+  .pill.deny{ background:var(--flag-soft); color:var(--flag); }
+  .pill.allow{ background:var(--accent-soft); color:var(--accent); }
+  .pill.contradiction{ background:var(--gold-soft); color:var(--gold); border:1px solid var(--gold); }
+
+  .exhibit-body{ padding:20px 22px; }
+  .exhibit-name{ font-weight:800; font-size:16.5px; margin:0 0 2px; }
+  .exhibit-type{ color:var(--ink-soft); font-size:13.5px; margin:0 0 14px; }
+
+  blockquote.clause{
+    margin:0; padding:14px 18px; border-left:3px solid var(--flag);
+    background:var(--flag-soft); border-radius:0 2px 2px 0;
+    font-size:15.5px; color:var(--ink); line-height:1.85;
+  }
+  blockquote.clause.allow{ border-left-color:var(--accent); background:var(--accent-soft); }
+  .clause-src{
+    margin-top:8px; font-size:13px; color:var(--ink-soft);
+  }
+  .exhibit-note{ margin-top:12px; font-size:14.5px; color:var(--ink); }
+  .exhibit-note strong{ color:var(--ink); font-weight:700; }
+
+  .exhibit-figure{
+    margin:14px 0 0; border:1px solid var(--line); border-radius:2px; overflow:hidden; background:var(--paper);
+  }
+  .exhibit-figure img{ display:block; width:100%; height:auto; }
+  .exhibit-figure figcaption{
+    padding:8px 14px; font-size:12.5px; color:var(--ink-soft); border-top:1px solid var(--line);
+  }
+  .figure-missing{
+    margin:14px 0 0; border:1px dashed var(--line-strong); border-radius:2px;
+    padding:14px 16px; font-size:13px; color:var(--ink-soft); background:var(--paper);
+  }
+
+  /* ---------- 비교표 ---------- */
+  .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:2px; box-shadow:var(--shadow); }
+  table{ border-collapse:collapse; width:100%; min-width:640px; background:var(--card); font-size:14.5px; }
+  thead th{
+    text-align:left; padding:12px 16px; background:var(--paper);
+    border-bottom:1px solid var(--line-strong); font-size:12.5px;
+    letter-spacing:.02em; color:var(--ink-soft); font-weight:700;
+  }
+  tbody td{ padding:13px 16px; border-bottom:1px solid var(--line); vertical-align:top; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr.target td{ background:var(--flag-soft); }
+  tbody tr.target td:first-child{ font-weight:700; border-left:3px solid var(--flag); }
+  td.num, th.num{ font-variant-numeric:tabular-nums; }
+  .src-note{ font-size:12px; color:var(--ink-soft); }
+
+  /* ---------- 반론/재반박 ---------- */
+  .duel{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:680px){ .duel{ grid-template-columns:1fr; } }
+  .duel .card{
+    background:var(--card); border:1px solid var(--line); border-radius:2px;
+    box-shadow:var(--shadow); padding:20px 22px;
+  }
+  .duel .card.them{ border-top:3px solid var(--flag); }
+  .duel .card.us{ border-top:3px solid var(--accent); }
+  .duel h4{ margin:0 0 10px; font-size:13.5px; letter-spacing:.02em; color:var(--ink-soft); font-weight:700;}
+  .duel .card.them h4{ color:var(--flag); }
+  .duel .card.us h4{ color:var(--accent); }
+  .duel p{ font-size:14.5px; margin-bottom:10px; }
+  .duel p:last-child{ margin-bottom:0; }
+
+  /* ---------- 요청안 목록 ---------- */
+  .ask{
+    background:var(--card); border:1px solid var(--line); border-radius:2px;
+    box-shadow:var(--shadow); padding:6px 0;
+  }
+  .ask-item{
+    display:flex; gap:16px; padding:18px 24px;
+    border-bottom:1px solid var(--line);
+  }
+  .ask-item:last-child{ border-bottom:none; }
+  .ask-rank{
+    font-weight:800; font-size:20px;
+    color:var(--accent); flex:none; width:30px;
+  }
+  .ask-item h5{ margin:0 0 6px; font-size:16px; font-weight:700; }
+  .ask-item p{ margin:0; font-size:14.5px; color:var(--ink-soft); }
+  .ask-item .tag{
+    display:inline-block; margin-top:8px; font-size:12.5px;
+    color:var(--accent); background:var(--accent-soft); padding:2px 9px; border-radius:99px; font-weight:600;
+  }
+
+  /* ---------- 확인필요 안내 ---------- */
+  .callout{
+    border:1px solid var(--gold); background:var(--gold-soft);
+    border-radius:2px; padding:18px 22px; font-size:14.5px;
+  }
+  .callout .callout-title{
+    font-weight:800; color:var(--gold); margin-bottom:8px; font-size:14.5px;
+  }
+
+  footer{
+    margin-top:56px; padding-top:20px; border-top:1px solid var(--line);
+    font-size:13px; color:var(--ink-soft); display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  }
+
+  @media print{
+    body{ background:#fff; }
+    .memo-head::before{ display:none; }
+  }
+</style>
+
+<div class="sheet">
+
+  <div class="memo-head">
+    <p class="eyebrow">협상 준비자료 · 초안</p>
+    <h1>동탄 파라곤3차 — 임차권 양도(명의변경) 협상준비자료</h1>
+    <p class="subtitle">사업주체(㈜바우하우스)와의 협의를 위해 원문 조항, 사업주체 배포자료, 타 사업장 사례를 대조하여 정리함.</p>
+    <dl class="memo-meta">
+      <div><dt>대상 물건</dt><dd>동탄 파라곤3차 (공공지원민간임대주택)</dd></div>
+      <div><dt>사업주체</dt><dd>㈜바우하우스 · 시공 ㈜라인산업</dd></div>
+      <div><dt>쟁점</dt><dd>임차권 양도(명의변경) 전면 금지 조항</dd></div>
+      <div><dt>검토기준일</dt><dd>2026.08.06</dd></div>
+    </dl>
+  </div>
+
+  <section>
+    <div class="sec-label">
+      <span class="sec-num">1</span>
+      <div>
+        <p class="sec-title">쟁점 요약</p>
+      </div>
+    </div>
+    <div class="lead">
+      <p>
+        파라곤3차는 <strong>10년 임대의무기간</strong> 종료 후 확정분양가로 분양전환되는 구조다. 모집공고문
+        원문은 임차권 양도·전대를 <strong>입주 전후를 불문하고 전면 금지</strong>하고, 위반 시 임차권 박탈과
+        위약벌을 규정한다.
+      </p>
+      <p>
+        이 조항대로라면 계약금과 중도금을 납입한 임차인은 10년간 계약상 지위를 처분할 수 없다. 전근·질병 등
+        사정이 생겨도 회수 수단이 없다. <strong>확정분양가 구조에서 양도가 막히면 자금이 장기간 묶인다.</strong>
+      </p>
+      <p>
+        그런데 실제 운용은 다르다. 안내자료에는 명의변경이 총 2회 가능하다고 되어 있고(자료2), 홍보자료에는
+        "전매가능"이 계약자 혜택으로 표기되어 있다(자료3). 계약자 진술도 같은 수치를 말한다(자료4).
+        <strong>공고문·안내자료·홍보자료가 서로 다른 내용을 담고 있다는 것이 이번 사안의 핵심이다.</strong>
+      </p>
+      <p>
+        다만 자료2부터 자료6까지는 모두 원 출처를 확인하지 못했다. 제7절에 확인 상태를 정리했다.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">
+      <span class="sec-num">2</span>
+      <div>
+        <p class="sec-title">법적 근거 — 명의변경 제한은 법정사항이 아니라 사업주체 재량 사항</p>
+      </div>
+    </div>
+    <div class="lead">
+      <p><strong>결론부터</strong></p>
+      <p>
+        명의변경(임차권 양도) 허용 여부와 횟수는 법령이 정한 사항이 아니다. <strong>임대사업자가 결정하는
+        사항이다.</strong> 근거는 다음 세 가지이며, 모두 1차 자료로 확인했다.
+      </p>
+
+      <p style="margin-top:18px;"><strong>근거 1 — 법령에 양도 횟수를 제한하는 조항이 없다</strong></p>
+      <p>
+        「민간임대주택에 관한 특별법」 및 동법 시행령에서 임차인의 임차권 양도 횟수를 제한하는 명문 조항은
+        확인되지 않았다. 양도·전대를 금지하고 위반 시 형사처벌하는 규정은 「공공주택 특별법」 제49조의4로,
+        이는 <strong>공공임대주택(LH·지방공사 등)에 적용되는 조항</strong>이다. 공공지원민간임대주택은 여기에
+        해당하지 않는다.
+      </p>
+
+      <p style="margin-top:18px;"><strong>근거 2 — 두 사업장 공고문 문구가 같은데 운용은 다르다</strong></p>
+      <p>
+        파라곤3차와 하이브엘의 공식 모집공고문을 각각 직접 확보해 전수 대조했다.
+      </p>
+      <div class="table-wrap" style="margin:12px 0;">
+        <table>
+          <thead>
+            <tr><th>구분</th><th>동탄 파라곤3차</th><th>수지구청역 하이브엘</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>공고문 금지 조항</td>
+              <td>"관련 법령에서 허용되는 경우에도 불구하고 <strong>임대인의 동의 없이</strong> … 양도하거나 … 전대할 수 없습니다"</td>
+              <td>"관련법령에서 허용되는 경우에도 불구하고 <strong>임대사업자의 동의없이</strong> 임차권 양도 및 임대주택의 전대는 불가함"</td>
+            </tr>
+            <tr>
+              <td>공고문상 "명의변경" 표현</td>
+              <td class="num">0건 (전 36면)</td>
+              <td class="num">0건 (전 32면)</td>
+            </tr>
+            <tr>
+              <td>공고문상 허용 횟수 규정</td>
+              <td class="num">없음</td>
+              <td class="num">없음</td>
+            </tr>
+            <tr class="target">
+              <td>실제 운용</td>
+              <td>총 2회</td>
+              <td>입주 전 6회 + 입주 후 무제한</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        공고문 문구가 사실상 동일한데 실제 허용 횟수는 2회와 6회로 다르다. <strong>공고문이 같은데 결과가
+        다르다면, 그 차이를 만든 것은 법령이 아니라 임대사업자의 결정이다.</strong>
+      </p>
+
+      <p style="margin-top:18px;"><strong>근거 3 — 사업주체가 스스로 재량임을 문서에 밝혔다</strong></p>
+      <p>
+        파라곤3차 안내자료(자료3-1)의 비고란은 "임차 기간 중 전매 가능"이라고 적은 뒤,
+        <strong>"전매시점 사업주체 고지"</strong>라는 단서를 달았다. 전매 시점을 법령이 정하는 것이 아니라
+        사업주체가 정해 알린다는 뜻이다. 재량 사항임을 사업주체가 문서로 인정한 표현이다.
+      </p>
+      <p>
+        같은 문구는 임차인 입장에서는 문제이기도 하다. 전매 가능 시점이 사업주체의 일방적 고지에 달려 있어
+        임차인은 자금 회수 시점을 예측할 수 없다. <strong>재량의 근거이자, 동시에 그 재량이 임차인에게
+        불리하게 행사될 수 있다는 근거다.</strong>
+      </p>
+
+      <p style="margin-top:18px;"><strong>사업주체가 들 수 있는 반대 논거 (사전 인지용)</strong></p>
+      <p>
+        2014.11.11. 시행된 구 「임대주택법」 시행령 개정 당시, "주택기금 또는 공공택지가 지원된 민간
+        공공건설임대주택은 공공성으로 인해 입주자격·임대료·분양전환 절차가 엄격히 제한되므로 임차권 양도·전대는
+        순수 민간임대에 한정해 허용한다"는 정책 설명이 있었다(대한민국 정책브리핑,
+        korea.kr/news/policyNewsView.do?newsId=148787231). 다만 이는 현행 「민간임대주택에 관한 특별법」
+        시행(2015년) 이전의 구법 관련 설명이다. 그리고 파라곤3차 스스로 총 2회 허용을 운용 중이라는 사실과
+        배치된다.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">
+      <span class="sec-num">3</span>
+      <div>
+        <p class="sec-title">원문·자료 대조</p>
+        <p class="sec-sub">각 자료를 원문 그대로 인용하고 출처를 표기함</p>
+      </div>
+    </div>
+
+    <div class="exhibit">
+      <div class="exhibit-head">
+        <span class="exhibit-tag">자료1 · 임차인모집공고문 원문</span>
+        <span class="pill deny">전면 금지</span>
+      </div>
+      <div class="exhibit-body">
+        <p class="exhibit-name">동탄 파라곤3차</p>
+        <p class="exhibit-type">공공지원민간임대주택 · 1,247세대 · 임대의무기간 10년</p>
+        <blockquote class="clause">
+          "임차인은 「민간임대주택에 관한 특별법」 등 관련 법령에서 허용되는 경우에도 불구하고 임대인의 동의 없이
+          임차권을 다른 사람에게 양도하거나 임대주택을 다른 사람에게 전대할 수 없습니다. 입주 전·후를 불문하고
+          임대인의 동의 없이 무단으로 양도 및 전대한 경우 사업주체는 임차권을 박탈하고 기 납부한 보증금 중
+          임대차계약서에 따른 위약벌이 공제되며, 입주 후 양도 및 전대한 경우 임차인의 퇴거를 요청할 수 있으며,
+          임대차 계약해지로 인한 불이익(임대차계약에서 정해진 위약금징구 등)이 발생할 수 있으므로 유의하시기 바랍니다."
+        </blockquote>
+        <p class="clause-src">출처 — 임차인모집공고문(2026.04.16.자 변경공고) 3면, "임차권 양도 및 전대 금지" 항. 원문 PDF:
+          http://xn--3-3b6e97po2dc47ageg29d.com/data/gongo01.pdf</p>
+        <div class="exhibit-figure">
+          <img src="gongo_p3.png" alt="임차인모집공고문 3면 캡처" />
+          <figcaption>위 원문 PDF 3면을 직접 캡처함(2026.08.06 확인)</figcaption>
+        </div>
+        <p class="exhibit-note">
+          원문은 "관련 법령에서 허용되는 경우에도 불구하고"라고 적어, 법령상 양도가 허용되는 경우가 있음을
+          전제하고 있다. 금지의 직접 근거는 임대인(사업주체)의 동의 여부이며, 공고문에는 동의 기준·허용 횟수·
+          절차에 관한 규정이 없다.
+        </p>
+      </div>
+    </div>
+
+    <div class="exhibit">
+      <div class="exhibit-head">
+        <span class="exhibit-tag">자료2 · 계약금·해지 및 위약금 안내자료</span>
+        <span class="pill contradiction">출처 미상 — 확인 필요</span>
+      </div>
+      <div class="exhibit-body">
+        <p class="exhibit-name">동탄 파라곤3차 — 계약금 안내 및 해지·위약금 규정</p>
+        <p class="exhibit-type">82·108타입 계약금 안내표 및 "6. 해지 및 위약금 규정" 항목</p>
+        <blockquote class="clause allow">
+          "명의 변경은 입주전, 2037년 2월 등기 시기 총 2회만 가능합니다." — "① 입주 전(계약 해제): 위약금 규모는
+          일반적으로 전체 임대보증금의 10%가 발생. 정당한 사유(근무지 이전, 질병 등)가 있을 경우 증빙을 통해
+          위약금을 감면받거나 임차권을 승계(전매)하는 방식으로 해결하기도 함. ② 입주 후(중도 퇴거): 위약금 규모는
+          확정분양가의 10% + 우선분양전환권 금액."
+        </blockquote>
+        <div class="exhibit-figure">
+          <figcaption>계약금 안내표(82·108타입 임대보증금·우선분양전환권 금액) 및 해지·위약금 규정 캡처(원본 이미지 삽입 예정)</figcaption>
+        </div>
+        <p class="clause-src">
+          출처 — 사용자 제공 자료. <strong>원 출처를 특정하지 못했다.</strong> 사업주체 공식 홈페이지 본문·
+          하위페이지(모바일판 포함) 및 관련 언론·블로그 검색으로 동일 문구를 찾지 못했다. 표 안의 82타입
+          우선분양전환권 1,500만원·108타입 2,500만원 금액은 기존 검토보고서에서 확인한 원문 수치와 일치하나,
+          이 사실만으로 문서 자체의 출처를 확정할 수는 없다. <strong>협상 착수 전 사업주체에 이 문서의 진위와
+          출처(홈페이지 URL, 견본주택 배포자료 등)를 확인받아야 한다.</strong>
+        </p>
+        <p class="exhibit-note">
+          이 문서가 진본으로 확인되면, "명의변경 총 2회(입주전 1회 + 2037.2. 등기 시기 1회)"라는 구체적 수치와
+          더불어 "정당한 사유가 있으면 위약금 감면 또는 임차권 승계(전매)로 해결한다"는 사업주체 자체 운용
+          기준까지 확인되는 셈이다. 이는 명의변경이 임대인의 재량 사항이라는 점(제2절 참조)을 사업주체 스스로
+          문서화한 것에 해당한다.
+        </p>
+      </div>
+    </div>
+
+    <div class="exhibit">
+      <div class="exhibit-head">
+        <span class="exhibit-tag">자료3 · 사업주체 배포 홍보자료 (동일 물건)</span>
+        <span class="pill contradiction">원문과 배치</span>
+      </div>
+      <div class="exhibit-body">
+        <p class="exhibit-name">동탄 파라곤3차 — 분양 홍보자료 2건</p>
+        <p class="exhibit-type">사업주체가 직접 배포한 홍보물 · 원문 모집공고문과 동일 물건 대상</p>
+        <blockquote class="clause allow">
+          자료3-1 ("10년 안심거주 + 우선분양전환형" 안내표 비고란) —
+          "임차 기간 중 전매 가능 (전매시점 사업주체 고지)"
+        </blockquote>
+        <div class="exhibit-figure">
+          <figcaption>자료3-1 — "10년 안심거주+우선분양전환형" 비고란: "임차 기간 중 전매 가능 *전매시점 사업주체 고지" (원본 이미지 삽입 예정)</figcaption>
+        </div>
+        <blockquote class="clause allow" style="margin-top:14px;">
+          자료3-2 ("계약자 특별혜택" 안내) —
+          "유주택자 계약가능 / 입주전, 분양전 전매가능 / 중도금 무이자 혜택 / 시스템에어컨 전실 무상혜택"
+          (하단 태그: "공공지원 민간임대 / 전매가능 / 확정분양가 / 세금無")
+        </blockquote>
+        <div class="exhibit-figure">
+          <figcaption>자료3-2 — "계약자 특별혜택" 목록 및 하단 태그칩: "전매가능" 표기 (원본 이미지 삽입 예정)</figcaption>
+        </div>
+        <p class="clause-src">출처 — 사용자 제공 자료 2건, 원 출처 미상(동일 사유로 특정 실패)</p>
+        <p class="exhibit-note">
+          원문(자료1)은 입주 전·후를 불문한 양도·전대 전면 금지 및 위반 시 임차권 박탈을 규정하는 반면,
+          이 홍보자료 2건은 각각 독립적으로 "전매가능"을 계약자 혜택으로 명시하고 있다. 진위가 확인되면,
+          광고 내용과 계약조항의 불일치는 「표시ㆍ광고의 공정화에 관한 법률」 제3조(부당한 표시·광고행위의
+          금지, 거짓·과장 및 기만적 표시·광고) 위반 여부 검토의 근거가 될 수 있다.
+        </p>
+      </div>
+    </div>
+
+    <div class="exhibit">
+      <div class="exhibit-head">
+        <span class="exhibit-tag">자료4 · 실제 계약자 진술</span>
+        <span class="pill contradiction">안내 내용 수시 변경 · 출처 미상</span>
+      </div>
+      <div class="exhibit-body">
+        <p class="exhibit-name">동탄 파라곤3차 계약자로 밝힌 사람의 온라인 게시글 댓글</p>
+        <p class="exhibit-type">호갱노노 단지 게시판 추정 · 작성자가 "오늘 계약당사자"라고 밝힘</p>
+        <blockquote class="clause allow">
+          "오늘 계약당사자인데 오늘기준으로 입주전 한번 10년뒤한번 뭐이렇데요. 3일동안 전매제한 이야기 나왔다가
+          들어갔다가, 중도금도 무이자로 생겼다가 없어졌다가, 오늘기준은 중도금 무이자 있다고하구요. 정부정책에
+          의거 오락가락 하나봐요."
+        </blockquote>
+        <p class="clause-src">
+          출처 — 사용자 제공 캡처. 게시글의 정확한 URL은 확보하지 못했다(호갱노노 해당 단지 게시판으로 추정되나
+          접속 시도한 개별 게시글 주소는 삭제·비공개 상태였다). <strong>익명 커뮤니티 진술로, 공식 문서가 아니다.</strong>
+        </p>
+        <p class="exhibit-note">
+          진술상 "입주전 1회, 10년뒤(분양전환·등기 시점) 1회"는 자료2("총 2회")의 수치와 일치한다. 다만 자료2도
+          출처가 확인되지 않은 상태이므로, 두 자료가 서로 다른 경로에서 같은 수치를 말하고 있다는 점만을
+          정황증거로 볼 수 있고, 이 자체로 공식 확정 사실이라고 단정할 수는 없다.
+        </p>
+      </div>
+    </div>
+
+    <div class="exhibit">
+      <div class="exhibit-head">
+        <span class="exhibit-tag">자료5 · 비교사례 — 수지구청역 롯데캐슬 하이브엘 (공식 모집공고문)</span>
+        <span class="pill deny">공고문 문구는 파라곤3차와 동일</span>
+      </div>
+      <div class="exhibit-body">
+        <p class="exhibit-name">수지구청역 롯데캐슬 하이브 엘</p>
+        <p class="exhibit-type">장기일반민간임대주택 · 715세대 · 임대의무기간 10년 · 2021.08.27.자 임차인모집공고</p>
+        <blockquote class="clause">
+          [공고문 1면] "당해 주택은 임대의무기간 종료 후 임차인에게 분양전환 우선권을 부여하지 않음.
+          「민간임대주택에 관한 특별법」 등 관련법령에서 허용되는 경우에도 불구하고 <strong>임대사업자의 동의없이</strong>
+          임차권 양도 및 임대주택의 전대는 불가함(공급 신청 전 반드시 확인 바람)."
+        </blockquote>
+        <blockquote class="clause" style="margin-top:12px;">
+          [공고문 2면] "입주 전 임대사업자의 동의 없이 임차인이 임차권을 양도ㆍ전대한 경우 임대사업자는 해당
+          임차인의 임차권을 박탈하고 기 납부한 계약금은 위약금으로 공제하며, 입주 후 임대사업자의 동의 없이
+          양도 및 전대한 경우에도 임대차 계약은 해지되며 임차인에게 위약금이 부과되고 임차인 또는 전대인은
+          퇴거하여야 함."
+        </blockquote>
+        <div class="exhibit-figure">
+          <img src="hivel_p1.png" alt="하이브엘 모집공고문 1면" />
+          <figcaption>하이브엘 공식 모집공고문 1면 — 양도·전대 금지 조항(2026.08.06 직접 캡처)</figcaption>
+        </div>
+        <p class="clause-src">
+          출처 — 공식 임차인모집공고문 PDF(전 32면) 직접 확보·대조.
+          https://file.kbland.kr/image/kbstar/land/doc/alian/kms/lots/apt_supply_mst/pbannc/selothscmno/6025082/uploadfile_202108274837532.pdf
+        </p>
+        <p class="exhibit-note">
+          <strong>이 자료가 이번 검토에서 가장 중요하다.</strong> 하이브엘 공고문 32면을 전수검색한 결과
+          "명의변경" 0건, 허용 횟수 표현 0건으로 파라곤3차와 동일하다. 금지 조항의 문구도 사실상 같다
+          ("관련법령에서 허용되는 경우에도 불구하고 임대사업자의 동의없이 … 불가함").
+        </p>
+        <p class="exhibit-note">
+          그럼에도 하이브엘의 실제 운용은 입주 전 6회·입주 후 무제한이다(자료5-1). <strong>동일한 공고문 문구에서
+          서로 다른 운용이 나온다는 것은, 허용 횟수가 법령이 아니라 임대사업자의 결정으로 정해진다는 것을
+          증명한다.</strong>
+        </p>
+        <p class="exhibit-note" style="margin-top:14px;">
+          <strong>[자료5-1] 하이브엘 안내자료</strong> — "명의변경 : 입주 시까지 6회 가능 / 입주 이후 무제한"
+          (사용자 제공, 안내문 표기 연락처 031-216-7988). 원 출처 웹페이지는 확인하지 못했다. 다만 위 공식
+          공고문 대조로 <strong>"공고문에 횟수 규정이 없다"는 사실 자체는 1차 자료로 확정</strong>되었으므로,
+          이 안내자료의 진위와 무관하게 위 논증은 성립한다.
+        </p>
+      </div>
+    </div>
+
+    <div class="exhibit">
+      <div class="exhibit-head">
+        <span class="exhibit-tag">자료6 · 비교사례 — 신광교 제일풍경채</span>
+        <span class="pill allow">입주전 2회 + 입주후 제한없음</span>
+      </div>
+      <div class="exhibit-body">
+        <p class="exhibit-name">신광교 제일풍경채 (광교풍경채 어바니티)</p>
+        <p class="exhibit-type">기업형 임대주택(뉴스테이 계열) · 1,766세대 · 시행 에이치엠홀딩스(주) · 시공 제일건설</p>
+        <blockquote class="clause allow">
+          "명의변경 — [임대차계약(선택1)] 불가 / [매매예약제(선택2)] 입주 전 2회(최초 계약일로부터 1년 이후) ·
+          입주 후 제한없음. 계약해지 시 [매매예약제]는 위약금 대신 명의변경으로 대체."
+        </blockquote>
+        <div class="exhibit-figure">
+          <figcaption>자료6 — 에이치엠홀딩스(주) 임대차계약·매매예약제 비교안내표(84A·103 타입) (원본 이미지 삽입 예정)</figcaption>
+        </div>
+        <p class="clause-src">출처 — 사용자 제공 자료. 문서 내 회사명은 "에이치엠홀딩스(주)"로 표기되어 있으나, 이 문서가 게재된
+          공식 웹페이지 URL은 확인하지 못했다 · 원문 모집공고문은 별도 확인 필요</p>
+        <p class="exhibit-note">
+          신광교도 순수 임대차계약(선택1)을 고르면 명의변경이 "불가"하다는 점은 파라곤3차와 같다. 다만
+          계약 시점에 분양전환가격을 미리 서면 확정하는 매매예약제(선택2)를 고른 임차인에 한해 양도를
+          허용한다. 파라곤3차의 "우선분양전환권"은 이 매매예약제와 동일한 상품 구조이므로 비교 대상은
+          이 선택2 조건이다.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">
+      <span class="sec-num">4</span>
+      <div>
+        <p class="sec-title">비교표</p>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th>동탄 파라곤3차</th>
+            <th>수지구청역 하이브엘</th>
+            <th>신광교 제일풍경채</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="target">
+            <td>법적 유형</td>
+            <td>공공지원민간임대주택</td>
+            <td>장기일반민간임대주택</td>
+            <td>기업형 임대주택(뉴스테이 계열)</td>
+          </tr>
+          <tr>
+            <td>임대의무기간</td>
+            <td class="num">10년</td>
+            <td class="num">10년</td>
+            <td class="num">8년</td>
+          </tr>
+          <tr>
+            <td>분양전환 방식</td>
+            <td>확정분양가(우선분양전환권)</td>
+            <td>우선양도금액(확정분양가)</td>
+            <td>매매예약(확정분양가)</td>
+          </tr>
+          <tr class="target">
+            <td>모집공고문 원문상 명의변경</td>
+            <td>입주 전·후 불문 동의 없이 전면 금지 · 허용 횟수 규정 없음</td>
+            <td class="src-note">원문 미확보</td>
+            <td class="src-note">원문 미확보</td>
+          </tr>
+          <tr class="target">
+            <td>실제 운용(안내자료 기준)</td>
+            <td>총 2회<br/><span class="src-note">입주 전 1회 + 2037.2. 등기 시기 1회</span></td>
+            <td>입주 전 6회 + 입주 후 무제한</td>
+            <td>입주 전 2회(최초계약 1년 후~) + 입주 후 제한없음</td>
+          </tr>
+          <tr>
+            <td>근거자료 및 확인 상태</td>
+            <td class="src-note">원문 = 공식 PDF 직접 확인(확실)<br/>총 2회 = 자료2·자료4, <strong>출처 미상</strong></td>
+            <td class="src-note">자료5, <strong>출처 미상</strong></td>
+            <td class="src-note">자료6, <strong>출처 미상</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">
+      <span class="sec-num">5</span>
+      <div>
+        <p class="sec-title">예상 반론과 대응 논거</p>
+      </div>
+    </div>
+    <div class="duel">
+      <div class="card them">
+        <h4>사업주체측 예상 논리</h4>
+        <p>
+          "공공지원민간임대주택은 정부 지원을 받은 만큼 공공성이 있다. 입주자격과 임대료를 통제하려면
+          임차권 양도를 제한할 수밖에 없다."
+        </p>
+        <p>
+          "하이브엘은 장기일반민간임대라 유형이 다르다. 신광교는 원문 공고문도 확인되지 않았다.
+          비교 대상이 아니다."
+        </p>
+      </div>
+      <div class="card us">
+        <h4>대응 논거</h4>
+        <p>
+          첫째, 원문이 이미 답을 하고 있다. 자료1은 "관련 법령에서 허용되는 경우에도 불구하고 임대인의
+          동의 없이" 안 된다고 적었다. 금지의 근거를 법령이 아니라 임대인의 동의에 두었다는 뜻이다.
+        </p>
+        <p>
+          둘째, 사업주체 스스로 이미 허용하고 있다. 총 2회라는 자체 기준을 운용 중이다(자료2·자료4).
+          법이 금지한다면 성립할 수 없는 기준이다.
+        </p>
+        <p>
+          셋째, 공공성 우려는 조건으로 해소된다. 양수인에게 동일한 자격요건을 요구하면 된다.
+          요청 사항은 양도 허용 자체가 아니라, 이미 존재하는 동의 기준을 계약서면에 명문화하는 것이다.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">
+      <span class="sec-num">6</span>
+      <div>
+        <p class="sec-title">협상 요청안</p>
+        <p class="sec-sub">우선순위 순</p>
+      </div>
+    </div>
+    <div class="ask">
+      <div class="ask-item">
+        <span class="ask-rank">1</span>
+        <div>
+          <h5>명의변경 허용 조건의 서면 확정</h5>
+          <p>현재 허용 횟수와 절차는 공고문에 없고 안내자료로만 전해진다. 허용 횟수·시점·신청 절차·소요 수수료를 계약서면 또는 정정공고에 명시할 것을 요청한다.</p>
+          <span class="tag">최우선</span>
+        </div>
+      </div>
+      <div class="ask-item">
+        <span class="ask-rank">2</span>
+        <div>
+          <h5>허용 횟수 확대</h5>
+          <p>입주 전 6회·입주 후 무제한(자료5 수준)을 목표로 한다. 최소 기준은 입주 전 2회·입주 후 제한없음(자료6 수준)으로 제시한다.</p>
+          <span class="tag">목표 / 최소기준</span>
+        </div>
+      </div>
+      <div class="ask-item">
+        <span class="ask-rank">3</span>
+        <div>
+          <h5>양수인 자격심사를 조건으로 한 승인 절차 신설</h5>
+          <p>양수인에게 동일한 자격요건 충족을 요구하는 조건부 승인 방식이다. 공공성 우려를 해소하면서 양도를 허용하는 절충안으로 제시한다.</p>
+          <span class="tag">절충안</span>
+        </div>
+      </div>
+      <div class="ask-item">
+        <span class="ask-rank">4</span>
+        <div>
+          <h5>안내자료와 계약조항 불일치의 정리</h5>
+          <p>자료2·3의 진위와 출처를 사업주체에 확인한다. 진본으로 확인되면 "전매가능" 표기와 원문 전면금지 조항의 불일치에 대한 해명 및 시정을 요구한다.</p>
+          <span class="tag">사실관계 확인 후 진행</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">
+      <span class="sec-num">7</span>
+      <div>
+        <p class="sec-title">확인 상태 정리</p>
+        <p class="sec-sub">협상 착수 전 확보해야 할 자료</p>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>항목</th>
+            <th>확인 상태</th>
+            <th>조치</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>모집공고문 양도·전대 금지 조항</td>
+            <td>확인 완료 — 공식 PDF 원문 직접 대조</td>
+            <td class="src-note">추가 조치 불요</td>
+          </tr>
+          <tr>
+            <td>공고문상 허용 횟수 규정 부존재</td>
+            <td>확인 완료 — 36면 전수검색</td>
+            <td class="src-note">추가 조치 불요</td>
+          </tr>
+          <tr class="target">
+            <td>"총 2회" 허용 기준(자료2)</td>
+            <td>출처 미상</td>
+            <td class="src-note">원 출처 확인 또는 사업주체 서면 확인</td>
+          </tr>
+          <tr class="target">
+            <td>"전매가능" 홍보 문구(자료3)</td>
+            <td>출처 미상</td>
+            <td class="src-note">배포 경로·시점 확인</td>
+          </tr>
+          <tr class="target">
+            <td>계약자 진술(자료4)</td>
+            <td>출처 미상 · 익명 진술</td>
+            <td class="src-note">참고자료로만 활용</td>
+          </tr>
+          <tr class="target">
+            <td>비교사례 2건(자료5·6)</td>
+            <td>출처 미상</td>
+            <td class="src-note">각 사업장 모집공고문 원문 확보 시 신뢰도 상승</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <span>동탄 파라곤3차 재조사 · 협상 준비자료 · 2026.08.06</span>
+    <span>내부 협상 준비용. 출처 미상 자료의 확인을 마친 후 대외 제출본을 작성할 것</span>
+  </footer>
+
+</div>
