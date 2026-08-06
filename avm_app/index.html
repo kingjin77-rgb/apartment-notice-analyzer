@@ -8,7 +8,7 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css");
 :root{
   --navy:#0d2162; --navy-deep:#081541; --navy-soft:#eff2fb;
-  --ink:#111418; --gray-700:#4b515a; --gray-500:#767c86; --gray-300:#b6bbc2;
+  --ink:#111418; --gray-700:#3a3f47; --gray-500:#5b616b; --gray-300:#b6bbc2;
   --line:#e3e5e9; --paper:#fff; --paper-alt:#f4f5f8; --gold:#b08d4f;
   --pos:#1c6b52; --neg:#a8332b;
   --ff:"Pretendard Variable",Pretendard,-apple-system,"Malgun Gothic",system-ui,sans-serif;
@@ -27,6 +27,8 @@ header{background:var(--paper);border-bottom:1px solid var(--line);height:60px;d
      display:grid;place-items:center;font-size:12.5px;font-weight:800}
 .logo b{display:block;font-size:15px;color:var(--ink);line-height:1.25;letter-spacing:-.025em}
 .logo span{display:block;font-size:10.5px;color:var(--gray-500)}
+.regionsel{margin-left:10px;padding:9px 10px;border:1px solid var(--line);border-radius:2px;
+     font:inherit;font-size:13.5px;color:var(--ink);background:var(--paper);flex-shrink:0}
 .hsearch{flex:1;max-width:380px;display:flex;position:relative;margin-left:8px}
 .hsearch input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--line);border-right:0;
      border-radius:2px 0 0 2px;font:inherit;font-size:13.5px;color:var(--ink);background:var(--paper)}
@@ -60,9 +62,9 @@ header{background:var(--paper);border-bottom:1px solid var(--line);height:60px;d
 .pin{position:relative;transform:translate(-50%,-100%);cursor:pointer;white-space:nowrap;
      filter:drop-shadow(0 2px 5px rgba(13,33,98,.26))}
 .pin .bx{background:var(--paper);border:1.5px solid var(--navy);border-radius:3px;padding:3px 8px 2px;text-align:center}
-.pin .nm{font-size:10px;color:var(--gray-700);line-height:1.25;font-weight:600;max-width:112px;
+.pin .nm{font-size:11px;color:var(--ink);line-height:1.3;font-weight:700;max-width:132px;
          overflow:hidden;text-overflow:ellipsis}
-.pin .pr{font-size:13px;color:var(--navy);font-weight:800;line-height:1.25;letter-spacing:-.03em}
+.pin .pr{font-size:14px;color:var(--navy);font-weight:800;line-height:1.3;letter-spacing:-.03em}
 .pin .tail{width:0;height:0;margin:0 auto;border-left:5px solid transparent;border-right:5px solid transparent;
      border-top:6px solid var(--navy)}
 .pin.rare .bx{border-color:var(--gold)} .pin.rare .pr{color:var(--gold)} .pin.rare .tail{border-top-color:var(--gold)}
@@ -99,17 +101,25 @@ header{background:var(--paper);border-bottom:1px solid var(--line);height:60px;d
 .btn.ghost{background:transparent;color:var(--navy);border:1px solid var(--navy)}
 .btn.ghost:hover{background:var(--navy-soft)}
 .btn.sm{padding:8px 13px;font-size:12.5px;width:auto}
-table.mini{width:100%;border-collapse:collapse;font-size:11.5px}
+table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
 .mini th,.mini td{border:1px solid var(--line);padding:6px 7px;text-align:right;white-space:nowrap}
-.mini th{background:var(--paper-alt);color:var(--gray-500);font-size:10px;font-weight:700}
+.mini th{background:var(--paper-alt);color:var(--gray-700);font-size:11px;font-weight:700}
 .mini td:first-child,.mini th:first-child{text-align:left}
 .mini tr.sum td{background:var(--navy-soft);font-weight:800;color:var(--navy)}
-.mini .sm{font-size:10px;color:var(--gray-500);font-weight:400;display:block}
+.mini .sm{font-size:11px;color:var(--gray-700);font-weight:400;display:block}
 .pos{color:var(--pos)} .neg{color:var(--neg)}
 .mx td.c{cursor:pointer;font-weight:700;color:var(--navy)}
 .mx td.c:hover{background:var(--navy-soft)}
 .mx td.na{color:var(--gray-300)}
+.tipbox{margin-top:10px;padding:10px 12px;background:#fdf6e8;border:1px solid var(--gold);
+     border-radius:2px;font-size:13px;color:var(--ink);font-weight:600;line-height:1.6}
 .resv{text-align:center;padding:18px 14px;border:2px solid var(--navy);background:var(--navy-soft)}
+.resv2{display:flex;gap:0;padding:0;overflow:hidden}
+.resv2 .rc{flex:1;padding:16px 12px;text-align:center}
+.resv2 .rc.fav{background:var(--navy);border-left:2px solid var(--navy-deep)}
+.resv2 .rc.fav .l{color:rgba(255,255,255,.75)}
+.resv2 .rc.fav .v{color:#fff}
+.resv2 .rc.fav .r{color:rgba(255,255,255,.72)}
 .resv .l{font-size:10.5px;letter-spacing:.15em;color:var(--navy);font-weight:800}
 .resv .v{font-size:30px;font-weight:800;color:var(--navy);letter-spacing:-.035em;line-height:1.2;margin:4px 0 2px}
 .resv .r{font-size:11.5px;color:var(--gray-500)}
@@ -146,7 +156,7 @@ table.mini{width:100%;border-collapse:collapse;font-size:11.5px}
 .steps-log div{padding:2px 0;color:var(--gray-300)}
 .steps-log div.on{color:var(--navy);font-weight:700}
 .steps-log div.dn{color:var(--pos)}
-.src{font-size:10.5px;color:var(--gray-500);margin-top:12px;line-height:1.7;
+.src{font-size:11.5px;color:var(--gray-700);margin-top:12px;line-height:1.75;
      border-top:1px solid var(--line);padding-top:10px}
 </style>
 </head>
@@ -155,6 +165,8 @@ table.mini{width:100%;border-collapse:collapse;font-size:11.5px}
 <header>
   <div class="logo"><span class="mark">JL</span>
     <span><b>법무법인제이엘 AI감정평가사</b><span>단체등기 · 잔금대출 사전 감정평가</span></span></div>
+  <select id="q_sido" class="regionsel"></select>
+  <select id="q_sgg" class="regionsel"></select>
   <div class="hsearch">
     <input id="q" placeholder="아파트명 검색 (예: 동탄역, 자이, 푸르지오)" autocomplete="off">
     <button onclick="doSearch()">검색</button>
@@ -196,16 +208,51 @@ table.mini{width:100%;border-collapse:collapse;font-size:11.5px}
         2025.01~2026.08 원본 22,810건 → 정제 20,919건 → 단지 60곳<br>
         계약해제 1,332건 · 직거래 559건 제외, 단지별 MAD 이상치 제거
       </div>
+      <div class="src" style="text-align:left;margin-top:14px">
+        <b style="color:var(--navy)">방법론 검증 — 실제 두 감정평가법인 대조</b><br>
+        대영·나라감정평가법인 82건(2021~2026) 중 동일단지·동일시점 23쌍 매칭 결과,
+        두 법인 산정액 편차 <b>중위 0.07% · 최대 1.67%</b>(공공주택특별법 시행규칙
+        제42조③ 110% 재감정 기준의 1/6 수준). 공시가격 비율로 실제 감정평가서
+        세대별 비율을 재현한 교차검증(구리갈매6단지 381세대)도 <b>중위오차 2.29%</b>.<br>
+        <span style="color:var(--gray-500)">※ 이 값들은 이 앱의 정확도를 보증하지 않는다 — 방법론이
+        실제 실무 관행과 같은 오차범위 안에서 작동함을 보여주는 근거일 뿐이다.</span>
+      </div>
     </div>
   </div>
 </div>
 
-<script src="data.js"></script>
+<script src="data.js?v=20260806c"></script>
 <script>
 const KAKAO_KEY="6dd941689e3c39956d9ba809f127c947";
 let map=null, ovs=[], selNm=null, filter="all", cur=null;
 // hasT=1 : 자체 실거래 보유 / hasT=0 : 거래 0건 -> 인근 유사단지 비준
 const C=COMPLEX_DATA.map((c,i)=>({...c, id:"x"+i, rare:!c.hasT||c.n<20}));
+
+// 지역선택 — 주소 표준구조 "시/도 시/군/구 구/읍/면 ..."의 앞 두 토큰으로 계층 선택.
+// 전국 확장 시에도 이 구조는 동일하므로 그대로 동작한다.
+function sidoOf(addr){ return (addr||"").split(" ")[0]||"기타"; }
+function sggOf(addr){ return (addr||"").split(" ")[1]||"기타"; }
+let curSido="전체", curSgg="전체";
+const sidoSel=document.getElementById("q_sido"), sggSel=document.getElementById("q_sgg");
+function fillSido(){
+  const list=["전체", ...new Set(C.map(c=>sidoOf(c.addr)))].sort((a,b)=>a==="전체"?-1:b==="전체"?1:a.localeCompare(b,"ko"));
+  sidoSel.innerHTML=list.map(s=>`<option value="${s}">${s==="전체"?"전체 시/도":s}</option>`).join("");
+}
+function fillSgg(){
+  const pool = curSido==="전체" ? C : C.filter(c=>sidoOf(c.addr)===curSido);
+  const list=["전체", ...new Set(pool.map(c=>sggOf(c.addr)))].sort((a,b)=>a==="전체"?-1:b==="전체"?1:a.localeCompare(b,"ko"));
+  sggSel.innerHTML=list.map(s=>`<option value="${s}">${s==="전체"?"전체 시/군/구":s}</option>`).join("");
+  curSgg="전체";
+}
+fillSido(); fillSgg();
+sidoSel.onchange=()=>{ curSido=sidoSel.value; fillSgg(); regionChanged(); };
+sggSel.onchange=()=>{ curSgg=sggSel.value; regionChanged(); };
+function regionChanged(){ qi.dispatchEvent(new Event("input")); if(map)draw(); else fb(); if(cur&&!inRegion(cur)){cur=null;renderComplex();} }
+function inRegion(c){
+  if(curSido!=="전체" && sidoOf(c.addr)!==curSido) return false;
+  if(curSgg!=="전체" && sggOf(c.addr)!==curSgg) return false;
+  return true;
+}
 
 /* ---------- 노후도 감가곡선 (실거래 회귀, modules/appraisal_engine.py fit_age_curve와 동일 로직 실측) ----------
    화성 4개구 실거래 보유 48개 단지 ㎡단가를 준공년도에 로그선형 회귀:
@@ -257,6 +304,7 @@ function initMap(){
   draw();
 }
 function pass(c){
+  if(!inRegion(c)) return false;
   if(filter==="noT")    return !c.hasT;
   if(filter==="lh")     return !!c.lh;
   if(filter==="future") return !!c.future;
@@ -361,7 +409,7 @@ function renderComplex(){
           <td>${x.d}m</td><td>${x.yr}</td><td>${x.n}건</td>
           <td>${(x.unit/1e4).toFixed(0)}만</td></tr>`).join("")}</tbody>
       </table>
-      <div style="font-size:11px;color:var(--gray-500);margin-top:6px">
+      <div style="font-size:12.5px;color:var(--gray-700);margin-top:6px">
         대상 단지에 거래가 없으므로 <b>위치적 유사성</b>이 인정되는 인근 단지 사례를 선정.
         음영 3건의 ㎡단가 중위값을 기준단가로 채택하고, 지역·개별요인으로 보정한다.
       </div>
@@ -387,7 +435,7 @@ function renderComplex(){
           <td>${bf[i][0]}~${bf[i][1]}층</td>
           <td class="${f==null?'':(f>=1?'pos':'neg')}">${f==null?'—':f.toFixed(3)}</td></tr>`).join("")}</tbody>
       </table>
-      <div style="font-size:11px;color:var(--gray-500);margin-top:6px">
+      <div style="font-size:12.5px;color:var(--gray-700);margin-top:6px">
         법령에 고시된 층별효용비율이 없으므로 ${c.hasT?"이 단지":"인근 단지"} 실거래를 층수로 회귀하여 산출.
         실무기준 [610-3.1.3]②의 "층별·위치별 효용요인 반영" 요건 충족.
       </div>
@@ -404,12 +452,15 @@ function renderComplex(){
       </div>
       <div class="pick" id="s_conv_wrap" style="margin-top:8px">
         <div><label>임대유형</label><select id="s_lease" onchange="togglePurpFields()">
-          <option value="10년">10년 공공임대</option><option value="5년">5년 공공임대</option>
+          <option value="10년">10년 공공임대</option>
+          <option value="10년분납">10년 공공임대 (분할납부·조기전환)</option>
+          <option value="5년">5년 공공임대</option>
           <option value="6년">6년 공공임대</option><option value="민간">민간임대</option></select></div>
         <div id="s_bcost_wrap"><label>건설원가(억)</label><input id="s_bcost" type="number" step="0.1" placeholder="예: 3.8"></div>
+        <div id="s_initprice_wrap"><label>최초주택가격(억)</label><input id="s_initprice" type="number" step="0.1" placeholder="예: 3.5"></div>
         <div><label>임대 경과연수</label><input id="s_ryears" type="number" step="1" value="6" min="0" max="10"></div>
       </div>
-      <div style="font-size:11px;color:var(--gray-500);margin-top:7px" id="purpHint"></div>
+      <div style="font-size:12.5px;color:var(--gray-700);margin-top:7px" id="purpHint"></div>
       <button class="btn" style="margin-top:13px" onclick="run()">평형 · 층별 감정평가 실행 →</button>
     </div>
 
@@ -431,10 +482,13 @@ function togglePurpFields(){
   ltvWrap.style.display = isConv? "none":"block";
   const lease=document.getElementById("s_lease").value;
   document.getElementById("s_bcost_wrap").style.display = (isConv&&lease==="5년")? "block":"none";
+  document.getElementById("s_initprice_wrap").style.display = (isConv&&lease==="10년분납")? "block":"none";
   if(!hint) return;
   if(isConv){
     hint.innerHTML = lease==="10년"
       ? "공공주택 특별법 시행규칙 [별표7] — 분양전환가격은 <b>감정평가금액을 초과할 수 없다</b>. 감정가가 곧 상한."
+      : lease==="10년분납"
+      ? "[별표8] — 입주시 30% + 4년차 20% + 조기분전시 20%(확정) + <b>조기분전시 30%(감정가 연동)</b> 4회 분할. 최초주택가격을 입력해야 산출된다."
       : lease==="5년"
       ? "[별표7] — 분양전환가격 = <b>(건설원가 + 감정평가금액) ÷ 2</b>. 건설원가를 입력해야 산출된다."
       : lease==="6년"
@@ -443,6 +497,20 @@ function togglePurpFields(){
   }else{
     hint.innerHTML = "";
   }
+}
+
+// 공공주택 특별법 시행규칙 [별표8] — 10년/분납 조기분양전환 4회 납부스케줄.
+// 하남감일B5 감일스윗시티10단지 조기분양전환 계약안내문(LH, 2026.06) 원문 대조로 확인.
+// 1~3회차(80%)는 최초주택가격에 LH 할부이자율 복리를 적용한 확정금액, 4회차(30%)만
+// 조기분양전환 시점 감정평가금액에 연동된다 — 이 앱의 예측이 실제로 걸리는 구간은 4회차뿐.
+function installmentSchedule(initialPrice, earlyAppraised, lhRate, earlyYear){
+  lhRate = lhRate==null?0.028:lhRate; earlyYear = earlyYear==null?5:earlyYear;
+  const y1 = initialPrice*0.30;
+  const y4 = initialPrice*Math.pow(1+lhRate,4)*0.20;
+  const fixed3 = initialPrice*Math.pow(1+lhRate,earlyYear)*0.20;
+  const final4 = earlyAppraised==null? null : earlyAppraised*0.30;
+  const total = final4==null? null : y1+y4+fixed3+final4;
+  return {y1,y4,fixed3,final4,total};
 }
 
 /* ---------- 감정평가 실행 ---------- */
@@ -454,8 +522,9 @@ function run(){
   const opt = purp==="분양전환" ? {
     lease:document.getElementById("s_lease").value,
     bcost:(+document.getElementById("s_bcost").value||0)*1e8,
+    initPrice:(+document.getElementById("s_initprice").value||0)*1e8,
     ryears:+document.getElementById("s_ryears").value||0
-  } : {lease:null,bcost:0,ryears:0};
+  } : {lease:null,bcost:0,initPrice:0,ryears:0};
   document.getElementById("panel").innerHTML=`<div class="load"><div class="spin"></div>
     <div class="t">감정평가 진행 중</div><div class="s">${cur.nm} · 전 평형 × 층대</div>
     <div class="steps-log" id="lg">${LOGS.map(l=>`<div>· ${l}</div>`).join("")}</div></div>`;
@@ -498,7 +567,7 @@ function cell(c,area,bi,purp,opt){
   return {est:mid,mid,lo,hi,band,grade,n,unit:au*f,proxy:!c.hasT,wear,dir,favorable,adverse};
 }
 
-let LAST_OPT={ryears:0,lease:"10년",bcost:0};
+let LAST_OPT={ryears:0,lease:"10년",bcost:0,initPrice:0};
 function matrix(purp,ltv,opt){
   opt = opt||LAST_OPT; LAST_OPT=opt;
   const c=cur, bf=bandFloors(c), isConv=purp==="분양전환";
@@ -527,9 +596,8 @@ function matrix(purp,ltv,opt){
           `<th>${b[0]}<span class="sm">${bf[i][0]}~${bf[i][1]}층</span></th>`).join("")}</tr></thead>
         <tbody>${rows}</tbody>
       </table>
-      <div style="font-size:11px;color:var(--gray-500);margin-top:7px">
-        금액을 누르면 <b>산정근거·입주민 관점 참고치</b>와 보고서로 이동합니다. 거래 3건 미만 평형은 산정하지 않습니다.
-      </div>
+      <div class="tipbox">👉 <b>표의 금액을 클릭</b>하면 산정근거·입주민 관점 참고치와 감정평가 보고서로 이동합니다.
+        <span style="color:var(--gray-700);font-weight:400">(거래 3건 미만 평형은 산정하지 않습니다)</span></div>
     </div>
     <div class="dlbar">
       <button class="btn ghost sm" style="flex:1" onclick="renderComplex()">← 단지</button>
@@ -561,9 +629,14 @@ function detail(area,bi,purp,ltv){
   <div class="phead"><h2>${c.nm}</h2>
     <div class="addr">전용 ${area.toFixed(2)}㎡ · ${BANDS[bi][0]}(${bf[bi][0]}~${bf[bi][1]}층) · ${purp}${isConv?` · ${opt.lease}`:""}</div></div>
   <div class="pbody">
-    <div class="resv"><div class="l">예 상 감 정 평 가 액 (중위)</div>
-      <div class="v">${won(r.mid)}원</div>
-      <div class="r">방어가능 범위 ${eok(r.lo)} ~ ${eok(r.hi)} (±${(r.band*100).toFixed(1)}%)</div></div>
+    <div class="resv resv2">
+      <div class="rc"><div class="l">일 반 (중위) 추 정</div>
+        <div class="v">${won(r.mid)}원</div>
+        <div class="r">방어가능 범위 ${eok(r.lo)} ~ ${eok(r.hi)} (±${(r.band*100).toFixed(1)}%)</div></div>
+      <div class="rc fav"><div class="l">${r.dir<0?"최 저":r.dir>0?"최 고":""} (입주민 유리) 추 정</div>
+        <div class="v">${won(r.favorable)}원</div>
+        <div class="r">§2~4와 동일 근거 · 조작 아닌 정상범위 하단</div></div>
+    </div>
 
     <div class="sect" style="margin-top:12px">
       <table class="mini">
@@ -575,7 +648,7 @@ function detail(area,bi,purp,ltv){
           <tr><td>상대측 유리</td><td>${eok(r.adverse)}</td><td>사업자·금융기관측 주장 가능선</td></tr>
         </tbody>
       </table>
-      <div style="font-size:11px;color:var(--gray-500);margin-top:6px">
+      <div style="font-size:12.5px;color:var(--gray-700);margin-top:6px">
         세 값 모두 <b>동일한 거래사례비교법 방법론</b> 안에서 사례 선정·보정의 정상 변동범위다.
         감정평가법이 두 법인의 산술평균을 쓰도록 정한 것도 이 변동을 전제하기 때문이다
         (공공주택 특별법 시행규칙 [별표7] 제2호 나목). 사례를 임의로 배제하거나
@@ -598,7 +671,7 @@ function detail(area,bi,purp,ltv){
            K-APT 단지정보로 확인 후 반영할 것.</span>`}
         ${opt.ryears>0?`<div class="calc">임대 ${opt.ryears}년 사용분 추가감가 ${(r.wear*100).toFixed(1)}%
           → 중위값에 이미 반영됨</div>`:""}
-        <div style="font-size:11px;color:var(--gray-500);margin-top:5px">
+        <div style="font-size:12.5px;color:var(--gray-700);margin-top:5px">
           분양전환·임대전환 아파트는 임차인이 실제 거주한 물건이라 신축 대비 마감재·설비 마모가
           있다. 정확한 반영에는 <b>현장조사(임장)</b>가 필요하며, 이 수치는 실거래 데이터 기반
           추정치로 임장 전 참고용이다.
@@ -641,7 +714,15 @@ function detail(area,bi,purp,ltv){
             <thead><tr><th>층대</th><th>효용비율</th></tr></thead>
             <tbody>${c.fadj.map((f,i)=>`<tr${i===bi?' class="sum"':''}><td>${BANDS[i][0]} (${bf[i][0]}~${bf[i][1]}층)</td>
               <td class="${f==null?'':(f>=1?'pos':'neg')}">${f==null?'—':f.toFixed(3)}</td></tr>`).join("")}</tbody>
-          </table></div></div>
+          </table>
+          <div style="font-size:12.5px;color:var(--gray-700);margin-top:8px">
+            <b style="color:var(--gray-700)">참고 — 향별 효용 (자동 반영 아님)</b><br>
+            이 단지의 세대별 향 데이터가 없어 위 층별효용에는 향을 반영하지 않았다. 실제 감정평가서
+            2건(오산세교 쌍용예가NHF·화성남양 시티프라디움3차, 2024)에서 채택된 값은 남동향 1.000 대비
+            남서향 0.998로 거의 무차이였다. 인용 선행연구(정기영 2001)는 남향 기준 동향 -4~5.3%,
+            서향 -5~7.5%(한국감정원), 향별 최대 10%(LG건설)까지 폭이 넓다 — 단지·연구마다 편차가
+            커서 특정 수치를 자동 곱하지 않았다. 현장에서 세대 향을 확인해 위 범위 안에서 가감할 것.
+          </div></div></div>
 
       <div class="why"><div class="why-h"><span class="n">5</span>시산가액 조정 — 감칙 제12조②</div>
         <div class="why-b"><table class="mini">
@@ -653,7 +734,32 @@ function detail(area,bi,purp,ltv){
            <tr><td>2026 공시가격 참고</td><td>${eok(Math.round(r.mid*0.697/1e6)*1e6)}</td><td>현실화 69.7%</td></tr>
           </tbody></table></div></div>
 
-      ${isConv?(()=>{
+      ${isConv&&opt.lease==="10년분납"?(()=>{
+        if(!opt.initPrice) return `<div class="why"><div class="why-h"><span class="n">6</span>분납 조기분양전환 산정 — [별표8]</div>
+          <div class="why-b"><div style="font-size:11px;color:var(--gold)">최초주택가격을 입력해야 산출된다.</div></div></div>`;
+        const s1=installmentSchedule(opt.initPrice,r.mid), s2=installmentSchedule(opt.initPrice,r.favorable);
+        return `<div class="why"><div class="why-h"><span class="n">6</span>분납 조기분양전환 산정 — 공공주택 특별법 시행규칙 [별표8]</div>
+        <div class="why-b">
+          <div class="quote"><span class="code">LH 계약안내문 원문 대조(하남감일B5, 2026.06)</span>
+            1~3회차(80%)는 최초주택가격에 LH 할부이자율 복리를 적용한 <b>확정금액</b>이라 이미 정확하게
+            계산된다. <b>4회차(30%)만 조기분양전환 시점 감정평가금액에 연동</b>되므로 이 앱의 예측이
+            실제로 걸리는 구간은 사실상 4회차뿐이다.</div>
+          <table class="mini" style="margin-top:6px">
+            <thead><tr><th>회차</th><th>산식</th><th>금액(중위기준)</th></tr></thead>
+            <tbody>
+              <tr><td>① 입주시 30%</td><td>최초주택가격×30%</td><td>${won(s1.y1)}</td></tr>
+              <tr><td>② 4년차 20%</td><td>최초주택가격×(1+이자율)⁴×20%</td><td>${won(s1.y4)}</td></tr>
+              <tr><td>③ 조기분전시 20%</td><td>최초주택가격×(1+이자율)ⁿ×20%</td><td>${won(s1.fixed3)}</td></tr>
+              <tr class="sum"><td>④ 조기분전시 30%</td><td><b>예상 감정가×30% — 이 앱이 예측하는 부분</b></td><td><b>${won(s1.final4)}</b></td></tr>
+              <tr class="sum"><td colspan="2">합계 (중위)</td><td><b>${won(s1.total)}</b></td></tr>
+              <tr><td colspan="2">합계 (입주민 유리)</td><td>${won(s2.total)}</td></tr>
+            </tbody></table>
+          <div style="font-size:12.5px;color:var(--gray-700);margin-top:6px">
+            LH 할부이자율 2.8%(기본금리, 2026.06.01 기준 변동금리) 가정. 실제 계약안내문상 이자율·조기전환
+            연차를 확인해 재계산할 것.</div>
+        </div></div>`;
+      })()
+      :isConv?(()=>{
         const cvMid=conversionPrice(r.mid,opt.lease,opt.bcost);
         const cvFav=conversionPrice(r.favorable,opt.lease,opt.bcost);
         return `<div class="why"><div class="why-h"><span class="n">6</span>분양전환가격 산정 — 공공주택 특별법 시행규칙 제40조</div>
@@ -665,7 +771,7 @@ function detail(area,bi,purp,ltv){
               <tr><td>감정가 중위 기준</td><td><b>${won(cvMid.price)}</b></td></tr>
               <tr class="sum"><td>입주민 유리 감정가 기준</td><td><b>${won(cvFav.price)}</b></td></tr>
             </tbody></table>
-            <div style="font-size:11px;color:var(--gray-500);margin-top:6px">
+            <div style="font-size:12.5px;color:var(--gray-700);margin-top:6px">
               두 값 모두 §2의 동일 방법론·동일 채택사례에서 나온 정상 범위다. 이의신청·협상 시
               "입주민 유리 감정가 기준" 값과 그 근거(§2~4)를 함께 제시할 수 있다.</div>`
           :`<div style="font-size:11px;color:var(--gold);margin-top:6px">입력값 부족으로 자동 산출되지 않음 — 위 조건을 채워야 한다.</div>`}
@@ -673,7 +779,7 @@ function detail(area,bi,purp,ltv){
       })()
       :`<div class="why"><div class="why-h"><span class="n">6</span>담보 대출한도 시산</div>
         <div class="why-b"><div class="calc">${eok(r.mid)} × LTV ${ltv*100}% − 소액임차보증금 5,500만 = <b>${won(loan)}</b></div>
-          <div style="font-size:11px;color:var(--gray-500);margin-top:5px">
+          <div style="font-size:12.5px;color:var(--gray-700);margin-top:5px">
             실제 한도는 은행 내규·차주 DSR·규제지역 지정에 따라 달라진다. 입주민에게 유리한 쪽은
             <b>상단(${eok(r.hi)})</b> 기준 한도다.</div></div></div>`}
     </div>
@@ -685,23 +791,52 @@ function detail(area,bi,purp,ltv){
 
     <div class="dlbar">
       <button class="btn ghost sm" style="flex:0 0 auto" onclick="matrix('${purp}',${ltv})">←</button>
-      <button class="btn gold" onclick="submitReport(${area},${bi},'${purp}',${ltv})">📄 감정평가 보고서 제출</button>
+      <button class="btn gold" onclick="openReport(${area},${bi},'${purp}',${ltv})">📄 감정평가 보고서 보기·저장</button>
     </div>
   </div>`;
   document.querySelector(".panel").scrollTop=0;
 }
 
-function submitReport(area,bi,purp,ltv){
-  const c=cur,bf=bandFloors(c),opt=LAST_OPT,r=cell(c,area,bi,purp,opt);
-  const step6 = purp==="분양전환" ? "6 분양전환가격 산정" : "6 대출한도 시산";
-  alert(`감정평가 보고서를 생성합니다.\n\n`+
-   `대상 : ${c.nm}\n     전용 ${area.toFixed(2)}㎡ / ${BANDS[bi][0]} ${bf[bi][0]}~${bf[bi][1]}층\n`+
-   `기준시점 : 2026-08-06\n평가목적 : ${purp}${purp==="분양전환"?` (${opt.lease})`:""}\n\n`+
-   `예상 감정평가액(중위) : ${won(r.mid)}원\n방어가능 범위 : ${eok(r.lo)} ~ ${eok(r.hi)}\n`+
-   `입주민 유리 참고치 : ${eok(r.favorable)}\n\n`+
-   `[보고서 구성 7개 절]\n 1 산정개요  2 적용방법·법적근거\n 3 거래사례 선택  4 가치형성요인 비교\n`+
-   ` 5 시산가액 조정  ${step6}  7 유의사항\n\n`+
-   `실제 앱에서는 이 시점에 DOCX가 내려받아집니다.\n(report_generator.py 파이프라인 재활용)`);
+// 감정평가 보고서 — 현재 패널(상세근거 전체)을 그대로 재사용해 별창의 인쇄용
+// 문서로 연다. 서버 없는 정적앱이므로 "저장"은 (1)인쇄→PDF 저장, (2)HTML 파일
+// 다운로드 두 경로로 제공한다.
+function openReport(area,bi,purp,ltv){
+  const c=cur, opt=LAST_OPT;
+  const wrap=document.createElement("div");
+  wrap.innerHTML=document.querySelector(".panel .pbody").innerHTML;
+  wrap.querySelectorAll(".dlbar").forEach(x=>x.remove());
+  const reportBody=wrap.innerHTML;
+  const styles=document.querySelector("style").innerHTML;
+  const title=`${c.nm} 예상감정평가 보고서 ${opt.lease?("("+opt.lease+") "):""}${(new Date()).toISOString().slice(0,10)}`;
+  const fname=JSON.stringify(title.replace(/\s+/g,"_")+".html");
+  const html=`<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>${title}</title>
+<style>${styles}
+body{background:#fff;padding:28px 22px;max-width:840px;margin:0 auto}
+.pbody{padding:0}
+.dlbar{display:none}
+.noprint{display:flex;gap:8px;margin-bottom:18px;position:sticky;top:0;background:#fff;
+  padding:10px 0;border-bottom:1px solid var(--line);z-index:5}
+@media print{ .noprint{display:none} body{padding:0;max-width:none} }
+</style></head><body>
+<div class="noprint">
+  <button class="btn sm" onclick="window.print()">🖨 인쇄 / PDF로 저장</button>
+  <button class="btn sm ghost" onclick="saveHtml()">💾 HTML 파일로 저장</button>
+</div>
+<h1 style="font-size:19px;margin-bottom:4px;color:var(--ink)">${c.nm} — 예상 감정평가 보고서</h1>
+<div style="font-size:12px;color:var(--gray-700);margin-bottom:20px">
+  작성일 2026-08-06 · 법무법인제이엘 사내 업무 참고자료 · 대외 제공·금융기관 제출 금지</div>
+${reportBody}
+<script>
+const RPT_NAME=${fname};
+function saveHtml(){
+  const blob=new Blob([document.documentElement.outerHTML],{type:"text/html"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=RPT_NAME; a.click();
+}
+<\/script>
+</body></html>`;
+  const win=window.open("","_blank");
+  if(!win){ alert("팝업이 차단되었습니다. 브라우저 주소창의 팝업 차단 아이콘을 해제한 뒤 다시 시도하세요."); return; }
+  win.document.open(); win.document.write(html); win.document.close();
 }
 </script>
 </body>
