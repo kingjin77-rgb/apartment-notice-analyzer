@@ -41,7 +41,7 @@ MANDATORY_ITEMS: list[dict[str, Any]] = [
         "code": "DETECTOR-01",
         "name": "자동화재탐지설비(세대별 감지기)",
         "condition": "아파트등은 모든 층에 자동화재탐지설비 설치 의무",
-        "keywords": ["자동화재탐지설비", "화재감지기", "감지기"],
+        "keywords": ["자동화재탐지설비", "화재감지기", "화재 감지기"],
     },
 ]
 
