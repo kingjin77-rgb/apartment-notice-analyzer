@@ -1,38 +1,12 @@
 <title>동탄 파라곤3차 — 임차인모집공고 검토보고서</title>
 <style>
   :root{
-    --paper:#eef0ee; --card:#ffffff; --ink:#1b2420; --ink-soft:#55635c;
-    --line:#d3d8d2; --line-strong:#b9c1b8;
-    --accent:#1f5c4a; --accent-soft:#e3ece8;
-    --flag:#8c2f2f; --flag-soft:#f4e4e2;
-    --gold:#a8752e; --gold-soft:#f1e6d4;
-    --shadow: 0 1px 2px rgba(20,24,20,.06), 0 8px 24px -12px rgba(20,24,20,.18);
-  }
-  @media (prefers-color-scheme: dark){
-    :root{
-      --paper:#141815; --card:#1b211d; --ink:#e7eae5; --ink-soft:#97a29a;
-      --line:#2b332e; --line-strong:#3a443d;
-      --accent:#4fbe9c; --accent-soft:#1c2c26;
-      --flag:#e2726b; --flag-soft:#2e1c1a;
-      --gold:#d9a44e; --gold-soft:#2b2318;
-      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.55);
-    }
-  }
-  :root[data-theme="dark"]{
-    --paper:#141815; --card:#1b211d; --ink:#e7eae5; --ink-soft:#97a29a;
-    --line:#2b332e; --line-strong:#3a443d;
-    --accent:#4fbe9c; --accent-soft:#1c2c26;
-    --flag:#e2726b; --flag-soft:#2e1c1a;
-    --gold:#d9a44e; --gold-soft:#2b2318;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.55);
-  }
-  :root[data-theme="light"]{
-    --paper:#eef0ee; --card:#ffffff; --ink:#1b2420; --ink-soft:#55635c;
-    --line:#d3d8d2; --line-strong:#b9c1b8;
-    --accent:#1f5c4a; --accent-soft:#e3ece8;
-    --flag:#8c2f2f; --flag-soft:#f4e4e2;
-    --gold:#a8752e; --gold-soft:#f1e6d4;
-    --shadow: 0 1px 2px rgba(20,24,20,.06), 0 8px 24px -12px rgba(20,24,20,.18);
+    --paper:#ffffff; --tint:#f5f8f6; --card:#ffffff; --ink:#14201b; --ink-soft:#5b6862;
+    --line:#dde3de; --line-strong:#bcc6bf;
+    --accent:#1f5c4a; --accent-soft:#eef4f1;
+    --flag:#8c2f2f; --flag-soft:#fbf1ef;
+    --gold:#8a6122; --gold-soft:#f9f3e6;
+    --shadow: none;
   }
 
   *{box-sizing:border-box;}
@@ -147,7 +121,7 @@
   .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:2px; box-shadow:var(--shadow); }
   table{ border-collapse:collapse; width:100%; min-width:640px; background:var(--card); font-size:14.5px; }
   thead th{
-    text-align:left; padding:12px 16px; background:var(--paper);
+    text-align:left; padding:12px 16px; background:var(--tint);
     border-bottom:1px solid var(--line-strong); font-size:12.5px;
     letter-spacing:.02em; color:var(--ink-soft); font-weight:700;
   }
@@ -180,7 +154,7 @@
   }
   .item-cat{ font-weight:800; font-size:15.5px; margin:0; letter-spacing:-.01em; text-wrap:balance; }
   .item blockquote{
-    margin:0; padding:13px 16px; background:var(--paper);
+    margin:0; padding:13px 16px; background:var(--tint);
     border-left:2px solid var(--line-strong); border-radius:0 2px 2px 0;
     font-size:14px; line-height:1.8; color:var(--ink);
   }
@@ -194,7 +168,7 @@
   /* ---------- 이미지 ---------- */
   figure{
     margin:0; border:1px solid var(--line); border-radius:2px;
-    overflow:hidden; background:var(--paper); box-shadow:var(--shadow);
+    overflow:hidden; background:var(--tint);
   }
   figure img{ display:block; width:100%; height:auto; }
   figcaption{
@@ -225,9 +199,32 @@
     .memo-head::before{ display:none; }
   }
   @media print{
-    body{ background:#fff; }
+    @page{ size:A4; margin:14mm 12mm; }
+    html,body{ background:#fff !important; }
+    body{ font-size:10.5pt; line-height:1.6; }
+    .sheet{ max-width:none; padding:0; }
     .memo-head::before{ display:none; }
-    section{ break-inside:avoid; }
+    .toc{ break-after:page; }
+
+    /* 섹션은 새 페이지에서 시작, 내부는 최대한 붙여둔다 */
+    section{ break-before:page; break-inside:auto; margin-top:0; padding-top:4mm; }
+    section:first-of-type{ break-before:auto; }
+    .sec-label{ break-after:avoid; break-inside:avoid; }
+    h3.sub{ break-after:avoid; break-inside:avoid; }
+
+    /* 표·인용·카드는 쪼개지지 않게 */
+    .table-wrap{ break-inside:avoid; overflow:visible; }
+    table{ min-width:0; width:100%; }
+    thead{ display:table-header-group; }
+    tr, .item, .comment, .callout, blockquote, figure{ break-inside:avoid; }
+    figure img{ max-height:105mm; object-fit:contain; }
+
+    /* 종이에서는 그림자·과한 채도 제거 */
+    *{ box-shadow:none !important; }
+    .lead, .comment, .callout, .item, .table-wrap, figure{ border-color:#c8d0ca !important; }
+
+    a{ color:inherit; text-decoration:none; }
+    footer{ break-inside:avoid; }
   }
 </style>
 
@@ -394,14 +391,15 @@
         풀옵션이 제공되며 우선분양전환형 선택 시 확정분양가는 82타입 7억 8,700만원, 108타입은 10억 3,500만원대 입니다.
       </blockquote>
       <p>
-        <strong>무상 제공 규모는 금액으로 확정되었습니다.</strong> 자료3-1이 임대형의 유상옵션비를
-        <strong>82타입 5,400만원 · 108타입 8,450만원</strong>으로 명시하고, 우선분양전환형에는 이 항목이
-        아예 없기 때문입니다. 즉 우선분양전환형을 선택하면 그 금액 상당의 옵션이 포함됩니다.
+        <strong>우선분양전환형을 선택하면 옵션은 무상입니다.</strong> 자료2·3-1이 임대형에만 유상옵션비
+        (<strong>82타입 5,450만원 · 108타입 8,450만원</strong>)를 부과하고 우선분양전환형에는 해당 항목을
+        두지 않았기 때문이며, 계약 현장 안내도 동일합니다. 즉 분양전환권 1,500만원(82타입)을 매입하면
+        <strong>5,450만원 상당의 옵션이 함께 제공</strong>되는 구조입니다.
       </p>
       <p>
-        다만 <strong>어느 품목까지인지는 여전히 불명</strong>입니다. 원문(모집공고문)에 유상옵션으로 기재된
-        품목은 아래와 같으며, 82타입 기준 아래 표의 합계는 5,400만원을 상회하므로 전 품목이 아니라
-        일부만 포함될 가능성이 있습니다 — 정확한 무상 범위는 계약 전 서면으로 확인해야 합니다.
+        아래는 원문(모집공고문)에 유상옵션으로 기재된 품목과 가격입니다. <strong>우선분양전환형을 선택하면
+        이 품목들이 무상 제공</strong>되므로, 아래 금액은 그대로 계약자가 절감하는 금액에 해당합니다.
+        다만 무상 제공 품목의 범위는 계약서 또는 별도 확인서에 명시되어야 분쟁 소지가 없습니다.
       </p>
       <div class="table-wrap">
         <table>
