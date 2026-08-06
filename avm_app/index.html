@@ -223,7 +223,7 @@ table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
   </div>
 </div>
 
-<script src="data.js?v=20260806h"></script>
+<script src="data.js?v=20260806i"></script>
 <script>
 const KAKAO_KEY="6dd941689e3c39956d9ba809f127c947";
 let map=null, ovs=[], selNm=null, filter="all", cur=null;
@@ -267,6 +267,36 @@ function ageBetween(subjectYear,caseYear){
 }
 // 임대 사용 마모: 연 0.4%, 상한 5% — 분양전환·임대 단지는 임차인 실사용 물건이라 신축 대비 추가 감가
 function rentalWear(years){ return years>0? Math.min(0.004*years,0.05) : 0; }
+
+// 아파트 가치형성요인 4계층 — 실제 감정평가서 원문 대조(지우감정평가법인 1-230619-301,
+// 청암감정평가사사무소 CA2308-004). modules/appraisal_engine.py APARTMENT_FACTOR_ITEMS와 동일.
+// "자동산출"은 이 앱이 공공API로 직접 계산·반영하는 항목, "확인필요"는 임장 전에는
+// 확정할 수 없는 항목 — 둘을 섞지 않고 항상 구분해 보여준다.
+const FACTOR_LAYERS = [
+ {layer:"단지외부요인", items:["대중교통의 편의성","교육시설 등의 배치","도심지 및 상업·업무시설과의 접근성",
+   "차량이용의 편리성","공공시설 및 편익시설과의 배치","자연환경(조망·풍치·경관 등)"],
+   auto:[], manual:["대중교통·상업시설 접근성","조망·풍치"]},
+ {layer:"단지내부요인", items:["시공업체의 브랜드","단지내 총세대수 및 최고층수","건물의 구조 및 마감상태",
+   "경과연수에 따른 노후도","단지내 면적구성(대형·중형·소형)","단지내 통로구조(복도식/계단식)",
+   "공용시설의 규모·구성·상태","전용률"],
+   auto:["시공업체 브랜드(단지명 매칭)","경과연수(연식회귀)","총세대수·최고층수(K-APT)"], manual:["마감상태","통로구조","공용시설 상태"]},
+ {layer:"호별요인", items:["층별 효용","향별 효용","위치별 효용(동별 및 라인별)","전유부분의 면적 및 대지사용권의 크기",
+   "내부 평면방식(베이)","베란다의 유무 및 면적의 대소","주차장 등의 유무","간선도로 및 철도 등에 의한 소음","관리상태"],
+   auto:["층별 효용(실거래 회귀)","전유면적"], manual:["향별 효용","위치·라인별 효용","평면방식(베이)","소음","관리상태"]},
+ {layer:"기타요인", items:["기타 가치에 영향을 미치는 요인"], auto:[], manual:["기타 가치영향요인"]},
+];
+function statusBadge(item,manual){
+  const isManual = manual.some(m=>item.includes(m)||m.includes(item.split("(")[0]));
+  return isManual? '<span style="color:var(--gold)">확인필요(임장)</span>' : '<span style="color:var(--pos)">자동산출 반영</span>';
+}
+function factorLayerTable(){
+  return `<table class="mini" style="margin-top:6px">
+    <thead><tr><th>구분</th><th>세부 항목</th><th>반영 상태</th></tr></thead>
+    <tbody>${FACTOR_LAYERS.map(L=>L.items.map((it,i)=>
+      `<tr>${i===0?`<td rowspan="${L.items.length}" style="vertical-align:top"><b>${L.layer}</b></td>`:""}
+        <td>${it}</td><td>${statusBadge(it,L.manual)}</td></tr>`).join("")).join("")}
+    </tbody></table>`;
+}
 
 // 평가목적별 이해관계 방향: -1=낮을수록 입주민 유리(분양전환가격), +1=높을수록 유리(담보한도)
 const PURPOSE_DIR={"분양전환":-1,"담보평가 (잔금대출)":1,"시가참고":0,"경매참고":0};
@@ -721,7 +751,22 @@ function detail(area,bi,purp,ltv){
         <div class="why-b">한국부동산원 공동주택 실거래가격지수(${c.sido||"해당 지역"} 아파트)로 기준시점 보정.
           <div class="calc">지수 2026.08 / 2026.05 → 보정률 ${idx}</div></div></div>
 
-      <div class="why"><div class="why-h"><span class="n">4</span>개별요인 — 층별효용 (실측)</div>
+      <div class="why"><div class="why-h"><span class="n">4</span>가치형성요인 비교 — 단지외부·단지내부·호별·기타 4계층</div>
+        <div class="why-b">
+          <div class="quote"><span class="code">출처: 지우감정평가법인 1-230619-301(2023.07.26) ·
+            청암감정평가사사무소 CA2308-004(2023.08.29) 원문 대조</span>
+            실제 감정평가서가 채택하는 아파트 개별요인 체계는 표준지공시지가의 6조건(가로·접근·환경 등
+            토지용)이 아니라 이 4계층이다. 실무기준 [610-3.1.3]②의 "층별·위치별 효용요인 반영" 의무가
+            바로 이 표에서 구체화된다.</div>
+          ${factorLayerTable()}
+          <div style="font-size:12.5px;color:var(--gray-700);margin-top:8px">
+            <b>자동산출</b>은 공공API로 이 앱이 직접 계산·반영한 항목, <b style="color:var(--gold)">확인필요(임장)</b>은
+            감칙 제10조상 실지조사 없이는 확정할 수 없어 반영하지 않은 항목이다. 확인필요 항목을 채우면
+            방어가능 범위(하단 §5)가 더 좁아질 수 있다 — 넓혀지지는 않는다(보수적 산정).
+          </div>
+        </div></div>
+
+      <div class="why"><div class="why-h"><span class="n">4-1</span>층별효용 (실측, 호별요인 중 자동산출분)</div>
         <div class="why-b">이 단지 실거래 ${c.n}건을 층수로 회귀하여 층대별 효용비율을 산출.
           <div class="calc">㎡단가 ${Math.round(r.unit/1e4).toLocaleString()}만 × ${area.toFixed(2)}㎡ = ${won(r.mid)}</div>
           <table class="mini" style="margin-top:6px">
