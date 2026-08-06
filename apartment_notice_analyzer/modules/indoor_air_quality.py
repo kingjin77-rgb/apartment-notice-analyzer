@@ -36,7 +36,7 @@ RECOMMENDED_LIMITS: dict[str, dict[str, Any]] = {
 }
 
 # 공고문에 측정계획 고지가 있는지 판별할 키워드 (제6조제1항)
-MEASUREMENT_NOTICE_KEYWORDS = ["실내공기질 측정", "공기질 측정", "측정 계획", "측정계획", "입회"]
+MEASUREMENT_NOTICE_KEYWORDS = ["실내공기질 측정", "공기질 측정", "측정 계획", "측정계획"]
 
 
 @dataclass
@@ -64,7 +64,7 @@ def _find_measured_values(text: str) -> dict[str, float]:
     """공고문 본문에서 물질명 뒤에 붙은 수치(측정결과가 기재된 드문 경우)를 찾는다."""
     found: dict[str, float] = {}
     for name in RECOMMENDED_LIMITS:
-        m = re.search(rf"{re.escape(name)}\D{{0,10}}?([\d,]+(?:\.\d+)?)", text)
+        m = re.search(rf"{re.escape(name)}\D{{0,10}}?([\d,]+(?:\.\d+)?)\s*(?:㎍|ug|㎎|mg|Bq|ppm|CFU)", text)
         if m:
             try:
                 found[name] = float(m.group(1).replace(",", ""))
