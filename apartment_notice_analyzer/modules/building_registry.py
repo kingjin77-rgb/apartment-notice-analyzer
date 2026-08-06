@@ -97,6 +97,44 @@ class BuildingRegistryClient:
             "ji": ji.zfill(4),
         })
 
+    def get_unit_areas(self, sigungu_cd: str, bjdong_cd: str, bun: str, ji: str = "0000") -> list[dict]:
+        """전유공용면적 조회(getBrExposPubuseAreaInfo) — 세대별 실제 전유면적 원부.
+
+        거래사례가 없는 단지의 '평형(타입) 구성'을 인근 단지에서 빌려오는 임시방편 대신,
+        이 단지 자체의 건축물대장 공부에서 직접 가져오기 위한 것이다.
+        (getBrHsprcInfo는 이름과 달리 동별 주택가격 공시이력이라 전유면적이 없다 — 실측 확인함)
+        """
+        return self._call("getBrExposPubuseAreaInfo", {
+            "sigunguCd": sigungu_cd,
+            "bjdongCd": bjdong_cd,
+            "platGbCd": "0",
+            "bun": bun.zfill(4),
+            "ji": ji.zfill(4),
+            "numOfRows": 3000,
+        })
+
+    def summarize_unit_areas(self, hsprc_info: list[dict]) -> list[dict]:
+        """get_unit_areas() 원본(호별 1행)을 전유면적 타입별로 집계.
+
+        exposPubuseGbCdNm(전유/공용 구분)이 '전유'인 행만 세대로 간주하고,
+        area 필드(exclusPrvatArea, ㎡)를 반올림해 타입으로 묶는다.
+        """
+        units = [r for r in hsprc_info if "전유" in (r.get("exposPubuseGbCdNm") or "")]
+        by_area: dict[float, int] = {}
+        for r in units:
+            a = r.get("area")
+            try:
+                a = round(float(a), 2)
+            except (TypeError, ValueError):
+                continue
+            if a <= 0:
+                continue
+            by_area[a] = by_area.get(a, 0) + 1
+        return sorted(
+            [{"a": a, "n": n} for a, n in by_area.items()],
+            key=lambda x: -x["n"],
+        )
+
     def summarize_complex(self, title_info: list[dict]) -> dict:
         """
         get_title_info() 원본(동별 1행)을 단지 단위 통계로 집계.

@@ -204,9 +204,11 @@ table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
       선택하면 단지 개요 → 평형·층·타입별 감정평가 →<br>산정근거 → 보고서 순으로 진행됩니다.
       <div class="src" style="text-align:left;margin-top:22px">
         <b style="color:var(--navy)">실데이터 적용</b><br>
-        국토교통부 실거래가 오픈API — 화성시 4개구(동탄·병점·봉담·남양)<br>
-        2025.01~2026.08 원본 22,810건 → 정제 20,919건 → 단지 60곳<br>
-        계약해제 1,332건 · 직거래 559건 제외, 단지별 MAD 이상치 제거
+        국토교통부 실거래가 오픈API — <b>화성시 파일럿(604개 단지)</b>은 거래0건 단지까지
+        인근 비준·연식회귀·층별효용 실측 완비. <b>경기도 전역 확장(4,261개 단지)</b>은
+        자체 실거래 보유 단지만 우선 반영 — 거래0건 단지 비준망은 다음 단계 작업.<br>
+        화성시: 2025.01~2026.08 원본 22,810건 → 정제 20,919건, 계약해제·직거래 제외 후
+        단지별 MAD 이상치 제거.
       </div>
       <div class="src" style="text-align:left;margin-top:14px">
         <b style="color:var(--navy)">방법론 검증 — 실제 두 감정평가법인 대조</b><br>
@@ -221,7 +223,7 @@ table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
   </div>
 </div>
 
-<script src="data.js?v=20260806c"></script>
+<script src="data.js?v=20260806e"></script>
 <script>
 const KAKAO_KEY="6dd941689e3c39956d9ba809f127c947";
 let map=null, ovs=[], selNm=null, filter="all", cur=null;
@@ -601,7 +603,8 @@ function matrix(purp,ltv,opt){
     </div>
     <div class="dlbar">
       <button class="btn ghost sm" style="flex:1" onclick="renderComplex()">← 단지</button>
-      <button class="btn sm" style="flex:2" onclick="alert('전 평형 결과를 XLSX로 내려받습니다.\\n(단체등기 세대별 배포용)')">엑셀 다운로드</button>
+      <button class="btn sm" style="flex:1" onclick="alert('전 평형 결과를 XLSX로 내려받습니다.\\n(단체등기 세대별 배포용)')">엑셀 다운로드</button>
+      <button class="btn gold sm" style="flex:2" onclick="openCombinedReport('${purp}',${ltv})">📑 통합 보고서 (전 평형)</button>
     </div>
   </div>`;
   document.querySelector(".panel").scrollTop=0;
@@ -797,46 +800,133 @@ function detail(area,bi,purp,ltv){
   document.querySelector(".panel").scrollTop=0;
 }
 
-// 감정평가 보고서 — 현재 패널(상세근거 전체)을 그대로 재사용해 별창의 인쇄용
-// 문서로 연다. 서버 없는 정적앱이므로 "저장"은 (1)인쇄→PDF 저장, (2)HTML 파일
-// 다운로드 두 경로로 제공한다.
+// 감정평가 보고서 — 팝업(window.open)은 브라우저 팝업차단에 걸려 실사용에서
+// 막히므로 쓰지 않는다. 같은 패널 안에서 인쇄전용 뷰로 전환하고, 저장은
+// (1)인쇄→PDF, (2)HTML 파일 다운로드(Blob, 팝업 아니라 차단 안 됨) 두 경로.
 function openReport(area,bi,purp,ltv){
-  const c=cur, opt=LAST_OPT;
+  const c=cur, opt=LAST_OPT, r=cell(c,area,bi,purp,opt);
   const wrap=document.createElement("div");
   wrap.innerHTML=document.querySelector(".panel .pbody").innerHTML;
   wrap.querySelectorAll(".dlbar").forEach(x=>x.remove());
   const reportBody=wrap.innerHTML;
-  const styles=document.querySelector("style").innerHTML;
   const title=`${c.nm} 예상감정평가 보고서 ${opt.lease?("("+opt.lease+") "):""}${(new Date()).toISOString().slice(0,10)}`;
-  const fname=JSON.stringify(title.replace(/\s+/g,"_")+".html");
-  const html=`<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>${title}</title>
-<style>${styles}
-body{background:#fff;padding:28px 22px;max-width:840px;margin:0 auto}
-.pbody{padding:0}
-.dlbar{display:none}
-.noprint{display:flex;gap:8px;margin-bottom:18px;position:sticky;top:0;background:#fff;
-  padding:10px 0;border-bottom:1px solid var(--line);z-index:5}
-@media print{ .noprint{display:none} body{padding:0;max-width:none} }
-</style></head><body>
-<div class="noprint">
-  <button class="btn sm" onclick="window.print()">🖨 인쇄 / PDF로 저장</button>
-  <button class="btn sm ghost" onclick="saveHtml()">💾 HTML 파일로 저장</button>
-</div>
-<h1 style="font-size:19px;margin-bottom:4px;color:var(--ink)">${c.nm} — 예상 감정평가 보고서</h1>
-<div style="font-size:12px;color:var(--gray-700);margin-bottom:20px">
-  작성일 2026-08-06 · 법무법인제이엘 사내 업무 참고자료 · 대외 제공·금융기관 제출 금지</div>
-${reportBody}
-<script>
-const RPT_NAME=${fname};
-function saveHtml(){
-  const blob=new Blob([document.documentElement.outerHTML],{type:"text/html"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=RPT_NAME; a.click();
+  window.__RPT_FNAME=title.replace(/\s+/g,"_")+".html";
+  window.__RPT_BACK=()=>detail(area,bi,purp,ltv);
+  document.getElementById("panel").innerHTML=`
+  <div class="pbody rptview">
+    <div class="noprint" style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="btn ghost sm" onclick="__RPT_BACK()">← 돌아가기</button>
+      <button class="btn sm" onclick="window.print()">🖨 인쇄 / PDF로 저장</button>
+      <button class="btn sm gold" onclick="saveReportHtml()">💾 HTML 파일로 저장</button>
+    </div>
+    <h1 style="font-size:18px;margin-bottom:4px;color:var(--ink)">${c.nm} — 예상 감정평가 보고서</h1>
+    <div style="font-size:12px;color:var(--gray-700);margin-bottom:18px">
+      작성일 2026-08-06 · 법무법인제이엘 사내 업무 참고자료 · 대외 제공·금융기관 제출 금지</div>
+    ${reportBody}
+  </div>`;
+  document.querySelector(".panel").scrollTop=0;
 }
-<\/script>
-</body></html>`;
-  const win=window.open("","_blank");
-  if(!win){ alert("팝업이 차단되었습니다. 브라우저 주소창의 팝업 차단 아이콘을 해제한 뒤 다시 시도하세요."); return; }
-  win.document.open(); win.document.write(html); win.document.close();
+// 통합 보고서 — 개별(§ openReport)은 평형·층대 1칸짜리, 이건 단지 전 평형×층대를
+// 한 문서에 모은 것(단체등기 세대별 배포용). 법적근거·방법론은 한 번만 서술하고
+// 평형별 결과는 표로 압축한다.
+function openCombinedReport(purp,ltv){
+  const c=cur, opt=LAST_OPT, bf=bandFloors(c), isConv=purp==="분양전환";
+  let rows="";
+  c.areas.forEach(a=>{
+    let tds="";
+    c.fadj.forEach((f,bi)=>{
+      const r=cell(c,a.a,bi,purp,opt);
+      if(!r||r.na){ tds+=`<td class="na">산정불가</td>`; return; }
+      tds+=`<td class="c"><b>${eok(r.mid)}</b><span class="sm">${r.dir<0?"최저":r.dir>0?"최고":"참고"} ${eok(r.favorable)}</span></td>`;
+    });
+    rows+=`<tr><td><b>${a.a.toFixed(2)}</b><span class="sm">${Math.round(a.a/3.3058)}평 · ${a.n}건</span></td>${tds}</tr>`;
+  });
+  let convRows="";
+  if(isConv){
+    c.areas.forEach(a=>{
+      const midCell=cell(c,a.a,2,purp,opt); // 중상층 대표
+      if(!midCell||midCell.na) return;
+      if(opt.lease==="10년분납"){
+        if(!opt.initPrice) return;
+        const s=installmentSchedule(opt.initPrice,midCell.mid);
+        convRows+=`<tr><td>${a.a.toFixed(2)}㎡</td><td>${won(s.total)}</td><td>①~③ 확정 ${won(s.y1+s.y4+s.fixed3)} + ④ 감정가연동 ${won(s.final4)}</td></tr>`;
+      }else{
+        const cv=conversionPrice(midCell.mid,opt.lease,opt.bcost);
+        convRows+=`<tr><td>${a.a.toFixed(2)}㎡</td><td>${cv.price!=null?won(cv.price):"입력값 필요"}</td><td>${cv.basis}</td></tr>`;
+      }
+    });
+  }
+  const title=`${c.nm} 통합 예상감정평가 보고서 ${opt.lease?("("+opt.lease+") "):""}${(new Date()).toISOString().slice(0,10)}`;
+  window.__RPT_FNAME=title.replace(/\s+/g,"_")+".html";
+  window.__RPT_BACK=()=>matrix(purp,ltv);
+  document.getElementById("panel").innerHTML=`
+  <div class="pbody rptview">
+    <div class="noprint" style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="btn ghost sm" onclick="__RPT_BACK()">← 돌아가기</button>
+      <button class="btn sm" onclick="window.print()">🖨 인쇄 / PDF로 저장</button>
+      <button class="btn sm gold" onclick="saveReportHtml()">💾 HTML 파일로 저장</button>
+    </div>
+    <h1 style="font-size:18px;margin-bottom:4px;color:var(--ink)">${c.nm} — 통합 예상 감정평가 보고서 (전 평형)</h1>
+    <div style="font-size:12px;color:var(--gray-700);margin-bottom:18px">
+      작성일 2026-08-06 · 평가목적 ${purp}${isConv?` (${opt.lease})`:""} · 법무법인제이엘 사내 업무 참고자료 ·
+      대외 제공·금융기관 제출 금지</div>
+
+    <div class="why"><div class="why-h"><span class="n">1</span>적용 방법 · 법적 근거</div>
+      <div class="why-b">대상은 집합건물법상 구분소유 부동산이므로 <b>거래사례비교법</b>이 법정 주방식이다.
+        <div class="quote"><span class="code">감정평가에 관한 규칙 제16조</span>
+          구분소유권의 대상이 되는 건물부분과 그 대지사용권을 일괄하여 감정평가할 때에는
+          <b>거래사례비교법을 적용해야 한다.</b></div>
+        <div class="quote"><span class="code">실무기준 [610-3.1.3] 제2항</span>
+          구분소유 부동산을 감정평가할 때에는 <b>층별ㆍ위치별 효용요인을 반영</b>하여야 한다.</div>
+      </div></div>
+
+    <div class="sect">
+      <h3>평형 · 층대별 예상 감정평가액 — 일반(중위) / ${c.rare||!c.hasT?"참고":"입주민유리"}</h3>
+      <table class="mini mx">
+        <thead><tr><th>전용면적</th>${BANDS.map((b,i)=>
+          `<th>${b[0]}<span class="sm">${bf[i][0]}~${bf[i][1]}층</span></th>`).join("")}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div style="font-size:12.5px;color:var(--gray-700);margin-top:8px">
+        굵은 글씨가 일반(중위) 추정, 아래 작은 글씨가 입주민 관점 참고치(최저/최고)다.
+        세대별 상세 산정근거(§2~5)는 개별 보고서(표 클릭 → 보고서 보기·저장)에서 확인한다.
+      </div>
+    </div>
+
+    ${isConv?`<div class="sect"><h3>6 분양전환가격 산정 (평형별, 중상층 대표)</h3>
+      <table class="mini">
+        <thead><tr><th>전용면적</th><th>분양전환가격</th><th>근거</th></tr></thead>
+        <tbody>${convRows||`<tr><td colspan="3" style="color:var(--gold)">입력값 부족 — 평가조건을 채운 뒤 다시 열람</td></tr>`}</tbody>
+      </table></div>`
+    :`<div class="sect"><h3>6 담보 대출한도 시산 (평형별, 중상층 대표)</h3>
+      <table class="mini">
+        <thead><tr><th>전용면적</th><th>대출한도</th></tr></thead>
+        <tbody>${c.areas.map(a=>{
+          const r=cell(c,a.a,2,purp,opt);
+          if(!r||r.na) return "";
+          const loan=Math.round(r.mid*ltv/1e6)*1e6-55000000;
+          return `<tr><td>${a.a.toFixed(2)}㎡</td><td>${won(loan)}</td></tr>`;
+        }).join("")}</tbody>
+      </table></div>`}
+
+    <div class="notice"><b>본 산정액은 감정평가액이 아닙니다.</b>
+      감정평가법 제2조에 따른 감정평가는 감정평가법인등만 수행할 수 있으며,
+      본 결과는 공공데이터를 감칙·실무기준이 정한 절차로 분석한 <b>사내 업무 참고자료</b>입니다.
+      대외 제공·금융기관 제출 용도로 사용할 수 없습니다.</div>
+  </div>`;
+  document.querySelector(".panel").scrollTop=0;
+}
+function saveReportHtml(){
+  const styles=document.querySelector("style").innerHTML;
+  const body=document.querySelector(".rptview").outerHTML;
+  const html=`<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<title>${window.__RPT_FNAME||"report"}</title><style>${styles}
+body{background:#fff;padding:24px;max-width:840px;margin:0 auto}
+.noprint{display:none}</style></head><body>${body}</body></html>`;
+  const blob=new Blob([html],{type:"text/html"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download=window.__RPT_FNAME||"report.html";
+  document.body.appendChild(a); a.click(); a.remove();
 }
 </script>
 </body>
