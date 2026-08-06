@@ -1,4 +1,4 @@
-<title>동탄 파라곤3차 — 계약조건 검토결과 안내문</title>
+<title>동탄 파라곤3차 — 임차권 명의변경 조건 개선 협의 안내</title>
 <style>
   :root{
     --paper:#ffffff; --tint:#f5f8f6; --ink:#14201b; --ink-soft:#5b6862;
@@ -18,36 +18,31 @@
 
   header{ border-bottom:2px solid var(--accent); padding-bottom:20px; }
   .eyebrow{ font-size:12.5px; letter-spacing:.06em; color:var(--ink-soft); margin:0 0 8px; font-weight:700; }
-  h1{ font-size:clamp(22px,3.6vw,27px); font-weight:800; margin:0 0 8px; letter-spacing:-.01em; text-wrap:balance; }
+  h1{ font-size:clamp(21px,3.4vw,26px); font-weight:800; margin:0 0 8px; letter-spacing:-.01em; text-wrap:balance; }
   .lead-line{ color:var(--ink-soft); font-size:15px; margin:0; }
 
   .summary{
     margin-top:24px; background:var(--accent-soft); border:1px solid var(--accent);
-    border-radius:2px; padding:20px 24px; font-size:16px;
+    border-radius:2px; padding:20px 24px;
   }
+  .summary p{ margin:0 0 10px; }
+  .summary p:last-child{ margin:0; }
   .summary strong{ color:var(--accent); }
 
   h2{
-    font-size:18px; font-weight:800; margin:38px 0 14px; letter-spacing:-.01em;
+    font-size:18px; font-weight:800; margin:36px 0 14px; letter-spacing:-.01em;
     border-left:4px solid var(--accent); padding-left:12px;
   }
-  h3{ font-size:16px; font-weight:800; margin:24px 0 8px; }
+  h3{ font-size:15.5px; font-weight:800; margin:22px 0 8px; }
   p{ margin:0 0 12px; }
   .muted{ color:var(--ink-soft); font-size:14.5px; }
 
-  .point{
-    border:1px solid var(--line-strong); border-left:4px solid var(--flag);
-    border-radius:0 2px 2px 0; padding:18px 22px; margin-bottom:14px; background:#fff;
+  .ground{
+    border:1px solid var(--line-strong); border-left:4px solid var(--accent);
+    border-radius:0 2px 2px 0; padding:16px 20px; margin-bottom:12px;
   }
-  .point.good{ border-left-color:var(--accent); }
-  .point h3{ margin:0 0 8px; }
-  .point p:last-child{ margin-bottom:0; }
-  .tagline{
-    display:inline-block; font-size:12px; font-weight:700; letter-spacing:.03em;
-    padding:2px 10px; border-radius:99px; margin-bottom:8px;
-    background:var(--flag-soft); color:var(--flag); border:1px solid var(--flag);
-  }
-  .tagline.good{ background:var(--accent-soft); color:var(--accent); border-color:var(--accent); }
+  .ground h3{ margin:0 0 6px; color:var(--accent); }
+  .ground p:last-child{ margin-bottom:0; }
 
   blockquote{
     margin:10px 0; padding:12px 16px; background:var(--tint);
@@ -56,35 +51,45 @@
   }
   blockquote .src{ display:block; margin-top:6px; font-size:12.5px; color:var(--ink-soft); }
 
-  ol.check{ margin:0; padding:0; list-style:none; counter-reset:c; }
-  ol.check li{
-    counter-increment:c; position:relative; padding:11px 0 11px 38px;
-    border-bottom:1px solid var(--line); font-size:15.5px;
-  }
-  ol.check li:last-child{ border-bottom:none; }
-  ol.check li::before{
-    content:counter(c); position:absolute; left:0; top:11px;
-    width:24px; height:24px; border-radius:50%; background:var(--accent-soft);
-    color:var(--accent); border:1px solid var(--accent);
-    font-size:12.5px; font-weight:800; display:flex; align-items:center; justify-content:center;
-  }
-  ol.check li b{ display:block; }
-  ol.check li span{ color:var(--ink-soft); font-size:14px; }
-
-  .table-wrap{ overflow-x:auto; border:1px solid var(--line-strong); border-radius:2px; }
-  table{ border-collapse:collapse; width:100%; min-width:460px; font-size:14.5px; }
+  .table-wrap{ overflow-x:auto; border:1px solid var(--line-strong); border-radius:2px; margin:12px 0; }
+  table{ border-collapse:collapse; width:100%; min-width:480px; font-size:14.5px; }
   th{ text-align:left; padding:11px 14px; background:var(--tint); border-bottom:1px solid var(--line-strong);
       font-size:12.5px; letter-spacing:.02em; color:var(--ink-soft); font-weight:700; }
   td{ padding:11px 14px; border-bottom:1px solid var(--line); vertical-align:top; }
   tr:last-child td{ border-bottom:none; }
-  td.num{ font-variant-numeric:tabular-nums; white-space:nowrap; }
   td:first-child{ font-weight:700; }
+  tr.us td{ background:var(--accent-soft); }
+  td.num{ font-variant-numeric:tabular-nums; white-space:nowrap; }
 
-  .note{
-    margin-top:32px; border:1px solid var(--gold); background:var(--gold-soft);
-    border-radius:2px; padding:18px 22px; font-size:14.5px;
+  ol.asks{ margin:0; padding:0; list-style:none; counter-reset:c; }
+  ol.asks li{
+    counter-increment:c; position:relative; padding:14px 0 14px 40px;
+    border-bottom:1px solid var(--line);
   }
-  .note b{ color:var(--gold); display:block; margin-bottom:6px; }
+  ol.asks li:last-child{ border-bottom:none; }
+  ol.asks li::before{
+    content:counter(c); position:absolute; left:0; top:14px;
+    width:26px; height:26px; border-radius:50%; background:var(--accent);
+    color:#fff; font-size:13px; font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+  }
+  ol.asks b{ display:block; font-size:16px; margin-bottom:3px; }
+  ol.asks span{ color:var(--ink-soft); font-size:14.5px; }
+
+  .callout{
+    margin-top:14px; border:1px solid var(--flag); background:var(--flag-soft);
+    border-radius:2px; padding:16px 20px; font-size:14.5px;
+  }
+  .callout b{ color:var(--flag); display:block; margin-bottom:6px; }
+  .callout.gold{ border-color:var(--gold); background:var(--gold-soft); }
+  .callout.gold b{ color:var(--gold); }
+
+  .need{ border:1px solid var(--line-strong); border-radius:2px; padding:6px 20px; }
+  .need li{ padding:11px 0; border-bottom:1px solid var(--line); font-size:15px; }
+  .need li:last-child{ border-bottom:none; }
+  .need ul{ margin:0; padding:0; list-style:none; }
+  .need b{ display:block; }
+  .need span{ color:var(--ink-soft); font-size:14px; }
 
   footer{
     margin-top:40px; padding-top:18px; border-top:1px solid var(--line);
@@ -97,7 +102,7 @@
     body{ font-size:10.5pt; line-height:1.65; }
     .sheet{ max-width:none; padding:0; }
     h2{ break-after:avoid; }
-    .point, blockquote, .table-wrap, .note, ol.check li, footer{ break-inside:avoid; }
+    .ground, blockquote, .table-wrap, .callout, .need, ol.asks li, footer{ break-inside:avoid; }
     *{ box-shadow:none !important; }
   }
 </style>
@@ -105,158 +110,165 @@
 <div class="sheet">
 
   <header>
-    <p class="eyebrow">법무법인제이엘 · 계약자 안내</p>
-    <h1>동탄 파라곤3차 계약조건 검토결과 안내</h1>
-    <p class="lead-line">임차인모집공고문 원문과 사업주체 배포자료를 직접 대조한 결과를 요약해 드립니다.</p>
+    <p class="eyebrow">동탄 파라곤3차 계약자 여러분께</p>
+    <h1>임차권 명의변경(전매) 조건 개선을 사업주체와 협의합니다</h1>
+    <p class="lead-line">모집공고문 원문과 타 사업장 공고문을 직접 대조한 결과를 바탕으로 협의를 준비하고 있습니다.</p>
   </header>
 
   <div class="summary">
-    <p style="margin:0;">
-      결론부터 말씀드리면, <strong>계약을 결정하실 때 들으신 핵심 조건 대부분이 모집공고문에는 없습니다.</strong>
-      확정분양가, 우선분양전환권, 명의변경 2회, 옵션 무상 — 이 네 가지는 홈페이지와 현장 안내자료에만
-      있고, 법적 구속력이 가장 강한 모집공고문에는 기재되어 있지 않습니다.
-      계약 전에 <strong>서면으로 받아두시는 것</strong>이 가장 중요합니다.
+    <p>
+      현재 안내되고 있는 명의변경 조건은 <strong>입주 전 1회, 2037년 2월 등기 시기 1회 — 총 2회</strong>입니다.
+      그런데 이 조건은 <strong>모집공고문 어디에도 없습니다.</strong> 현장 안내자료로만 전해지고 있습니다.
+    </p>
+    <p>
+      원문을 대조한 결과 확인된 핵심은 이것입니다. <strong>명의변경 허용 여부와 횟수는 법으로 정해진 것이
+      아니라, 사업주체가 결정하는 사항입니다.</strong> 그렇다면 협의로 바꿀 수 있는 사안이라는 뜻입니다.
     </p>
   </div>
 
-  <h2>1. 무엇을 확인했나</h2>
+  <h2>1. 지금 조건의 무엇이 문제인가</h2>
+
   <p>
-    모집공고문 PDF 원문을 직접 내려받아 <strong>전 36면을 한 글자씩 검색</strong>했습니다.
-    추측이나 요약이 아니라, 원문에 그 표현이 실제로 있는지 없는지를 세어서 확인한 결과입니다.
-    비교를 위해 다른 민간임대 단지(수지구청역 하이브엘) 공고문 32면도 같은 방식으로 대조했습니다.
+    계약자 입장에서 명의변경은 <strong>10년 동안 유일한 출구</strong>입니다. 전근, 질병, 자금 사정이 생겨도
+    계약상 지위를 넘길 수 없다면 자금이 장기간 묶입니다. 현재 조건에는 세 가지 문제가 있습니다.
   </p>
 
-  <h2>2. 꼭 아셔야 할 네 가지</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>문제</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>① 근거가 없다</td>
+          <td>"총 2회"는 모집공고문에 없습니다. 공고문 전 36면을 검색해도 허용 횟수를 정한 규정이 <strong>0건</strong>입니다. 안내자료가 바뀌면 조건도 바뀔 수 있는 상태입니다.</td>
+        </tr>
+        <tr>
+          <td>② 횟수가 부족하다</td>
+          <td>입주 전 1회뿐입니다. 계약부터 입주(2027년 2월)까지, 다시 등기(2037년)까지 10년간 사정이 생길 여지에 비해 지나치게 적습니다.</td>
+        </tr>
+        <tr>
+          <td>③ 시점을 알 수 없다</td>
+          <td>사업주체 안내자료는 전매 가능 시점을 <strong>"전매시점 사업주체 고지"</strong>라고 적었습니다. 언제 가능한지를 사업주체가 통보해 주기 전까지 계약자는 알 수 없습니다.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-  <div class="point">
-    <span class="tagline">확인 필요</span>
-    <h3>① 확정분양가·우선분양전환권이 공고문에 없습니다</h3>
+  <div class="callout">
+    <b>특히 짚어야 할 부분</b>
+    사업주체 홍보자료의 표제는 <strong>"10년 안심 거주 및 분양전환시 전매권 활용하여 시세차익까지"</strong>입니다.
+    전매를 계약자 혜택으로 앞세워 광고했습니다. 반면 모집공고문은 입주 전·후를 불문하고 양도·전대를 금지하고,
+    위반 시 임차권 박탈과 위약벌을 규정합니다. <strong>광고와 계약조항이 서로 다릅니다.</strong>
+  </div>
+
+  <h2>2. 왜 협의가 가능한가 — 근거 세 가지</h2>
+  <p class="muted">모두 공식 문서를 직접 확인한 내용입니다. 추측이 아닙니다.</p>
+
+  <div class="ground">
+    <h3>근거 1 — 법령에 양도 횟수를 제한하는 조항이 없습니다</h3>
     <p>
-      "확정분양가", "우선분양전환"이라는 표현이 공고문 36면 전체에 <strong>단 한 번도 나오지 않습니다.</strong>
-      오히려 공고문은 이렇게 적고 있습니다.
-    </p>
-    <blockquote>
-      "본 주택의 임대의무기간은 10년 이상이며, 임대의무기간 종료 후 임차인에게
-      <b>분양전환 우선권을 부여하지 않습니다.</b>"
-      <span class="src">— 모집공고문 ▣임대기간 항</span>
-    </blockquote>
-    <p>
-      분양가와 분양 대상자는 <strong>"사업주체가 직접 정한 기준에 따라"</strong> 정한다고도 되어 있습니다.
-      즉 안내받으신 확정분양가(82타입 7억 8,732만원)는 실제로 운영되는 조건이지만,
-      그 약속이 공고문에는 남아 있지 않은 상태입니다.
+      「민간임대주택에 관한 특별법」과 시행령에서 임차권 양도 횟수를 제한하는 조항은 확인되지 않았습니다.
+      양도·전대를 금지하고 형사처벌하는 규정은 「공공주택 특별법」에 있는데, 이는 LH·지방공사 등
+      <strong>공공임대주택에 적용되는 조항</strong>이고 본 단지는 해당하지 않습니다.
     </p>
   </div>
 
-  <div class="point">
-    <span class="tagline">확인 필요</span>
-    <h3>② 사업주체가 공고문에 국토교통부 경고를 스스로 인용해 두었습니다</h3>
-    <blockquote>
-      "국토교통부 권고사항에 따라 <b>장래 임대의무기간 경과 후 소유권을 양도하기로 미리 약정하는 것은
-      관련 법에 근거가 없어 우선변제권 등이 적용되지 않고</b>, 해당 계약을 체결하거나 유도하는 행위는
-      「민간임대주택에 관한 특별법」에 저촉될 수 있음"
-      <span class="src">— 모집공고문 3면</span>
-    </blockquote>
+  <div class="ground">
+    <h3>근거 2 — 같은 문구를 쓰는 다른 단지는 훨씬 많이 허용합니다</h3>
     <p>
-      확정분양가 약정이 바로 이 경고가 말하는 "미리 약정하는 것"에 해당할 수 있습니다.
-      이 부분에 대한 사업주체의 법률 검토 결과를 요구할 필요가 있습니다.
-    </p>
-  </div>
-
-  <div class="point">
-    <span class="tagline">확인 필요</span>
-    <h3>③ 명의변경(전매) 2회도 공고문에 근거가 없습니다</h3>
-    <p>
-      안내자료에는 "명의 변경은 입주전, 2037년 2월 등기 시기 총 2회만 가능"이라고 되어 있습니다.
-      그런데 공고문에는 <strong>허용 횟수를 정한 규정이 아예 없고</strong>, 오히려 이렇게 되어 있습니다.
-    </p>
-    <blockquote>
-      "임차인은 … <b>임대인의 동의 없이</b> 임차권을 다른 사람에게 양도하거나 임대주택을 다른 사람에게
-      전대할 수 없습니다. 입주 전·후를 불문하고 … 무단으로 양도 및 전대한 경우 사업주체는 임차권을 박탈하고
-      기 납부한 보증금 중 … 위약벌이 공제되며…"
-      <span class="src">— 모집공고문 3면</span>
-    </blockquote>
-    <p>
-      다만 이는 <strong>바꿔 말하면 사업주체가 동의하면 가능하다</strong>는 뜻이기도 합니다.
-      실제로 같은 문구를 쓰는 다른 단지는 훨씬 많은 횟수를 허용하고 있어, 횟수는 법으로 정해진 것이 아니라
-      <strong>사업주체가 정하는 사항</strong>입니다. 그래서 서면 확정을 요구할 수 있는 사안입니다.
-    </p>
-  </div>
-
-  <div class="point good">
-    <span class="tagline good">유리한 조건</span>
-    <h3>④ 옵션 무상 제공은 사실로 확인됩니다</h3>
-    <p>
-      우선분양전환형을 선택하시면 옵션이 무상으로 제공됩니다. 배포자료상 임대형에만 유상옵션비가 붙어
-      있고 분양전환형에는 없기 때문이며, 금액으로 환산하면 다음과 같습니다.
+      수지구청역 롯데캐슬 하이브엘의 공식 모집공고문(전 32면)을 직접 확보해 대조했습니다.
+      금지 조항 문구가 파라곤3차와 사실상 같고, 허용 횟수 규정이 없는 것도 같습니다.
+      그런데 실제 운용은 완전히 다릅니다.
     </p>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>구분</th><th class="num">82타입</th><th class="num">108타입</th></tr></thead>
+        <thead><tr><th>구분</th><th>동탄 파라곤3차</th><th>수지구청역 하이브엘</th></tr></thead>
         <tbody>
-          <tr><td>임대형이 부담하는 유상옵션비</td><td class="num">5,450만원</td><td class="num">8,450만원</td></tr>
-          <tr><td>분양전환형이 내는 전환권 금액</td><td class="num">1,500만원</td><td class="num">2,500만원</td></tr>
+          <tr><td>공고문 금지 문구</td><td>동의 없이 양도·전대 불가</td><td>동의 없이 양도·전대 불가 <span class="muted">(사실상 동일)</span></td></tr>
+          <tr><td>공고문상 허용 횟수</td><td class="num">규정 없음</td><td class="num">규정 없음</td></tr>
+          <tr class="us"><td>실제 운용</td><td class="num">총 2회</td><td class="num">입주 전 6회 + 입주 후 무제한</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="muted" style="margin-top:10px;">
-      전환권을 매입하시면 그보다 훨씬 큰 금액의 옵션이 함께 제공되는 구조입니다.
-      다만 <strong>어떤 품목이 무상인지 목록을 서면으로 받아두셔야</strong> 나중에 다툼이 없습니다.
+    <p>
+      <strong>공고문이 같은데 결과가 다릅니다. 그 차이를 만든 것은 법이 아니라 사업주체의 결정입니다.</strong>
     </p>
   </div>
 
-  <h2>3. 계약 전 서면으로 받아두실 것</h2>
-  <p class="muted">
-    구두 안내는 나중에 증명이 어렵습니다. 아래는 종이나 문자·메일 등 남는 형태로 받아두시길 권해 드리는 항목입니다.
-  </p>
-  <ol class="check">
+  <div class="ground">
+    <h3>근거 3 — 사업주체가 스스로 재량임을 문서에 밝혔습니다</h3>
+    <p>
+      안내자료 비고란에 <strong>"임차 기간 중 전매 가능 *전매시점 사업주체 고지"</strong>라고 적혀 있습니다.
+      전매 시점을 법이 정하는 것이 아니라 사업주체가 정해 알린다는 뜻입니다.
+      재량 사항임을 사업주체가 문서로 인정한 표현입니다.
+    </p>
+  </div>
+
+  <h2>3. 사업주체에 요청할 사항</h2>
+
+  <ol class="asks">
     <li>
-      <b>확정분양가와 우선분양전환권 조건</b>
-      <span>금액, 시점, 산정근거를 계약서 또는 특약서에 명시해 달라고 요청하십시오.</span>
+      <b>명의변경 조건의 서면 확정</b>
+      <span>허용 횟수·시점·신청 절차·수수료를 계약서면 또는 정정공고에 명시할 것. <strong>이것이 최우선입니다.</strong> 지금은 안내자료로만 존재해 언제든 바뀔 수 있습니다.</span>
     </li>
     <li>
-      <b>명의변경 허용 횟수·시점·절차·수수료</b>
-      <span>"총 2회"가 계약서 어디에 근거하는지 확인하시고, 없으면 명문화를 요청하십시오.</span>
+      <b>허용 횟수 확대</b>
+      <span>목표는 하이브엘 수준(입주 전 6회·입주 후 무제한), 최소 기준은 신광교 제일풍경채 수준(입주 전 2회·입주 후 제한 없음)으로 제시합니다.</span>
     </li>
     <li>
-      <b>무상 제공되는 옵션 품목 목록</b>
-      <span>"풀옵션"이라는 표현 대신 품목별 목록으로 받으십시오.</span>
+      <b>양수인 자격심사를 조건으로 한 승인 절차 신설</b>
+      <span>양수인에게 동일한 자격요건을 요구하는 조건부 승인 방식입니다. 사업주체가 공공성을 이유로 들 경우의 절충안입니다.</span>
     </li>
     <li>
-      <b>중도 해지 시 위약금 산정기준</b>
-      <span>안내상 입주 후 퇴거 시 확정분양가의 10% + 전환권 금액입니다. 82타입 기준 9천만원을 넘습니다.</span>
-    </li>
-    <li>
-      <b>표준임대차계약서 전문</b>
-      <span>공고문이 여러 조건을 "계약서에 따른다"고만 하고 있어, 계약 전 미리 열람하셔야 합니다.</span>
+      <b>광고와 계약조항 불일치에 대한 해명·시정</b>
+      <span>"전매권 활용하여 시세차익까지"라고 광고하면서 계약조항으로는 전면 금지한 부분에 대한 설명을 요구합니다.</span>
     </li>
   </ol>
 
-  <div class="note">
-    <b>유주택자로 계약하시는 경우 — 반드시 먼저 확인하십시오</b>
-    계약 현장에서 <strong>"유주택자는 기존주택 매도약정 조건으로만 중도금 집단대출이 가능하다"</strong>는
-    안내를 받았다는 이야기가 있습니다. 사실이라면 기존 주택을 팔아야 하는 의무가 생기고,
-    재건축 예정 등으로 처분이 어려운 주택을 보유하신 분은 대출 자체가 막혀 자기 자금으로
-    납부하셔야 합니다. <strong>집단대출 외 개인대출이 일정 기간 제한된다</strong>는 이야기도 있습니다.
-    공고문은 "사업주체는 중도금 대출 알선 의무가 없고, 대출이 안 되어도 계약 해제 사유가 아니다"라고
-    정하고 있으므로, <strong>계약서에 서명하시기 전에 대출 조건을 은행과 사업주체 양쪽에서
-    확인받으시기 바랍니다.</strong>
+  <div class="callout gold">
+    <b>협의 방향에 대해</b>
+    저희가 요구하는 것은 <strong>양도를 새로 허용해 달라는 것이 아닙니다.</strong> 사업주체가 이미 총 2회를
+    운용하고 있으므로, 명의변경이 가능하다는 사실 자체는 다툼의 여지가 없습니다.
+    <strong>이미 존재하는 기준을 계약서면에 명문화하고, 그 범위를 합리적 수준으로 넓혀 달라는 것</strong>입니다.
+    무리한 요구가 아니며, 동종 사업장의 실제 운용 사례가 근거입니다.
   </div>
 
-  <h2>4. 정리</h2>
+  <h2>4. 계약자 여러분께 부탁드립니다</h2>
   <p>
-    이 안내문은 계약을 하지 마시라는 뜻이 아닙니다. 확정분양가와 옵션 무상은 실제로 존재하는 조건이고,
-    유리한 부분도 분명히 있습니다. 다만 <strong>그 조건들이 법적 구속력이 가장 강한 문서에는 적혀 있지
-    않다는 점</strong>이 위험입니다. 지금 단계에서 서면으로 남겨두시면 대부분 해소됩니다.
+    협의의 성패는 <strong>"총 2회"라는 조건을 사업주체가 실제로 안내했다는 사실을 얼마나 명확히 입증하느냐</strong>에
+    달려 있습니다. 현재 이 수치의 출처가 공식 문서로 확정되지 않은 상태입니다. 아래 자료를 가지고 계시면
+    공유해 주시기 바랍니다.
   </p>
-  <p>
-    자세한 근거와 조항별 검토 내용은 별도 <strong>검토보고서</strong>에 정리되어 있습니다.
-    개별 상황에 따라 판단이 달라질 수 있으니, 궁금한 점은 문의해 주시기 바랍니다.
+  <div class="need">
+    <ul>
+      <li>
+        <b>명의변경 횟수가 적힌 안내자료</b>
+        <span>견본주택에서 받으신 인쇄물, 상담 시 보여준 화면 촬영, 문자·카카오톡 안내 등 형태 무관</span>
+      </li>
+      <li>
+        <b>"전매 가능"이 표기된 홍보물</b>
+        <span>전단, 배너, 홈페이지 캡처 등. 받으신 시점을 함께 알려주시면 더 좋습니다</span>
+      </li>
+      <li>
+        <b>임대차계약서 및 우선분양전환권 관련 특약</b>
+        <span>계약서에 명의변경 조항이 어떻게 적혀 있는지가 핵심입니다. 개인정보는 가리셔도 됩니다</span>
+      </li>
+      <li>
+        <b>상담 과정의 기록</b>
+        <span>담당자 안내 내용, 통화 녹취, 메모 등. 안내 내용이 시기별로 달랐다면 특히 중요합니다</span>
+      </li>
+    </ul>
+  </div>
+
+  <p style="margin-top:16px;">
+    자료가 많이 모일수록 협의에서 쓸 수 있는 근거가 단단해집니다.
+    특히 <strong>같은 내용을 여러 분이 각각 안내받았다는 사실</strong>이 확인되면,
+    이것이 개별 착오가 아니라 사업주체의 일관된 안내였음을 입증할 수 있습니다.
   </p>
 
   <footer>
-    법무법인제이엘 · 동탄 파라곤3차 임차인모집공고 검토 · 검토기준일 2026.08.04<br/>
-    본 안내문은 공개된 모집공고문 원문과 제공된 자료를 대조한 결과이며, 계약 여부는 개인의 판단에 따릅니다.
-    구체적 사안은 별도 상담이 필요합니다.
+    법무법인제이엘 · 동탄 파라곤3차 임차권 명의변경 협의 준비 · 2026.08<br/>
+    본 안내문은 공개된 모집공고문 원문(파라곤3차 36면·하이브엘 32면)과 제공된 자료를 직접 대조한 결과입니다.
+    계약조건 및 협의 결과는 개별 상황에 따라 달라질 수 있습니다.
   </footer>
 
 </div>
