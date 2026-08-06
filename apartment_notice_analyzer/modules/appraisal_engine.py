@@ -402,6 +402,31 @@ def appraise(
 # 분양전환가격 역산
 # ---------------------------------------------------------------------------
 
+def conversion_base_date(move_in_end: str, lease_years: int = 10) -> str | None:
+    """
+    분양전환 감정평가의 기준시점을 산출한다.
+
+    "최초 입주지정기간 종료일이 속하는 달의 다음 달 1일"을 기산점으로 삼아
+    임대의무기간이 경과한 시점이 기준시점이 된다.
+
+    move_in_end: 최초 입주지정기간 종료일 (YYYYMMDD 또는 YYYY-MM-DD)
+    반환: 기준시점 YYYYMMDD
+
+    주의: 이 계산은 분양전환 '시기' 판단용이다. 감칙 제9조 제2항상 실제
+    기준시점은 가격조사를 완료한 날이므로, 실제 감정평가서의 기준시점과는
+    며칠 차이가 날 수 있다. 사전 예측 단계에서 시점수정 목표월을 잡는 데 쓴다.
+    """
+    s = str(move_in_end).replace("-", "").strip()
+    if len(s) < 6 or not s[:6].isdigit():
+        return None
+    y, m = int(s[:4]), int(s[4:6])
+    # 종료일이 속한 달의 다음 달 1일
+    m += 1
+    if m > 12:
+        y, m = y + 1, 1
+    return f"{y + lease_years}{m:02d}01"
+
+
 def conversion_price(*, appraised: float, build_cost: float | None = None,
                      lease_type: str = "10년") -> dict:
     """
@@ -416,7 +441,14 @@ def conversion_price(*, appraised: float, build_cost: float | None = None,
     if lt.startswith("10"):
         return {"lease_type": "10년 임대", "price": appraised,
                 "basis": "[별표7] 1.가 — 분양전환가격은 감정평가금액을 초과할 수 없다.",
-                "note": "실무상 감정평가금액이 곧 분양전환가격 상한이 된다."}
+                "note": (
+                    "실무상 감정평가금액이 곧 분양전환가격이 된다. 두 곳의 감정평가법인이 "
+                    "각각 평가한 금액의 산술평균으로 확정하며(시행규칙 제42조), 택지비+건축비 "
+                    "원가방식이 아니라 분양전환 시점의 시장가치를 반영한다. 따라서 임대기간 중 "
+                    "주변 시세가 상승하면 분양전환가격도 그대로 상승한다 — 입주민 부담이 "
+                    "커지는 구조이므로 사전 예측의 실익이 가장 큰 유형이다.\n"
+                    "장기수선충당금은 분양 시 별도 정산 대상이며 분양전환가격에 포함되지 않는다."
+                )}
     if lt.startswith("5"):
         if build_cost is None:
             return {"lease_type": "5년 임대", "price": None,
@@ -438,6 +470,131 @@ def conversion_price(*, appraised: float, build_cost: float | None = None,
                 "법에 저촉될 수 있다'는 경고문구를 실제 공고문에서 사업주체 스스로 인용한 사례가 있다 "
                 "(동탄 파라곤3차, 2026.08 조사)."
             )}
+
+
+def build_cost(*, initial_price: float, land_price: float,
+               fund_loan: float = 0.0, deposit: float = 0.0,
+               rate_start: float = 0.0, rate_end: float = 0.0,
+               lease_years: float = 0.0, useful_life: int = 40) -> dict:
+    """
+    건설원가를 산출한다. 공공주택 특별법 시행규칙 [별표7] 제2호 가목.
+
+        건설원가 = 최초 입주자모집공고 당시 주택가격 + 자기자금이자 − 감가상각비
+
+        자기자금이자 = (최초 주택가격 − 주택도시기금 융자금 − 임대보증금)
+                       × 이자율 × 임대기간
+          이자율 = 임대시작일과 분양전환일의 1년만기 정기예금 평균이자율의 산술평균
+        감가상각비 = 법인세법 시행령 제26조 정액법
+          철근콘크리트 주택 내용연수 40년, 건축비(건물분)를 상각 대상으로 한다.
+
+    5년 임대의 분양전환가격 = (건설원가 + 감정평가금액) ÷ 2 에 들어가는 항이다.
+    10년 임대는 건설원가를 쓰지 않는다(감정평가금액이 곧 상한).
+    """
+    building_price = max(0.0, initial_price - land_price)   # 건축비 = 주택가격 − 택지비
+    rate = (rate_start + rate_end) / 2
+    own_fund = max(0.0, initial_price - fund_loan - deposit)
+    own_interest = own_fund * rate * lease_years
+    depreciation = (building_price / useful_life) * lease_years if useful_life else 0.0
+    total = initial_price + own_interest - depreciation
+    return {
+        "건설원가": round(total),
+        "최초주택가격": round(initial_price),
+        "택지비": round(land_price),
+        "건축비(건물분)": round(building_price),
+        "자기자금이자": round(own_interest),
+        "  자기자금": round(own_fund),
+        "  적용이자율": round(rate, 5),
+        "  임대기간(년)": lease_years,
+        "감가상각비": round(depreciation),
+        "  내용연수": useful_life,
+        "basis": "공공주택 특별법 시행규칙 [별표7] 제2호 가목",
+        "note": "표준건축비·정기예금 금리는 추정치이므로 실제 분양전환 통보서 수치로 보정할 것.",
+    }
+
+
+def ceiling_price_5yr(*, std_build_cost: float, land_price: float,
+                      land_interest: float = 0.0,
+                      depreciation: float = 0.0) -> dict:
+    """
+    5년 임대 분양전환가격의 상한(산정가격 − 감가상각비).
+    [별표7] 제1호 나목 단서 및 제2호 다목.
+
+        산정가격 = 분양전환 당시 표준건축비 + 최초 택지비 + 택지비이자
+    """
+    calc = std_build_cost + land_price + land_interest
+    return {
+        "산정가격": round(calc),
+        "상한": round(calc - depreciation),
+        "  표준건축비": round(std_build_cost),
+        "  최초택지비": round(land_price),
+        "  택지비이자": round(land_interest),
+        "  감가상각비": round(depreciation),
+        "basis": "공공주택 특별법 시행규칙 [별표7] 제1호 나목 단서, 제2호 다목",
+        "note": "5년 임대는 (건설원가+감정평가금액)÷2가 이 상한을 초과할 수 없다.",
+    }
+
+
+def sampling_rule(total_units: int) -> dict:
+    """
+    분양전환 감정평가의 표본 산정 규칙.
+    공공주택 특별법 시행규칙 제42조 제2항 (시행 2026.6.22. 국토교통부령 제1599호).
+
+    "같은 단지에서 30세대 이상의 공공임대주택을 분양전환하는 경우에는
+     분양전환대상 세대수의 10퍼센트 범위에서 동·규모·층 및 방향 등을 고려하여
+     감정평가의 대상 주택을 정할 수 있다."
+
+    실무상 함의가 크다. 전 세대를 평가하지 않고 표본만 평가한 뒤 나머지는
+    그 표본에서 유추한다. 즉 '어떤 세대가 표본으로 뽑히느냐'가 단지 전체
+    분양전환가격을 좌우한다. 표본 선정 기준이 동·규모·층·방향이므로
+    우리 엔진의 층별효용·향·면적 분석이 그대로 표본 검증 논리가 된다.
+    """
+    if total_units < 30:
+        return {"applies": False, "max_sample": total_units,
+                "basis": "시행규칙 제42조 제2항 — 30세대 미만은 표본평가 규정 미적용",
+                "note": "전 세대 평가가 원칙이다."}
+    cap = int(total_units * 0.10)
+    return {
+        "applies": True, "total_units": total_units, "max_sample": cap,
+        "basis": "공공주택 특별법 시행규칙 제42조 제2항",
+        "criteria": ["동", "규모(면적)", "층", "방향"],
+        "note": (
+            f"분양전환대상 {total_units:,}세대의 10% 이내, 즉 최대 {cap:,}세대만 "
+            f"감정평가 대상으로 정할 수 있다. 표본이 단지 전체 가격을 좌우하므로 "
+            f"표본이 동·규모·층·방향을 대표하는지 검증할 실익이 크다."
+        ),
+    }
+
+
+def revaluation_trigger(appraisals: list[float]) -> dict:
+    """
+    재감정 요건 판정.
+    공공주택 특별법 시행규칙 제42조 제3항.
+
+    "감정평가금액 중 최고 평가액이 최저 평가액의 100분의 110을 초과하는 경우에는
+     ... 감정평가를 다시 의뢰하여야 한다."
+
+    입주민 입장에서 결정적인 조항이다. 두 평가액 격차가 10%를 넘으면 재감정이
+    강제되고, 종전 감정평가에 대한 타당성 조사도 요구할 수 있다.
+    """
+    vals = [v for v in appraisals if v and v > 0]
+    if len(vals) < 2:
+        return {"triggered": False, "note": "평가액이 2건 미만이라 판정 불가"}
+    lo, hi = min(vals), max(vals)
+    ratio = hi / lo
+    triggered = ratio > 1.10
+    return {
+        "triggered": triggered, "min": lo, "max": hi, "ratio": round(ratio, 4),
+        "threshold": 1.10,
+        "basis": "공공주택 특별법 시행규칙 제42조 제3항",
+        "note": (
+            f"최고 {hi:,.0f}원 / 최저 {lo:,.0f}원 = {ratio:.1%}. "
+            + ("110%를 초과하므로 시장·군수·구청장은 재감정을 의뢰하여야 한다. "
+               "공공주택사업자 또는 임차인은 종전 감정평가에 대한 타당성 조사를 "
+               "요구할 수 있다(감정평가법 제46조①1호)."
+               if triggered else
+               "110% 이내이므로 재감정 사유에 해당하지 않는다.")
+        ),
+    }
 
 
 def reverse_appraised(*, conversion: float, build_cost: float,
