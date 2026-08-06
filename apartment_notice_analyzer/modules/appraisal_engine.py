@@ -472,6 +472,49 @@ def conversion_price(*, appraised: float, build_cost: float | None = None,
             )}
 
 
+def installment_conversion_schedule(*, initial_price: float, early_appraised: float | None = None,
+                                    lh_rate: float = 0.028, year4_rate: float | None = None,
+                                    early_year: int = 5) -> dict:
+    """
+    분납 공공임대(10년/분납) 조기분양전환의 4회 납부 스케줄.
+    「공공주택특별법 시행규칙」[별표8] 근거 — 실제 LH 계약안내문(하남감일B5,
+    2026.06 조기분양전환) 원문 대조로 확인한 구조.
+
+    최초주택가격(입주자모집공고 당시 산정가격) 기준으로 앞 3회는 LH 할부이자율
+    복리 적용, 마지막 30%만 조기분양전환 시점의 실제 감정평가금액(두 법인 평균)에
+    연동된다 — 즉 4회차만 '예측이 필요한' 항목이고 나머지는 확정 계산이다.
+
+    initial_price: 최초주택가격 (입주자모집공고 당시)
+    early_appraised: 조기분양전환 시점 감정평가금액 산술평균 (모르면 4회차 None)
+    lh_rate: LH 할부이자율 (연리, 변동금리 — 2026.06.01 기준 3.0%가 아니라
+             입주시~4년차 구간엔 보통 기본금리 2.8% 별도 적용되므로 계약안내문 확인 필수)
+    year4_rate: 4년차 이자율이 입주시와 다를 경우 별도 지정. None이면 lh_rate 사용.
+    early_year: 조기분양전환 시행 연차 (하남감일B5 사례는 5년차)
+    """
+    r4 = year4_rate if year4_rate is not None else lh_rate
+    year1 = initial_price * 0.30
+    year4 = initial_price * ((1 + r4) ** 4) * 0.20
+    early_fixed = initial_price * ((1 + lh_rate) ** early_year) * 0.20
+    early_final = None if early_appraised is None else early_appraised * 0.30
+    total = None if early_final is None else year1 + year4 + early_fixed + early_final
+    return {
+        "basis": "「공공주택특별법 시행규칙」[별표8] — LH 계약안내문(하남감일B5 감일스윗시티10단지, "
+                 "2026.06 조기분양전환) 원문 대조",
+        "note": (
+            "1~3회차(80%)는 최초주택가격에 LH 할부이자율 복리를 적용한 확정 금액이라 "
+            "사전예측이 정확히 맞는다. 4회차(30%)만 '조기분양전환 시점 감정평가금액'에 "
+            "연동되므로 이 앱의 예측이 실제로 효력을 갖는 구간은 사실상 4회차뿐이다."
+        ),
+        "회차별": {
+            "1_입주시_30%": round(year1),
+            "2_4년차_20%": round(year4),
+            "3_조기분전시_20%_확정분": round(early_fixed),
+            "4_조기분전시_30%_감정가연동": None if early_final is None else round(early_final),
+        },
+        "합계": None if total is None else round(total),
+    }
+
+
 # ---------------------------------------------------------------------------
 # 공공건설임대주택 표준건축비 (국토교통부고시 제2023-64호, 시행 2023-02-01)
 #
