@@ -223,7 +223,7 @@ table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
   </div>
 </div>
 
-<script src="data.js?v=20260806i"></script>
+<script src="data.js?v=20260806j"></script>
 <script>
 const KAKAO_KEY="6dd941689e3c39956d9ba809f127c947";
 let map=null, ovs=[], selNm=null, filter="all", cur=null;
@@ -272,29 +272,102 @@ function rentalWear(years){ return years>0? Math.min(0.004*years,0.05) : 0; }
 // 청암감정평가사사무소 CA2308-004). modules/appraisal_engine.py APARTMENT_FACTOR_ITEMS와 동일.
 // "자동산출"은 이 앱이 공공API로 직접 계산·반영하는 항목, "확인필요"는 임장 전에는
 // 확정할 수 없는 항목 — 둘을 섞지 않고 항상 구분해 보여준다.
+// 상태 3단계 — "자동산출"을 과대표기하지 않는다(2026-08-06 지적 반영):
+//   auto   = 지금 이 앱이 실제로 계산해서 숫자를 반영하는 항목
+//   linked = 데이터 소스는 확보돼 있으나(K-APT·건축HUB·공고문분석기 등) 아직 이 앱에 안 붙인 항목
+//   manual = 진짜 임장(실지조사) 없이는 확정 불가능한 항목
 const FACTOR_LAYERS = [
- {layer:"단지외부요인", items:["대중교통의 편의성","교육시설 등의 배치","도심지 및 상업·업무시설과의 접근성",
-   "차량이용의 편리성","공공시설 및 편익시설과의 배치","자연환경(조망·풍치·경관 등)"],
-   auto:[], manual:["대중교통·상업시설 접근성","조망·풍치"]},
- {layer:"단지내부요인", items:["시공업체의 브랜드","단지내 총세대수 및 최고층수","건물의 구조 및 마감상태",
-   "경과연수에 따른 노후도","단지내 면적구성(대형·중형·소형)","단지내 통로구조(복도식/계단식)",
-   "공용시설의 규모·구성·상태","전용률"],
-   auto:["시공업체 브랜드(단지명 매칭)","경과연수(연식회귀)","총세대수·최고층수(K-APT)"], manual:["마감상태","통로구조","공용시설 상태"]},
- {layer:"호별요인", items:["층별 효용","향별 효용","위치별 효용(동별 및 라인별)","전유부분의 면적 및 대지사용권의 크기",
-   "내부 평면방식(베이)","베란다의 유무 및 면적의 대소","주차장 등의 유무","간선도로 및 철도 등에 의한 소음","관리상태"],
-   auto:["층별 효용(실거래 회귀)","전유면적"], manual:["향별 효용","위치·라인별 효용","평면방식(베이)","소음","관리상태"]},
- {layer:"기타요인", items:["기타 가치에 영향을 미치는 요인"], auto:[], manual:["기타 가치영향요인"]},
+ {layer:"단지외부요인", items:[
+   {it:"대중교통의 편의성", s:"linked", src:"카카오 지하철/버스정류장 검색 — 아직 미연결"},
+   {it:"교육시설 등의 배치", s:"linked", src:"school_distance.py(카카오 학교 검색) — 이미 만든 모듈, JS 미연결"},
+   {it:"도심지 및 상업·업무시설과의 접근성", s:"linked", src:"카카오 카테고리검색(백화점·마트·병원 등) 거리계산 — 아직 미연결"},
+   {it:"차량이용의 편리성", s:"linked", src:"카카오 IC·간선도로 검색 — 아직 미연결"},
+   {it:"공공시설 및 편익시설과의 배치", s:"linked", src:"카카오 카테고리검색(관공서·주민센터 등) — 아직 미연결"},
+   {it:"자연환경(조망·풍치·경관 등)", s:"manual", note:"로드뷰·스카이뷰로 개별단지 보조판단은 가능(온디맨드), 확정은 임장"},
+ ]},
+ {layer:"단지내부요인", items:[
+   {it:"시공업체의 브랜드", s:"auto", src:"detect_brand() 단지명 매칭"},
+   {it:"단지내 총세대수 및 최고층수", s:"auto", src:"K-APT AptBasisInfoServiceV4"},
+   {it:"건물의 구조 및 마감상태", s:"linked", src:"건축HUB strctCdNm(구조)는 자동가능, 마감재 품질만 임장"},
+   {it:"경과연수에 따른 노후도", s:"auto", src:"실거래 연식회귀(fit_age_curve)"},
+   {it:"단지내 면적구성(대형·중형·소형)", s:"auto", src:"단지 areas[] 분포"},
+   {it:"단지내 통로구조(복도식/계단식)", s:"linked", src:"K-APT hall_type(codeHallNm) — 이미 확보된 필드, JS 미연결"},
+   {it:"공용시설의 규모·구성·상태", s:"linked", src:"규모(면적)는 건축HUB 자동가능, 청결·관리상태만 임장"},
+   {it:"전용률", s:"linked", src:"건축HUB 전유/공급면적 비율 계산 — 아직 미연결"},
+ ]},
+ {layer:"호별요인", items:[
+   {it:"층별 효용", s:"auto", src:"단지 자체거래 층수 회귀"},
+   {it:"향별 효용", s:"linked", note:"동단위 추정(building_orientation.py)까지만 가능, 세대 라인별 확정은 임장"},
+   {it:"위치별 효용(동별 및 라인별)", s:"linked", note:"동단위는 연동가능, 라인별은 공시가격 역산 시도(정확도 낮음)"},
+   {it:"전유부분의 면적 및 대지사용권의 크기", s:"auto"},
+   {it:"내부 평면방식(베이)", s:"linked", src:"분양 당시 입주자모집공고문 첨부 평면도 있으면 공고문분석기로 확인 — 없으면 임장. 포털 평면도 이미지(네이버 등)는 스크래핑 ToS 문제로 미사용"},
+   {it:"베란다의 유무 및 면적의 대소", s:"linked", src:"위와 동일 — 공고문 평면도 첨부시만 가능"},
+   {it:"주차장 등의 유무", s:"linked", src:"K-APT getAphusDtlInfoV4 주차대수 — 이미 확보된 필드, JS 미연결"},
+   {it:"간선도로 및 철도 등에 의한 소음", s:"linked", src:"분양공고문 분석기(이 리포 본 기능, 유의사항 문구 탐지) 또는 카카오로 철도역·간선도로 거리계산 — 아직 이 앱엔 미연결"},
+   {it:"관리상태", s:"manual", note:"관리비 체납·청소상태 등은 방문 확인만 가능"},
+ ]},
+ {layer:"기타요인", items:[{it:"기타 가치에 영향을 미치는 요인", s:"manual", note:"정의상 사전 목록화 불가능한 잔여 항목"}]},
 ];
-function statusBadge(item,manual){
-  const isManual = manual.some(m=>item.includes(m)||m.includes(item.split("(")[0]));
-  return isManual? '<span style="color:var(--gold)">확인필요(임장)</span>' : '<span style="color:var(--pos)">자동산출 반영</span>';
+function statusBadge(x){
+  if(x.s==="auto") return '<span style="color:var(--pos)">자동산출 반영</span>';
+  if(x.s==="linked") return '<span style="color:var(--navy)">연동가능(미연결)</span>';
+  return '<span style="color:var(--gold)">확인필요(임장)</span>';
 }
+// 실시간 정밀조사 — 유저 제안(2026-08-06): 4,860개 전체를 배치로 미리 돌리는 대신,
+// 사용자가 특정 단지를 "클릭하는 순간" 카카오 로컬 API로 그 단지만 실시간 조사한다.
+// KAKAO_REST_API_KEY는 이 앱이 사내 전용(외부 미배포)이라 클라이언트에 노출해도
+// 되는 수준으로 판단 — keys.public.txt에 이미 커밋된 공개데이터 키와 동일한 원칙.
+const KAKAO_REST = "05e389f436950940951c2df266c6ec1d";
+const LIVE_CATS = [
+  {code:"SW8", label:"지하철역", radius:1200},
+  {code:"SC4", label:"학교", radius:1000},
+  {code:"MT1", label:"대형마트·백화점", radius:2000},
+  {code:"PO3", label:"공공기관", radius:1500},
+];
+async function liveInvestigate(c){
+  const results = await Promise.all(LIVE_CATS.map(async cat=>{
+    try{
+      const r = await fetch(`https://dapi.kakao.com/v2/local/search/category.json?category_group_code=${cat.code}&x=${c.lng}&y=${c.lat}&radius=${cat.radius}&sort=distance`,
+        {headers:{Authorization:`KakaoAK ${KAKAO_REST}`}});
+      const d = await r.json();
+      const docs = (d.documents||[]).slice(0,3);
+      return {...cat, ok:true, docs};
+    }catch(e){ return {...cat, ok:false, err:e.message}; }
+  }));
+  return results;
+}
+function liveResultTable(results){
+  return `<table class="mini" style="margin-top:6px">
+    <thead><tr><th>구분</th><th>최근접 시설</th><th>거리</th></tr></thead>
+    <tbody>${results.map(r=>{
+      if(!r.ok) return `<tr><td>${r.label}</td><td colspan="2" style="color:var(--neg)">조회 실패</td></tr>`;
+      if(!r.docs.length) return `<tr><td>${r.label}</td><td colspan="2" style="color:var(--gray-500)">반경 ${r.radius}m 내 없음</td></tr>`;
+      return r.docs.map((d,i)=>`<tr>${i===0?`<td rowspan="${r.docs.length}" style="vertical-align:top">${r.label}</td>`:""}
+        <td>${d.place_name}</td><td>${d.distance}m</td></tr>`).join("");
+    }).join("")}</tbody>
+  </table>`;
+}
+async function runLiveInvestigate(btnEl){
+  const c = cur;
+  btnEl.disabled = true; btnEl.textContent = "조사 중…";
+  const box = document.getElementById("liveBox");
+  try{
+    const results = await liveInvestigate(c);
+    box.innerHTML = `<div style="font-size:12.5px;color:var(--gray-700);margin-bottom:6px">
+      카카오 로컬 API 실시간 조회 — ${c.nm} 기준 (${new Date().toLocaleTimeString("ko-KR")})</div>${liveResultTable(results)}`;
+  }catch(e){
+    box.innerHTML = `<div style="color:var(--neg)">조사 실패: ${e.message}</div>`;
+  }
+  btnEl.disabled = false; btnEl.textContent = "🔍 실시간 정밀조사 다시 실행";
+}
+
 function factorLayerTable(){
   return `<table class="mini" style="margin-top:6px">
     <thead><tr><th>구분</th><th>세부 항목</th><th>반영 상태</th></tr></thead>
-    <tbody>${FACTOR_LAYERS.map(L=>L.items.map((it,i)=>
+    <tbody>${FACTOR_LAYERS.map(L=>L.items.map((x,i)=>
       `<tr>${i===0?`<td rowspan="${L.items.length}" style="vertical-align:top"><b>${L.layer}</b></td>`:""}
-        <td>${it}</td><td>${statusBadge(it,L.manual)}</td></tr>`).join("")).join("")}
+        <td>${x.it}${x.src?`<span class="sm" style="display:block;color:var(--gray-500)">${x.src}</span>`:""}${x.note?`<span class="sm" style="display:block;color:var(--gray-500)">${x.note}</span>`:""}</td>
+        <td>${statusBadge(x)}</td></tr>`).join("")).join("")}
     </tbody></table>`;
 }
 
@@ -764,6 +837,8 @@ function detail(area,bi,purp,ltv){
             감칙 제10조상 실지조사 없이는 확정할 수 없어 반영하지 않은 항목이다. 확인필요 항목을 채우면
             방어가능 범위(하단 §5)가 더 좁아질 수 있다 — 넓혀지지는 않는다(보수적 산정).
           </div>
+          <button class="btn ghost sm" style="margin-top:8px" onclick="runLiveInvestigate(this)">🔍 실시간 정밀조사 — 이 단지만 지금 조회</button>
+          <div id="liveBox" style="margin-top:6px"></div>
         </div></div>
 
       <div class="why"><div class="why-h"><span class="n">4-1</span>층별효용 (실측, 호별요인 중 자동산출분)</div>
