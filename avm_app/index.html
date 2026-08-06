@@ -223,7 +223,7 @@ table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
   </div>
 </div>
 
-<script src="data.js?v=20260806e"></script>
+<script src="data.js?v=20260806f"></script>
 <script>
 const KAKAO_KEY="6dd941689e3c39956d9ba809f127c947";
 let map=null, ovs=[], selNm=null, filter="all", cur=null;
@@ -820,11 +820,33 @@ function openReport(area,bi,purp,ltv){
       <button class="btn sm gold" onclick="saveReportHtml()">💾 HTML 파일로 저장</button>
     </div>
     <h1 style="font-size:18px;margin-bottom:4px;color:var(--ink)">${c.nm} — 예상 감정평가 보고서</h1>
-    <div style="font-size:12px;color:var(--gray-700);margin-bottom:18px">
+    <div style="font-size:12px;color:var(--gray-700);margin-bottom:14px">
       작성일 2026-08-06 · 법무법인제이엘 사내 업무 참고자료 · 대외 제공·금융기관 제출 금지</div>
+    ${targetTable(c,area,bi,purp,opt)}
     ${reportBody}
   </div>`;
   document.querySelector(".panel").scrollTop=0;
+}
+// 대상물건의 표시 — 실제 감정평가서 표지 양식(소재지·전유부분·대지권) 준용.
+// openReport()에서 .pbody 만 복사할 때 .phead(전용면적·층대)가 함께 안 넘어와
+// 보고서에 평형이 아예 안 보이던 문제가 있었다 — 이 표로 명시적으로 채운다.
+function targetTable(c,area,bi,purp,opt){
+  const bf=bandFloors(c);
+  const isConv=purp==="분양전환";
+  return `<div class="sect" style="margin-top:0">
+    <h3>대상물건의 표시</h3>
+    <table class="kv" style="width:100%">
+      <tr><th>소재지</th><td>${c.addr||""}${c.road?` (도로명: ${c.road})`:""}</td></tr>
+      <tr><th>단지명</th><td>${c.nm}</td></tr>
+      <tr><th>전유부분</th><td>공동주택(아파트) · 전용면적 <b>${area.toFixed(2)}㎡</b>
+        (${Math.round(area/3.3058)}평) · ${BANDS[bi][0]} <b>${bf[bi][0]}~${bf[bi][1]}층</b>
+        중 표준층 기준${c.yr?` · ${c.yr}년 준공(경과 ${2026-Number(c.yr)}년)`:""}${c.maxfl?` · 최고 ${c.maxfl}층`:""}</td></tr>
+      <tr><th>평가목적</th><td>${purp}${isConv&&opt.lease?` (${opt.lease})`:""}</td></tr>
+      <tr><th>기준시점</th><td>2026-08-06</td></tr>
+      <tr><th>비고</th><td style="color:var(--gray-700)">실제 동·호수는 세대별 배치에 따라 층·라인이 달라 개별 확인이
+        필요하다. 이 표는 같은 평형·층대에 속하는 전 세대에 공통 적용되는 산정 기준을 표시한다.</td></tr>
+    </table>
+  </div>`;
 }
 // 통합 보고서 — 개별(§ openReport)은 평형·층대 1칸짜리, 이건 단지 전 평형×층대를
 // 한 문서에 모은 것(단체등기 세대별 배포용). 법적근거·방법론은 한 번만 서술하고
@@ -870,6 +892,17 @@ function openCombinedReport(purp,ltv){
     <div style="font-size:12px;color:var(--gray-700);margin-bottom:18px">
       작성일 2026-08-06 · 평가목적 ${purp}${isConv?` (${opt.lease})`:""} · 법무법인제이엘 사내 업무 참고자료 ·
       대외 제공·금융기관 제출 금지</div>
+
+    <div class="sect" style="margin-top:0">
+      <h3>대상물건의 표시</h3>
+      <table class="kv" style="width:100%">
+        <tr><th>소재지</th><td>${c.addr||""}${c.road?` (도로명: ${c.road})`:""}</td></tr>
+        <tr><th>단지명</th><td>${c.nm}${c.yr?` · ${c.yr}년 준공`:""}${c.maxfl?` · 최고 ${c.maxfl}층`:""}</td></tr>
+        <tr><th>대상평형</th><td>전용 ${c.areas.map(a=>a.a.toFixed(2)+"㎡").join(" · ")} (전 세대 유형)</td></tr>
+        <tr><th>평가목적</th><td>${purp}${isConv&&opt.lease?` (${opt.lease})`:""}</td></tr>
+        <tr><th>기준시점</th><td>2026-08-06</td></tr>
+      </table>
+    </div>
 
     <div class="why"><div class="why-h"><span class="n">1</span>적용 방법 · 법적 근거</div>
       <div class="why-b">대상은 집합건물법상 구분소유 부동산이므로 <b>거래사례비교법</b>이 법정 주방식이다.
