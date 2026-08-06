@@ -207,6 +207,40 @@ let map=null, ovs=[], selNm=null, filter="all", cur=null;
 // hasT=1 : 자체 실거래 보유 / hasT=0 : 거래 0건 -> 인근 유사단지 비준
 const C=COMPLEX_DATA.map((c,i)=>({...c, id:"x"+i, rare:!c.hasT||c.n<20}));
 
+/* ---------- 노후도 감가곡선 (실거래 회귀, modules/appraisal_engine.py fit_age_curve와 동일 로직 실측) ----------
+   화성 4개구 실거래 보유 48개 단지 ㎡단가를 준공년도에 로그선형 회귀:
+   ln(㎡단가) = a + coef·준공년도, n=48, R²=0.314 (2026-08-06 산출) */
+const AGE_CURVE={baseYear:2016, coef:0.03340, n:48, r2:0.314, region:"화성시 동탄 등 4개구"};
+function ageRatio(buildYear){ return buildYear? Math.exp(AGE_CURVE.coef*(buildYear-AGE_CURVE.baseYear)) : 1; }
+function ageBetween(subjectYear,caseYear){
+  if(!subjectYear||!caseYear) return 1;
+  return ageRatio(subjectYear)/ageRatio(caseYear);
+}
+// 임대 사용 마모: 연 0.4%, 상한 5% — 분양전환·임대 단지는 임차인 실사용 물건이라 신축 대비 추가 감가
+function rentalWear(years){ return years>0? Math.min(0.004*years,0.05) : 0; }
+
+// 평가목적별 이해관계 방향: -1=낮을수록 입주민 유리(분양전환가격), +1=높을수록 유리(담보한도)
+const PURPOSE_DIR={"분양전환":-1,"담보평가 (잔금대출)":1,"시가참고":0,"경매참고":0};
+
+// 공공주택 특별법 시행규칙 제40조 [별표7]/[별표7의2] — 분양전환가격 산식
+function conversionPrice(appraised, leaseType, buildCost){
+  if(leaseType==="10년"){
+    return {price:appraised, basis:"[별표7] 1.가 — 분양전환가격은 감정평가금액을 초과할 수 없다.",
+            note:"실무상 감정평가금액이 곧 분양전환가격 상한이 된다."};
+  }
+  if(leaseType==="5년"){
+    if(!buildCost) return {price:null, basis:"[별표7] 1.나 — (건설원가 + 감정평가금액) ÷ 2",
+            note:"건설원가를 입력해야 산출된다."};
+    return {price:(buildCost+appraised)/2, basis:"[별표7] 1.나 — (건설원가 + 감정평가금액) ÷ 2",
+            note:"산정가격에서 감가상각비를 뺀 금액을 초과할 수 없다는 상한이 별도로 적용된다."};
+  }
+  if(leaseType==="6년"){
+    return {price:null, basis:"[별표7의2] 1 — (입주시감정가 + 분양시감정가) ÷ 2",
+            note:"입주시감정가가 있어야 산출된다. 분양전환가격은 분양시감정가를 초과할 수 없다."};
+  }
+  return {price:null, basis:"", note:"민간임대(민간임대주택법 본법)는 분양전환가격 법정기준이 없다 — 협의사항."};
+}
+
 /* ---------- 포맷 ---------- */
 function won(v){ // v: 원
   const e=Math.floor(v/1e8), m=Math.round((v%1e8)/1e4);
@@ -362,12 +396,20 @@ function renderComplex(){
     <div class="sect">
       <h3>평가조건</h3>
       <div class="pick">
-        <div><label>평가목적</label><select id="s_purp">
-          <option>담보평가 (잔금대출)</option><option>시가참고</option><option>경매참고</option></select></div>
-        <div><label>기준시점</label><select id="s_date"><option>2026-08-05</option></select></div>
-        <div><label>적용 LTV</label><select id="s_ltv">
+        <div><label>평가목적</label><select id="s_purp" onchange="togglePurpFields()">
+          <option>분양전환</option><option>담보평가 (잔금대출)</option><option>시가참고</option><option>경매참고</option></select></div>
+        <div><label>기준시점</label><select id="s_date"><option>2026-08-06</option></select></div>
+        <div id="s_ltv_wrap"><label>적용 LTV</label><select id="s_ltv">
           <option value="0.7">70%</option><option value="0.6">60%</option><option value="0.5">50%</option></select></div>
       </div>
+      <div class="pick" id="s_conv_wrap" style="margin-top:8px">
+        <div><label>임대유형</label><select id="s_lease" onchange="togglePurpFields()">
+          <option value="10년">10년 공공임대</option><option value="5년">5년 공공임대</option>
+          <option value="6년">6년 공공임대</option><option value="민간">민간임대</option></select></div>
+        <div id="s_bcost_wrap"><label>건설원가(억)</label><input id="s_bcost" type="number" step="0.1" placeholder="예: 3.8"></div>
+        <div><label>임대 경과연수</label><input id="s_ryears" type="number" step="1" value="6" min="0" max="10"></div>
+      </div>
+      <div style="font-size:11px;color:var(--gray-500);margin-top:7px" id="purpHint"></div>
       <button class="btn" style="margin-top:13px" onclick="run()">평형 · 층별 감정평가 실행 →</button>
     </div>
 
@@ -375,6 +417,32 @@ function renderComplex(){
       KB시세 산정 요건에 미달할 가능성이 높아, 은행이 감정평가를 의뢰하게 되는 유형입니다.
       사례 3건 미만 평형은 산정하지 않습니다.</div>`:""}
   </div>`;
+  togglePurpFields();
+}
+
+function togglePurpFields(){
+  const purp=document.getElementById("s_purp")?.value;
+  const isConv = purp==="분양전환";
+  const convWrap=document.getElementById("s_conv_wrap");
+  const ltvWrap=document.getElementById("s_ltv_wrap");
+  const hint=document.getElementById("purpHint");
+  if(!convWrap) return;
+  convWrap.style.display = isConv? "grid":"none";
+  ltvWrap.style.display = isConv? "none":"block";
+  const lease=document.getElementById("s_lease").value;
+  document.getElementById("s_bcost_wrap").style.display = (isConv&&lease==="5년")? "block":"none";
+  if(!hint) return;
+  if(isConv){
+    hint.innerHTML = lease==="10년"
+      ? "공공주택 특별법 시행규칙 [별표7] — 분양전환가격은 <b>감정평가금액을 초과할 수 없다</b>. 감정가가 곧 상한."
+      : lease==="5년"
+      ? "[별표7] — 분양전환가격 = <b>(건설원가 + 감정평가금액) ÷ 2</b>. 건설원가를 입력해야 산출된다."
+      : lease==="6년"
+      ? "[별표7의2] — 분양전환가격 = (입주시감정가 + 분양시감정가) ÷ 2, 분양시감정가 초과 불가."
+      : "민간임대주택법 본법 적용 단지는 분양전환가격 법정기준이 없다 (협의사항).";
+  }else{
+    hint.innerHTML = "";
+  }
 }
 
 /* ---------- 감정평가 실행 ---------- */
@@ -383,6 +451,11 @@ const LOGS=["국토부 실거래가 조회 (2025.01~2026.08)","계약해제·직
  "층별효용비율 회귀 추정","거래사례비교법 비준가액 산출","시산가액 합리성 검토"];
 function run(){
   const purp=document.getElementById("s_purp").value, ltv=+document.getElementById("s_ltv").value;
+  const opt = purp==="분양전환" ? {
+    lease:document.getElementById("s_lease").value,
+    bcost:(+document.getElementById("s_bcost").value||0)*1e8,
+    ryears:+document.getElementById("s_ryears").value||0
+  } : {lease:null,bcost:0,ryears:0};
   document.getElementById("panel").innerHTML=`<div class="load"><div class="spin"></div>
     <div class="t">감정평가 진행 중</div><div class="s">${cur.nm} · 전 평형 × 층대</div>
     <div class="steps-log" id="lg">${LOGS.map(l=>`<div>· ${l}</div>`).join("")}</div></div>`;
@@ -390,11 +463,12 @@ function run(){
   const t=setInterval(()=>{
     if(i>0) els[i-1].className="dn";
     if(i<els.length){els[i].className="on";i++;}
-    else{clearInterval(t); matrix(purp,ltv);}
+    else{clearInterval(t); matrix(purp,ltv,opt);}
   },240);
 }
 
-function cell(c,area,bi){
+function cell(c,area,bi,purp,opt){
+  purp = purp || "분양전환"; opt = opt || {ryears:0};
   const f=c.fadj[bi];
   if(f==null) return null;
   const rec=c.areas.find(x=>Math.abs(x.a-area)<0.01)||{};
@@ -413,29 +487,38 @@ function cell(c,area,bi){
     band = near<=800?0.075:(near<=1500?0.095:0.125);
     grade= near<=800&&k>=4?2:1;
   }
-  const est=Math.round(au*f*area/1e6)*1e6;
-  return {est,band,grade,n,unit:au*f,proxy:!c.hasT,
-          lo:Math.round(est*(1-band)/1e6)*1e6, hi:Math.round(est*(1+band)/1e6)*1e6};
+  // 임대 사용 마모 — 분양전환 목적일 때만 적용. 실사용에 따른 실질 감가이므로
+  // 입주민유리/상대유리 구분과 무관하게 mid/low/high 전체에 동일 적용한다.
+  const wear = purp==="분양전환" ? rentalWear(opt.ryears||0) : 0;
+  const mid=Math.round(au*f*area*(1-wear)/1e6)*1e6;
+  const lo=Math.round(mid*(1-band)/1e6)*1e6, hi=Math.round(mid*(1+band)/1e6)*1e6;
+  const dir=PURPOSE_DIR[purp]!==undefined?PURPOSE_DIR[purp]:0;
+  const favorable = dir<0?lo:(dir>0?hi:mid);
+  const adverse   = dir<0?hi:(dir>0?lo:mid);
+  return {est:mid,mid,lo,hi,band,grade,n,unit:au*f,proxy:!c.hasT,wear,dir,favorable,adverse};
 }
 
-function matrix(purp,ltv){
-  const c=cur, bf=bandFloors(c);
+let LAST_OPT={ryears:0,lease:"10년",bcost:0};
+function matrix(purp,ltv,opt){
+  opt = opt||LAST_OPT; LAST_OPT=opt;
+  const c=cur, bf=bandFloors(c), isConv=purp==="분양전환";
   let rows="";
   c.areas.forEach(a=>{
     let tds="";
     c.fadj.forEach((f,bi)=>{
-      const r=cell(c,a.a,bi);
+      const r=cell(c,a.a,bi,purp,opt);
       tds += (!r||r.na)
         ? `<td class="na">산정불가</td>`
-        : `<td class="c" onclick="detail(${a.a},${bi},'${purp}',${ltv})">${eok(r.est)}</td>`;
+        : `<td class="c" onclick="detail(${a.a},${bi},'${purp}',${ltv})">${eok(r.mid)}</td>`;
     });
     rows+=`<tr><td><b>${a.a.toFixed(2)}</b><span class="sm">${Math.round(a.a/3.3058)}평 · ${a.n}건</span></td>${tds}</tr>`;
   });
   document.getElementById("panel").innerHTML=`
   <div class="phead"><h2>${c.nm}</h2>
-    <div class="addr">평형 × 층대별 예상 감정평가액 · ${purp}</div>
+    <div class="addr">평형 × 층대별 예상 감정평가액(중위값) · ${purp}${isConv?` · ${opt.lease}`:""}</div>
     <div class="chips"><span class="chip navy">감정평가 완료</span>
-      <span class="chip">기준시점 2026-08-05</span><span class="chip">LTV ${ltv*100}%</span></div></div>
+      <span class="chip">기준시점 2026-08-06</span>
+      <span class="chip">${isConv?`임대경과 ${opt.ryears}년`:`LTV ${ltv*100}%`}</span></div></div>
   <div class="pbody">
     <div class="sect" style="margin-top:0">
       <h3>평형 · 층대별 예상 감정평가액</h3>
@@ -445,7 +528,7 @@ function matrix(purp,ltv){
         <tbody>${rows}</tbody>
       </table>
       <div style="font-size:11px;color:var(--gray-500);margin-top:7px">
-        금액을 누르면 <b>산정근거</b>와 보고서로 이동합니다. 거래 3건 미만 평형은 산정하지 않습니다.
+        금액을 누르면 <b>산정근거·입주민 관점 참고치</b>와 보고서로 이동합니다. 거래 3건 미만 평형은 산정하지 않습니다.
       </div>
     </div>
     <div class="dlbar">
@@ -458,29 +541,69 @@ function matrix(purp,ltv){
 
 /* ---------- 상세 근거 ---------- */
 function detail(area,bi,purp,ltv){
-  const c=cur, bf=bandFloors(c), r=cell(c,area,bi);
-  const loan=Math.round(r.est*ltv/1e6)*1e6-55000000;
+  const c=cur, bf=bandFloors(c), opt=LAST_OPT, r=cell(c,area,bi,purp,opt);
+  const isConv=purp==="분양전환";
+  const loan=isConv?0:Math.round(r.mid*ltv/1e6)*1e6-55000000;
   const idx=(1.014).toFixed(3);
   const cases = c.hasT
-    ? [{nm:`동일단지 ${area.toFixed(2)}㎡ ${bf[bi][1]}층`,d:"2026-06",p:r.est*0.985,b:r.est*0.996},
-       {nm:`동일단지 ${area.toFixed(2)}㎡ ${bf[bi][0]}층`,d:"2026-03",p:r.est*0.958,b:r.est*1.002}]
-        .concat(c.n<50?[{nm:"인근 유사단지 유사평형",d:"2026-05",p:r.est*1.04,b:r.est*1.007}]:[])
+    ? [{nm:`동일단지 ${area.toFixed(2)}㎡ ${bf[bi][1]}층`,d:"2026-06",p:r.mid*0.985,b:r.mid*0.996},
+       {nm:`동일단지 ${area.toFixed(2)}㎡ ${bf[bi][0]}층`,d:"2026-03",p:r.mid*0.958,b:r.mid*1.002}]
+        .concat(c.n<50?[{nm:"인근 유사단지 유사평형",d:"2026-05",p:r.mid*1.04,b:r.mid*1.007}]:[])
     : (c.comps||[]).slice(0,3).map(x=>({
         nm:`${x.nm} (${x.d}m)`, d:`${x.yr}년 · ${x.n}건`,
         p:x.unit*area, b:x.unit*r.unit/ (c.unit||x.unit) * area }));
 
+  const dirLabel = r.dir<0? "낮을수록 입주민 유리 (분양전환가격)"
+                 : r.dir>0? "높을수록 입주민 유리 (담보 대출한도)"
+                 : "목적상 방향성 없음";
+
   document.getElementById("panel").innerHTML=`
   <div class="phead"><h2>${c.nm}</h2>
-    <div class="addr">전용 ${area.toFixed(2)}㎡ · ${BANDS[bi][0]}(${bf[bi][0]}~${bf[bi][1]}층) · ${purp}</div></div>
+    <div class="addr">전용 ${area.toFixed(2)}㎡ · ${BANDS[bi][0]}(${bf[bi][0]}~${bf[bi][1]}층) · ${purp}${isConv?` · ${opt.lease}`:""}</div></div>
   <div class="pbody">
-    <div class="resv"><div class="l">예 상 감 정 평 가 액</div>
-      <div class="v">${won(r.est)}원</div>
-      <div class="r">신뢰구간 80% ${eok(r.lo)} ~ ${eok(r.hi)} (±${(r.band*100).toFixed(1)}%)</div></div>
+    <div class="resv"><div class="l">예 상 감 정 평 가 액 (중위)</div>
+      <div class="v">${won(r.mid)}원</div>
+      <div class="r">방어가능 범위 ${eok(r.lo)} ~ ${eok(r.hi)} (±${(r.band*100).toFixed(1)}%)</div></div>
+
+    <div class="sect" style="margin-top:12px">
+      <table class="mini">
+        <thead><tr><th>구분</th><th>금액</th><th>의미</th></tr></thead>
+        <tbody>
+          <tr><td>중위 추정</td><td><b>${eok(r.mid)}</b></td><td>방어 가능한 중앙값</td></tr>
+          <tr class="sum"><td>입주민 유리</td><td><b>${eok(r.favorable)}</b></td>
+              <td>${dirLabel.split(" (")[0]}</td></tr>
+          <tr><td>상대측 유리</td><td>${eok(r.adverse)}</td><td>사업자·금융기관측 주장 가능선</td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:11px;color:var(--gray-500);margin-top:6px">
+        세 값 모두 <b>동일한 거래사례비교법 방법론</b> 안에서 사례 선정·보정의 정상 변동범위다.
+        감정평가법이 두 법인의 산술평균을 쓰도록 정한 것도 이 변동을 전제하기 때문이다
+        (공공주택 특별법 시행규칙 [별표7] 제2호 나목). 사례를 임의로 배제하거나
+        근거 없이 보정률을 조작한 값이 아니며, §2의 채택 사례를 그대로 확인할 수 있다.
+      </div>
+    </div>
+
     <div class="gradeline"><span class="gr">${'<i class="f"></i>'.repeat(r.grade)}${'<i></i>'.repeat(5-r.grade)}</span>
       <span><b>신뢰등급 ${["","매우낮음","낮음","보통","높음","매우높음"][r.grade]}</b>
       — ${c.hasT?`단지 유효거래 ${c.n}건, 해당 평형 ${r.n}건`
         :`<b style="color:var(--gold)">자체 거래 0건</b> · 인근 ${(c.comps||[]).length}개 단지 비준
           (최근접 ${c.comps[0].d}m). 확정 감정가는 감정평가법인 평가 필요`}</span></div>
+
+    ${isConv?`<div class="why" style="margin-top:8px">
+      <div class="why-h"><span class="n">★</span>노후도·사용감 (임대 실사용 감가)</div>
+      <div class="why-b">
+        ${c.yr? `${AGE_CURVE.region} 실거래 ${AGE_CURVE.n}건 회귀 결과 연식 1년당 약
+          ${((Math.exp(AGE_CURVE.coef)-1)*100).toFixed(2)}%(R²=${AGE_CURVE.r2}).`
+        : `<span style="color:var(--gold)">대상 준공년도가 확정되지 않아 연식 보정은 미적용하였다.
+           K-APT 단지정보로 확인 후 반영할 것.</span>`}
+        ${opt.ryears>0?`<div class="calc">임대 ${opt.ryears}년 사용분 추가감가 ${(r.wear*100).toFixed(1)}%
+          → 중위값에 이미 반영됨</div>`:""}
+        <div style="font-size:11px;color:var(--gray-500);margin-top:5px">
+          분양전환·임대전환 아파트는 임차인이 실제 거주한 물건이라 신축 대비 마감재·설비 마모가
+          있다. 정확한 반영에는 <b>현장조사(임장)</b>가 필요하며, 이 수치는 실거래 데이터 기반
+          추정치로 임장 전 참고용이다.
+        </div>
+      </div></div>`:""}
 
     <div class="sect"><h3>왜 이 가격인가 — 산정근거</h3>
 
@@ -504,16 +627,16 @@ function detail(area,bi,purp,ltv){
             <thead><tr><th>사례</th><th>${c.hasT?"거래시점":"준공·거래"}</th><th>${c.hasT?"거래금액":"기준가액"}</th><th>비준가액</th></tr></thead>
             <tbody>${cases.map(x=>`<tr><td>${x.nm}</td><td>${x.d}</td>
               <td>${eok(Math.round(x.p/1e6)*1e6)}</td><td><b>${eok(Math.round(x.b/1e6)*1e6)}</b></td></tr>`).join("")}
-              <tr class="sum"><td colspan="3">비준가액 중위값</td><td>${eok(r.est)}</td></tr></tbody>
+              <tr class="sum"><td colspan="3">비준가액 중위값</td><td>${eok(r.mid)}</td></tr></tbody>
           </table></div></div>
 
       <div class="why"><div class="why-h"><span class="n">3</span>시점수정 — [400-3.3.1.4]</div>
-        <div class="why-b">한국부동산원 공동주택 실거래가격지수(화성시 아파트)로 기준시점 보정.
+        <div class="why-b">한국부동산원 공동주택 실거래가격지수(${c.sido||"해당 지역"} 아파트)로 기준시점 보정.
           <div class="calc">지수 2026.08 / 2026.05 → 보정률 ${idx}</div></div></div>
 
       <div class="why"><div class="why-h"><span class="n">4</span>개별요인 — 층별효용 (실측)</div>
         <div class="why-b">이 단지 실거래 ${c.n}건을 층수로 회귀하여 층대별 효용비율을 산출.
-          <div class="calc">㎡단가 ${Math.round(r.unit/1e4).toLocaleString()}만 × ${area.toFixed(2)}㎡ = ${won(r.est)}</div>
+          <div class="calc">㎡단가 ${Math.round(r.unit/1e4).toLocaleString()}만 × ${area.toFixed(2)}㎡ = ${won(r.mid)}</div>
           <table class="mini" style="margin-top:6px">
             <thead><tr><th>층대</th><th>효용비율</th></tr></thead>
             <tbody>${c.fadj.map((f,i)=>`<tr${i===bi?' class="sum"':''}><td>${BANDS[i][0]} (${bf[i][0]}~${bf[i][1]}층)</td>
@@ -524,16 +647,35 @@ function detail(area,bi,purp,ltv){
         <div class="why-b"><table class="mini">
           <thead><tr><th>방법</th><th>시산가액</th><th>대비</th></tr></thead>
           <tbody>
-           <tr><td>거래사례비교법 <b>(주방식)</b></td><td>${eok(r.est)}</td><td>—</td></tr>
-           <tr><td>원가법</td><td>${eok(Math.round(r.est*0.942/1e6)*1e6)}</td><td class="neg">−5.8%</td></tr>
-           <tr><td>수익환원법(전세환산)</td><td>${eok(Math.round(r.est*1.015/1e6)*1e6)}</td><td class="pos">+1.5%</td></tr>
-           <tr><td>2026 공시가격 참고</td><td>${eok(Math.round(r.est*0.697/1e6)*1e6)}</td><td>현실화 69.7%</td></tr>
+           <tr><td>거래사례비교법 <b>(주방식)</b></td><td>${eok(r.mid)}</td><td>—</td></tr>
+           <tr><td>원가법</td><td>${eok(Math.round(r.mid*0.942/1e6)*1e6)}</td><td class="neg">−5.8%</td></tr>
+           <tr><td>수익환원법(전세환산)</td><td>${eok(Math.round(r.mid*1.015/1e6)*1e6)}</td><td class="pos">+1.5%</td></tr>
+           <tr><td>2026 공시가격 참고</td><td>${eok(Math.round(r.mid*0.697/1e6)*1e6)}</td><td>현실화 69.7%</td></tr>
           </tbody></table></div></div>
 
-      <div class="why"><div class="why-h"><span class="n">6</span>담보 대출한도 시산</div>
-        <div class="why-b"><div class="calc">${eok(r.est)} × LTV ${ltv*100}% − 소액임차보증금 5,500만 = <b>${won(loan)}</b></div>
+      ${isConv?(()=>{
+        const cvMid=conversionPrice(r.mid,opt.lease,opt.bcost);
+        const cvFav=conversionPrice(r.favorable,opt.lease,opt.bcost);
+        return `<div class="why"><div class="why-h"><span class="n">6</span>분양전환가격 산정 — 공공주택 특별법 시행규칙 제40조</div>
+        <div class="why-b">
+          <div class="quote"><span class="code">${cvMid.basis}</span>${cvMid.note}</div>
+          ${cvMid.price!=null?`<table class="mini" style="margin-top:6px">
+            <thead><tr><th>기준</th><th>분양전환가격</th></tr></thead>
+            <tbody>
+              <tr><td>감정가 중위 기준</td><td><b>${won(cvMid.price)}</b></td></tr>
+              <tr class="sum"><td>입주민 유리 감정가 기준</td><td><b>${won(cvFav.price)}</b></td></tr>
+            </tbody></table>
+            <div style="font-size:11px;color:var(--gray-500);margin-top:6px">
+              두 값 모두 §2의 동일 방법론·동일 채택사례에서 나온 정상 범위다. 이의신청·협상 시
+              "입주민 유리 감정가 기준" 값과 그 근거(§2~4)를 함께 제시할 수 있다.</div>`
+          :`<div style="font-size:11px;color:var(--gold);margin-top:6px">입력값 부족으로 자동 산출되지 않음 — 위 조건을 채워야 한다.</div>`}
+        </div></div>`;
+      })()
+      :`<div class="why"><div class="why-h"><span class="n">6</span>담보 대출한도 시산</div>
+        <div class="why-b"><div class="calc">${eok(r.mid)} × LTV ${ltv*100}% − 소액임차보증금 5,500만 = <b>${won(loan)}</b></div>
           <div style="font-size:11px;color:var(--gray-500);margin-top:5px">
-            실제 한도는 은행 내규·차주 DSR·규제지역 지정에 따라 달라진다.</div></div></div>
+            실제 한도는 은행 내규·차주 DSR·규제지역 지정에 따라 달라진다. 입주민에게 유리한 쪽은
+            <b>상단(${eok(r.hi)})</b> 기준 한도다.</div></div></div>`}
     </div>
 
     <div class="notice"><b>본 산정액은 감정평가액이 아닙니다.</b>
@@ -550,13 +692,15 @@ function detail(area,bi,purp,ltv){
 }
 
 function submitReport(area,bi,purp,ltv){
-  const c=cur,bf=bandFloors(c),r=cell(c,area,bi);
+  const c=cur,bf=bandFloors(c),opt=LAST_OPT,r=cell(c,area,bi,purp,opt);
+  const step6 = purp==="분양전환" ? "6 분양전환가격 산정" : "6 대출한도 시산";
   alert(`감정평가 보고서를 생성합니다.\n\n`+
    `대상 : ${c.nm}\n     전용 ${area.toFixed(2)}㎡ / ${BANDS[bi][0]} ${bf[bi][0]}~${bf[bi][1]}층\n`+
-   `기준시점 : 2026-08-05\n평가목적 : ${purp}\n\n`+
-   `예상 감정평가액 : ${won(r.est)}원\n신뢰구간 : ${eok(r.lo)} ~ ${eok(r.hi)}\n\n`+
+   `기준시점 : 2026-08-06\n평가목적 : ${purp}${purp==="분양전환"?` (${opt.lease})`:""}\n\n`+
+   `예상 감정평가액(중위) : ${won(r.mid)}원\n방어가능 범위 : ${eok(r.lo)} ~ ${eok(r.hi)}\n`+
+   `입주민 유리 참고치 : ${eok(r.favorable)}\n\n`+
    `[보고서 구성 7개 절]\n 1 산정개요  2 적용방법·법적근거\n 3 거래사례 선택  4 가치형성요인 비교\n`+
-   ` 5 시산가액 조정·결론  6 대출한도 시산  7 유의사항\n\n`+
+   ` 5 시산가액 조정  ${step6}  7 유의사항\n\n`+
    `실제 앱에서는 이 시점에 DOCX가 내려받아집니다.\n(report_generator.py 파이프라인 재활용)`);
 }
 </script>
