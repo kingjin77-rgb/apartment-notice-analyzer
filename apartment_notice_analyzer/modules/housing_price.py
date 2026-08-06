@@ -44,7 +44,10 @@ class UnitPrice:
     area: float            # prvuseAr — 전용면적
     price: int             # pblntfPc — 공시가격(원)
     year: str              # stdrYear
-    updated: str = ""      # lastUpdtDt
+    floor: int | None = None   # floorNm — API가 층을 직접 준다
+    kind: str = ""             # aphusSeCodeNm (아파트/연립/다세대)
+    addr: str = ""             # ldCodeNm
+    updated: str = ""          # lastUpdtDt
 
     @property
     def unit_price(self) -> float:
@@ -94,12 +97,16 @@ class HousingPriceClient:
                 break
             for f in fields:
                 try:
+                    fl = f.get("floorNm")
                     out.append(UnitPrice(
                         pnu=f.get("pnu", ""), complex_name=f.get("aphusNm", ""),
                         dong=f.get("dongNm", ""), ho=f.get("hoNm", ""),
                         area=float(f.get("prvuseAr") or 0),
                         price=int(float(f.get("pblntfPc") or 0)),
-                        year=str(f.get("stdrYear") or ""), updated=f.get("lastUpdtDt", ""),
+                        year=str(f.get("stdrYear") or ""),
+                        floor=int(fl) if str(fl).strip().lstrip("-").isdigit() else None,
+                        kind=f.get("aphusSeCodeNm", ""), addr=f.get("ldCodeNm", ""),
+                        updated=f.get("lastUpdtDt", ""),
                     ))
                 except (TypeError, ValueError):
                     continue
@@ -111,15 +118,16 @@ class HousingPriceClient:
     def floor_ratio_table(self, units: list[UnitPrice]) -> dict:
         """
         세대별 공시가격에서 층별효용비율을 실측한다.
-        호명(hoNm) 앞자리가 층수인 관행을 이용한다 — "1204" -> 12층.
-        동일 전용면적끼리만 비교해야 층 효과가 분리된다.
+
+        API가 floorNm으로 층을 직접 주므로 그것을 쓰고, 없을 때만 호명에서
+        추출한다. 동일 전용면적끼리만 비교해야 층 효과가 분리된다.
         """
         import collections
         import statistics
 
         by_area: dict[float, list[tuple[int, float]]] = collections.defaultdict(list)
         for u in units:
-            fl = _floor_from_ho(u.ho)
+            fl = u.floor if u.floor and u.floor > 0 else _floor_from_ho(u.ho)
             if fl and u.area and u.unit_price:
                 by_area[round(u.area, 2)].append((fl, u.unit_price))
 
