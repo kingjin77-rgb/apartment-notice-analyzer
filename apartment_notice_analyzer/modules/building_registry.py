@@ -120,20 +120,31 @@ class BuildingRegistryClient:
         area 필드(exclusPrvatArea, ㎡)를 반올림해 타입으로 묶는다.
         """
         units = [r for r in hsprc_info if "전유" in (r.get("exposPubuseGbCdNm") or "")]
-        by_area: dict[float, int] = {}
+        raw: list[float] = []
         for r in units:
             a = r.get("area")
             try:
-                a = round(float(a), 2)
+                a = float(a)
             except (TypeError, ValueError):
                 continue
-            if a <= 0:
-                continue
-            by_area[a] = by_area.get(a, 0) + 1
-        return sorted(
-            [{"a": a, "n": n} for a, n in by_area.items()],
-            key=lambda x: -x["n"],
-        )
+            if a > 0:
+                raw.append(a)
+        if not raw:
+            return []
+
+        # 같은 타입이라도 세대마다 대장상 전유면적이 소수점 이하 몇 g 단위로
+        # 흔들려서(59.94 vs 59.70 등) 그대로 세면 진짜 타입 하나가 두세 개
+        # 잡음값으로 쪼개지고, 그 틈에 희소한 특수세대(펜트하우스 등)가
+        # "주요 타입"으로 잘못 끼어든다. ±0.6㎡ 이내는 같은 타입으로 묶는다.
+        raw.sort()
+        clusters: list[list[float]] = []
+        for a in raw:
+            if clusters and a - clusters[-1][-1] <= 0.6:
+                clusters[-1].append(a)
+            else:
+                clusters.append([a])
+        out = [{"a": round(sum(c) / len(c), 2), "n": len(c)} for c in clusters]
+        return sorted(out, key=lambda x: -x["n"])
 
     def summarize_complex(self, title_info: list[dict]) -> dict:
         """
