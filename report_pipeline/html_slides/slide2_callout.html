@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareR.ttf"); font-weight: 400; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareB.ttf"); font-weight: 700; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareEB.ttf"); font-weight: 800; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1332px; height: 750px; overflow: hidden; }
+  body {
+    font-family: "NanumSquare", sans-serif;
+    background: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/ai_templates/callout4_facility.png") center/cover no-repeat;
+    position: relative;
+  }
+  .title { position: absolute; left: 48px; top: 34px; }
+  .title .eyebrow { font-size: 15px; font-weight: 700; color: #3B82F6; letter-spacing: 1px; margin-bottom: 6px; }
+  .title h1 { font-size: 30px; font-weight: 800; color: #14213a; }
+  .co { position: absolute; padding: 12px 16px 10px 22px; display: flex; flex-direction: column; justify-content: center; }
+  .co .dong { font-size: 17px; font-weight: 800; color: #14213a; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+  .co .dot { width: 9px; height: 9px; border-radius: 50%; background: #C0392B; display: inline-block; }
+  .co .dot.warn { background: #C77700; }
+  .co .txt { font-size: 13px; line-height: 1.45; color: #33404f; font-weight: 400; }
+  .co b { color: #C0392B; }
+  /* 4개 콜아웃 박스 — 템플릿 박스 내부에 정확히 배치 (실측 보정 2차) */
+  .tl { left: 80px;  top: 178px; width: 285px; height: 116px; }
+  .tr { left: 964px; top: 178px; width: 288px; height: 116px; }
+  .bl { left: 80px;  top: 568px; width: 285px; height: 116px; }
+  .br { left: 964px; top: 568px; width: 290px; height: 116px; }
+  .caption {
+    position: absolute; left: 0; right: 0; bottom: 14px; text-align: center;
+    font-size: 12.5px; color: #7c8794;
+  }
+  .brand { position: absolute; right: 48px; top: 40px; font-size: 15px; font-weight: 800; color: #14213a; }
+  .brand span { color: #1E4D3B; }
+</style>
+</head>
+<body>
+  <div class="title">
+    <div class="eyebrow">안양 에버포레 자연&e편한세상 (A1BL)</div>
+    <h1>동별 유의사항 요약 — 4개동 전수 점검</h1>
+  </div>
+  <div class="brand">법무법인 <span>JL</span></div>
+
+  <div class="co tl">
+    <div class="dong"><span class="dot"></span>101동</div>
+    <div class="txt">지하1층 <b>부대복리시설(라운지카페·도담누리터)</b> 직접 인접 — 진동·소음 영향 명시적 고지</div>
+  </div>
+
+  <div class="co tr">
+    <div class="dong"><span class="dot warn"></span>102동</div>
+    <div class="txt"><b>문주·데크주차장</b> 인접 — 차량 출입 소음·야간 조명 영향 가능</div>
+  </div>
+
+  <div class="co bl">
+    <div class="dong"><span class="dot"></span>103동</div>
+    <div class="txt">지하1층 <b>생활지원센터·멀티룸</b>, 지상1층 <b>스터디라운지</b> 인접 — 소음·사생활 침해 고지</div>
+  </div>
+
+  <div class="co br">
+    <div class="dong"><span class="dot warn"></span>104동</div>
+    <div class="txt"><b>쓰레기·재활용 보관소</b> 인접 — 악취·수거차량 소음 유의</div>
+  </div>
+
+  <div class="caption">※ 중앙 3D 이미지는 모식도(개념도)로 실제 단지 배치와 무관 — 동별 위치·시설 인접 관계는 입주자모집공고 원문 기재 사항 기준</div>
+</body>
+</html>

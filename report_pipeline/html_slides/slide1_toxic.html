@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareR.ttf"); font-weight: 400; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareB.ttf"); font-weight: 700; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareEB.ttf"); font-weight: 800; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1332px; height: 750px; overflow: hidden; }
+  body {
+    font-family: "NanumSquare", sans-serif;
+    background: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/ai_templates/flow3_blueprint.png") center/cover no-repeat;
+    position: relative;
+  }
+  /* 상단 타이틀 바 */
+  .titlebar {
+    position: absolute; left: 0; top: 0; width: 100%; height: 96px;
+    background: linear-gradient(180deg, rgba(8,20,38,.92) 0%, rgba(8,20,38,.75) 70%, rgba(8,20,38,0) 100%);
+    display: flex; align-items: center; padding: 0 44px; gap: 18px;
+  }
+  .titlebar .no { font-size: 26px; font-weight: 800; color: #7FA8D9; letter-spacing: 1px; }
+  .titlebar h1 { font-size: 27px; font-weight: 800; color: #fff; }
+  .titlebar .badge {
+    margin-left: auto; background: #C0392B; color: #fff; font-size: 15px; font-weight: 700;
+    padding: 7px 16px; border-radius: 6px;
+  }
+  .card { position: absolute; display: flex; flex-direction: column; padding: 22px 24px; }
+  .card .label { font-size: 14px; font-weight: 800; letter-spacing: .5px; margin-bottom: 12px; }
+  .card .body { font-size: 16.5px; line-height: 1.62; font-weight: 400; }
+  /* 좌: 문제 조항 (흰 카드 영역 138-748 x 422-1108 → /2 스케일) */
+  .left  { left: 74px;  top: 220px; width: 300px; height: 336px; }
+  .left .label { color: #C0392B; }
+  .left .body { color: #23303f; }
+  .left .src { margin-top: auto; font-size: 12.5px; color: #8a93a0; }
+  /* 중앙: JL 검토 (네이비 카드 985-1625 x 640-1230 → /2) */
+  .center { left: 500px; top: 330px; width: 310px; height: 275px; }
+  .center .label { color: #9DC3F0; }
+  .center .body { color: #fff; font-weight: 700; font-size: 17px; }
+  /* 우: 개선요청 (흰 카드 1913-2524 x 422-1108 → /2) */
+  .right { left: 962px; top: 220px; width: 296px; height: 336px; }
+  .right .label { color: #1E4D3B; }
+  .right .body { color: #23303f; font-weight: 700; }
+  .footer {
+    position: absolute; left: 44px; bottom: 16px; font-size: 12.5px; color: rgba(255,255,255,.75);
+  }
+</style>
+</head>
+<body>
+  <div class="titlebar">
+    <span class="no">04</span>
+    <h1>부대복리시설 인접 동(101·103동) — 소음·사생활 침해</h1>
+    <span class="badge">중요 상</span>
+  </div>
+
+  <div class="card left">
+    <div class="label">문제 조항 (원문)</div>
+    <div class="body">“101동 지하1층 부대복리시설(라운지카페, 도담누리터 등)이, 103동 지하1층 생활지원센터, 멀티룸(주민회의실), 키즈스테이션과 지상1층 스터디라운지, 스터디룸, 에듀라운지 등이 위치하여 … 미세한 진동 및 소음에 의한 사생활 및 환경권이 침해당할 수 있습니다.”</div>
+    <div class="src">입주자모집공고 원문 직접 인용</div>
+  </div>
+
+  <div class="card center">
+    <div class="label">✓ 법무법인 JL 검토</div>
+    <div class="body">사업주체는 침해 가능성만 고지하고 소음 저감 설계·방음 조치 내용은 일절 기재하지 않음 — 101·103동 계약자에게 실질적 위험이 전가되는 구조</div>
+  </div>
+
+  <div class="card right">
+    <div class="label">✓ 개선요청</div>
+    <div class="body">101동·103동 인접 세대에는 계약 전 개별 안내문을 발송하고, 방음 보강 조치 여부를 확인해 줄 것을 요청합니다.</div>
+  </div>
+
+  <div class="footer">법무법인 제이엘 · 분양공고문 분석팀 — 안양 에버포레 자연&e편한세상(A1BL) 검토보고서</div>
+</body>
+</html>
