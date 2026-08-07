@@ -7,7 +7,7 @@
 ## 사용법
 1. `secrets/.env.example`을 `secrets/.env`로 복사
 2. 실제 키 값 채워넣기
-3. Node 스크립트에서는 `require('dotenv').config({ path: 'secrets/.env' })`로 로드
+3. Node 스크립트에서는 별도 dotenv 패키지 없이 자체 파서로 로드함 (report_pipeline/scripts/fetch_stock_images.js 참고 — npm 레지스트리 접근이 막힌 환경에서도 동작하도록 의존성 0으로 구현)
 
 ## 중요: PC ↔ 클라우드 세션 간 동기화 안 됨
 `.env`는 의도적으로 git에서 제외되기 때문에, **PC와 클라우드 세션 양쪽에 각각 따로 키를 넣어야 함.**
@@ -15,4 +15,5 @@
 다른 계정 세션 포함)에서 이 폴더에 `.env`를 각자 채워야 한다.
 
 ## 현재 등록된 키
-- PEXELS_API_KEY: (미등록 — 사용자가 https://www.pexels.com/api/ 가입 후 발급)
+- PEXELS_API_KEY: 등록됨(2026-08-07, 클라우드 세션에만 — PC 등 다른 환경엔 위 "동기화 안 됨" 참고해서 각자 추가 필요). 사진/동영상 엔드포인트 공용.
+- **주의**: 이 클라우드 샌드박스는 외부 인터넷 egress 자체가 막혀있어(api.pexels.com curl 테스트 결과 연결거부) 이 세션에서 Pexels API를 직접 호출할 수 없음. 실제 이미지 fetch는 PC 로컬 환경 등 일반 인터넷이 되는 곳에서 build 스크립트를 돌려야 작동함.
