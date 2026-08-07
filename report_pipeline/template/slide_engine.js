@@ -15,6 +15,37 @@ const path = require("path");
 const LOGO_PATH = path.join(__dirname, "brand", "jl_logo_crop.png");
 const LOGO_RATIO = 409 / 138; // 실제 로고 crop 비율(가로/세로)
 
+/* ── 섹션 표지용 스톡 무드샷 (2026-08-07 Pexels 수집분) ─────────
+ * 장식용 배경 전용 — 실제 분석 내용(배치도·동 위치 등)은 항상 원문에서 크롭한
+ * 이미지만 쓴다(RULES.md 11번). 여기서는 "이 섹션이 무슨 내용이냐"에 맞는
+ * 무드샷을 키워드 매칭으로 고른다. */
+const STOCK_DIR = path.join(__dirname, "brand", "stock");
+const STOCK_CATEGORIES = {
+  section_law: ["법", "규정", "시행령", "청약", "규제", "분양가상한", "전매제한", "법령"],
+  section_document: ["계약", "확인사항", "요구사항", "요약", "서류", "신청", "접수", "공고문"],
+  section_construction: ["구조", "내진", "시공", "마감재", "층고", "조경", "전기", "건설", "감리", "심층분석"],
+  section_meeting: ["협의", "협의체", "대표회의", "입주예정자", "소통", "요청"],
+  cover_building: ["입지", "동별", "위치", "단지", "배치"],
+  cover_interior: ["세대", "실내", "인테리어"],
+};
+let _stockCursor = {}; // 카테고리별 _1/_2 순환 사용(같은 사진 반복 방지)
+
+function pickSectionImage(title) {
+  const t = String(title || "");
+  let best = null, bestScore = 0;
+  for (const [cat, kws] of Object.entries(STOCK_CATEGORIES)) {
+    const score = kws.reduce((s, kw) => s + (t.includes(kw) ? 1 : 0), 0);
+    if (score > bestScore) { bestScore = score; best = cat; }
+  }
+  if (!best) best = "cover_building"; // 기본값
+  const idx = (_stockCursor[best] = (_stockCursor[best] || 0) + 1);
+  for (const n of [((idx - 1) % 2) + 1, ((idx) % 2) + 1]) {
+    const p = path.join(STOCK_DIR, `${best}_${n}.jpg`);
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
+}
+
 /* ── 팔레트 (JL 제안서 샘플 기준) ─────────────────────────────── */
 const C = {
   WHITE: "FFFFFF", INK: "111827", BODY: "374151", MUTED: "6B7280",
@@ -418,11 +449,41 @@ function coverSlide(deck) {
 
 // 2026-08-07: 사용자 지시로 목차 슬라이드 영구 삭제(더 이상 호출 안 함, 함수도 제거).
 
+/* ── 섹션 표지 (전면 사진 + 다크오버레이, 좌하단 "0N 제목") ──────
+ * 실제 JL 제안서 샘플 톤앤매너 반영(2026-08-07). 이미지가 없으면(스톡 미수집
+ * 등) 조용히 건너뛰고 기존 화이트 콘텐츠 슬라이드로만 진행 — 필수 아님. */
+function sectionDividerSlide(deck, sec) {
+  const imgPath = pickSectionImage(sec.title);
+  if (!imgPath) return; // 스톡 이미지 없으면 스킵(다운그레이드 아님 — 자산 미보유 시 안전 폴백)
+
+  const s = deck.pres.addSlide();
+  s.addImage({ path: imgPath, x: 0, y: 0, w: W, h: H });
+  s.addShape(deck.pres.ShapeType.rect, {
+    x: 0, y: 0, w: W, h: H,
+    fill: { color: C.NAVY_DARK, transparency: 38 },
+    line: { type: "none" },
+  });
+
+  const num = sec.num ? String(sec.num).padStart(2, "0") : "";
+  s.addText([
+    { text: num ? `${num}  ` : "", options: { fontFace: FONT_HEAD, fontSize: 20, bold: true, color: "9DB2CC" } },
+    { text: sec.title || "", options: { fontFace: FONT_HEAD, fontSize: 34, bold: true, color: C.WHITE } },
+  ], { x: M, y: H - 1.6, w: CW - 2.2, h: 1.1, valign: "bottom", margin: 0 });
+
+  // 로고(jl_logo_crop.png)는 짙은 네이비 단색이라 이 어두운 오버레이 배경에서는
+  // 거의 안 보임 — 흰색/밝은 버전 로고 파일이 생기기 전까진 여기서는 생략.
+  s.addText([
+    { text: "법무법인 ", options: { fontFace: FONT_HEAD, fontSize: 11, bold: true, color: C.WHITE } },
+    { text: "JL", options: { fontFace: FONT_HEAD, fontSize: 13, bold: true, color: "7FB88F" } },
+  ], { x: W - M - 1.6, y: 0.36, w: 1.6, h: 0.3, align: "right", valign: "middle", margin: 0 });
+}
+
 function buildDeck(content, slugDir) {
   const deck = new Deck(content);
   coverSlide(deck);
 
   for (const sec of content.sections || []) {
+    sectionDividerSlide(deck, sec);
     deck.sectionNum = sec.num ?? "";
     deck.sectionTitle = sec.title || "";
     deck.newContentSlide(false);
