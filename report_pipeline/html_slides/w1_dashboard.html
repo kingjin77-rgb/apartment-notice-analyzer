@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareR.ttf"); font-weight: 400; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareB.ttf"); font-weight: 700; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareEB.ttf"); font-weight: 800; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1332px; height:750px; overflow:hidden; }
+  body { font-family:"NanumSquare",sans-serif; background:#fff; position:relative; }
+  .head { position:absolute; left:52px; top:36px; right:52px; }
+  .head .eyebrow { font-size:14px; font-weight:700; color:#C89B3C; letter-spacing:1.2px; margin-bottom:7px; }
+  .head h1 { font-size:31px; font-weight:800; color:#1F3864; display:inline-block; border-bottom:4px solid #C89B3C; padding-bottom:8px; }
+  .brand { position:absolute; right:52px; top:44px; font-size:16px; font-weight:800; color:#1F3864; }
+  .brand small { display:block; font-size:9.5px; color:#8a93a0; letter-spacing:2.5px; font-weight:700; text-align:right; }
+  .stats { position:absolute; right:52px; top:96px; display:flex; gap:8px; }
+  .pill { border-radius:999px; padding:6px 15px; font-size:13.5px; font-weight:800; }
+  .pill.warn { background:#FBEAEA; color:#C0392B; border:1px solid #E9C2BC; }
+  .pill.ok { background:#EAF3EA; color:#2E7D32; border:1px solid #C2DCC4; }
+  .grid { position:absolute; left:52px; right:52px; top:150px; bottom:52px;
+    display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,1fr); gap:14px; }
+  .tile { border-radius:10px; padding:18px 20px; background:#fff; border:1px solid #E5E7EB;
+    box-shadow:0 2px 10px rgba(31,56,100,.06); position:relative; display:flex; flex-direction:column; }
+  .tile .bar { position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:10px 0 0 10px; }
+  .bar.warn { background:#C0392B; } .bar.ok { background:#2E7D32; }
+  .tile .top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:9px; }
+  .tile h2 { font-size:16px; font-weight:800; color:#1F3864; line-height:1.32; }
+  .badge { font-size:12px; font-weight:800; padding:4px 10px; border-radius:5px; white-space:nowrap; margin-left:8px; }
+  .badge.warn { background:#C0392B; color:#fff; } .badge.ok { background:#2E7D32; color:#fff; }
+  .tile p { font-size:13px; line-height:1.52; color:#4b5563; }
+  .tile.summary { background:#1F3864; border:none; justify-content:center; }
+  .tile.summary .num { font-size:46px; font-weight:800; color:#C89B3C; line-height:1; margin-bottom:9px; }
+  .tile.summary .num span { font-size:22px; color:#8FA3C6; }
+  .tile.summary .lab { font-size:14.5px; font-weight:700; color:#DCE4F2; line-height:1.5; }
+  .foot { position:absolute; left:52px; bottom:18px; font-size:12px; color:#9aa3ad; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <div class="eyebrow">안양 에버포레 자연&e편한세상 (A1BL) — 입주자모집공고 전수 검토</div><br>
+    <h1>최우선 개선요구사항 7건 요약</h1>
+  </div>
+  <div class="brand">법무법인 JL<small>JL LAWFIRM</small></div>
+  <div class="stats"><div class="pill warn">주의 5</div><div class="pill ok">양호 2</div></div>
+
+  <div class="grid">
+    <div class="tile summary">
+      <div class="num">5<span>/7</span></div>
+      <div class="lab">계약 전 사업주체에<br>확인·개선요청 필요 항목</div>
+    </div>
+    <div class="tile"><div class="bar warn"></div>
+      <div class="top"><h2>내진설계 등급<br>고지 누락</h2><span class="badge warn">주의</span></div>
+      <p>원문 전체(약 16.4만자) "내진" 키워드 전수검색 0건 — 유사 단지의 내진 I등급 명시와 대조적</p></div>
+    <div class="tile"><div class="bar warn"></div>
+      <div class="top"><h2>분양보증 고지<br>미확인</h2><span class="badge warn">주의</span></div>
+      <p>분양대금에 대한 분양보증서(HUG 등) 문구 미확인 — 표(이미지)에만 있을 가능성, 재확인 필요</p></div>
+    <div class="tile"><div class="bar warn"></div>
+      <div class="top"><h2>이의제기 금지<br>광범위 반복</h2><span class="badge warn">주의</span></div>
+      <p>"이의를 제기할 수 없습니다"류 문구 40회 이상 — 재산가치 직결 사항까지 포괄 금지</p></div>
+    <div class="tile"><div class="bar warn"></div>
+      <div class="top"><h2>중계장치 위치<br>사후 변경</h2><span class="badge warn">주의</span></div>
+      <p>위치 미확정 상태에서 이의제기 금지 — 확정 위치 계약 전 공개 요청 필요</p></div>
+    <div class="tile"><div class="bar warn"></div>
+      <div class="top"><h2>구조 관련 고지<br>미확인</h2><span class="badge warn">주의</span></div>
+      <p>지하주차장 층고·영구배수공법 수치 미기재 — A2BL 대비 구조 정보 소략</p></div>
+    <div class="tile"><div class="bar ok"></div>
+      <div class="top"><h2>계약금 부담<br>수준</h2><span class="badge ok">양호</span></div>
+      <p>계약금 10% · 중도금 60%(6회) · 잔금 30% — 초기 부담 낮은 표준 구조</p></div>
+    <div class="tile"><div class="bar ok"></div>
+      <div class="top"><h2>분양가상한제<br>산정 투명성</h2><span class="badge ok">양호</span></div>
+      <p>주택법 제57조 근거 택지비·건축비 가산비 산출내역 원문 공개</p></div>
+  </div>
+  <div class="foot">법무법인 제이엘 · 분양공고문 분석팀 — 근거 문구는 모두 입주자모집공고 원문 직접 대조</div>
+</body>
+</html>

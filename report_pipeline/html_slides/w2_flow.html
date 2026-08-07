@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareR.ttf"); font-weight: 400; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareB.ttf"); font-weight: 700; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareEB.ttf"); font-weight: 800; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1332px; height:750px; overflow:hidden; }
+  body { font-family:"NanumSquare",sans-serif; background:#fff; position:relative; }
+  .head { position:absolute; left:52px; top:36px; display:flex; align-items:center; gap:14px; }
+  .head .no { font-size:24px; font-weight:800; color:#C89B3C; }
+  .head h1 { font-size:27px; font-weight:800; color:#1F3864; }
+  .badge-top { position:absolute; right:150px; top:44px; background:#C0392B; color:#fff; font-size:14px; font-weight:700; padding:6px 14px; border-radius:6px; }
+  .brand { position:absolute; right:52px; top:40px; font-size:15px; font-weight:800; color:#1F3864; }
+  .brand small { display:block; font-size:9px; color:#8a93a0; letter-spacing:2px; text-align:right; }
+  .row { position:absolute; left:52px; right:52px; top:150px; bottom:120px; display:flex; align-items:stretch; gap:0; }
+  .col { flex:1; display:flex; flex-direction:column; border-radius:12px; padding:24px 26px; position:relative; }
+  .step { position:absolute; top:-16px; left:24px; font-size:13px; font-weight:800; letter-spacing:1px;
+    padding:6px 14px; border-radius:999px; }
+  .c1 { background:#F7F8FA; border:1.5px solid #D8DDE5; }
+  .c1 .step { background:#fff; color:#C0392B; border:1.5px solid #E3B7B0; }
+  .c1 .body { font-size:15.5px; line-height:1.62; color:#2c3543; }
+  .c1 .src { margin-top:auto; font-size:12px; color:#9aa3ad; }
+  .c2 { background:#1F3864; margin:0 46px; box-shadow:0 8px 24px rgba(31,56,100,.28); }
+  .c2 .step { background:#C89B3C; color:#fff; }
+  .c2 .body { font-size:16.5px; line-height:1.6; color:#fff; font-weight:700; margin-top:6px; }
+  .c2 .icon { font-size:34px; margin-bottom:12px; }
+  .c3 { background:#EAF3EA; border:1.5px solid #BFDCC2; }
+  .c3 .step { background:#2E7D32; color:#fff; }
+  .c3 .body { font-size:16px; line-height:1.6; color:#1c3a1e; font-weight:700; }
+  .arrow { position:absolute; top:50%; transform:translateY(-50%); width:0; height:0;
+    border-top:20px solid transparent; border-bottom:20px solid transparent; border-left:26px solid #C89B3C; z-index:5; }
+  .a1 { left: calc(33.33% - 6px); } .a2 { left: calc(66.66% + 18px); }
+  .labels { position:absolute; left:52px; right:52px; bottom:62px; display:flex; }
+  .labels div { flex:1; text-align:center; font-size:14px; font-weight:800; color:#1F3864; }
+  .labels div:nth-child(2) { margin:0 46px; }
+  .foot { position:absolute; left:52px; bottom:18px; font-size:12px; color:#9aa3ad; }
+</style>
+</head>
+<body>
+  <div class="head"><span class="no">04</span><h1>부대복리시설 인접 동(101·103동) — 소음·사생활 침해</h1></div>
+  <div class="badge-top">중요 상</div>
+  <div class="brand">법무법인 JL<small>JL LAWFIRM</small></div>
+
+  <div class="row">
+    <div class="col c1">
+      <div class="step">문제 조항 (원문)</div>
+      <div class="body" style="margin-top:8px">“101동 지하1층 부대복리시설(라운지카페, 도담누리터 등)이, 103동 지하1층 생활지원센터, 멀티룸(주민회의실), 키즈스테이션과 지상1층 스터디라운지 … 미세한 진동 및 소음에 의한 사생활 및 환경권이 침해당할 수 있습니다.”</div>
+      <div class="src">입주자모집공고 원문 직접 인용</div>
+    </div>
+    <div class="arrow a1"></div>
+    <div class="col c2">
+      <div class="step">법무법인 JL 검토</div>
+      <div class="icon">⚖️</div>
+      <div class="body">침해 가능성만 고지하고 소음 저감 설계·방음 조치는 일절 기재하지 않음 — 101·103동 계약자에게 위험이 전가되는 구조</div>
+    </div>
+    <div class="arrow a2"></div>
+    <div class="col c3">
+      <div class="step">✓ 개선요청</div>
+      <div class="body" style="margin-top:8px">101동·103동 인접 세대에는 계약 전 개별 안내문을 발송하고, 방음 보강 조치 여부를 확인해 줄 것을 요청합니다.</div>
+    </div>
+  </div>
+
+  <div class="labels"><div>사실 확인</div><div>법률 검토</div><div>실행 요청</div></div>
+  <div class="foot">법무법인 제이엘 · 분양공고문 분석팀 — 안양 에버포레 자연&e편한세상(A1BL) 검토보고서</div>
+</body>
+</html>
