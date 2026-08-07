@@ -108,25 +108,13 @@ class Deck {
     const s = this.pres.addSlide();
     s.background = { color: C.WHITE };
 
-    // 섹션 첫 페이지에만 작은 썸네일(내용에 맞는 스톡사진, 전면사진 아님 —
-    // "간지 필요없음, 썸네일 정도" 사용자 피드백 반영. 2026-08-07)
-    const showThumb = !continued && this.sectionThumb;
+    // 2026-08-07 대장님 지시: 헤더 옆 작은 썸네일 완전 폐기(없어 보임) — 로고만 단정하게.
     const logoH = 0.34, logoW = logoH * LOGO_RATIO;
-    const thumbW = 0.95, thumbH = 0.62, thumbGap = 0.12;
-    const rightReserve = showThumb ? (thumbW + thumbGap + logoW + thumbGap + 0.15) : (logoW + 0.35);
 
     const title = (this.sectionNum !== "" ? `${this.sectionNum}. ` : "") + (this.sectionTitle || "");
     s.addText([
       { text: title, options: { fontFace: FONT_HEAD, fontSize: 21, bold: true, color: C.INK } },
-    ], { x: M, y: 0.34, w: CW - rightReserve, h: 0.62, valign: "middle", margin: 0 });
-
-    if (showThumb) {
-      s.addImage({ path: this.sectionThumb, x: W - M - logoW - thumbGap - thumbW, y: 0.30, w: thumbW, h: thumbH });
-      s.addShape(this.pres.ShapeType.rect, {
-        x: W - M - logoW - thumbGap - thumbW, y: 0.30, w: thumbW, h: thumbH,
-        fill: { type: "none" }, line: { color: C.LINE, width: 0.75 },
-      });
-    }
+    ], { x: M, y: 0.34, w: CW - logoW - 0.35, h: 0.62, valign: "middle", margin: 0 });
 
     // 우상단 JL 워드마크(실제 로고 이미지)
     if (fs.existsSync(LOGO_PATH)) {
@@ -473,7 +461,6 @@ function buildDeck(content, slugDir) {
   for (const sec of content.sections || []) {
     deck.sectionNum = sec.num ?? "";
     deck.sectionTitle = sec.title || "";
-    deck.sectionThumb = pickSectionImage(sec.title); // 섹션 첫 페이지에만 작은 썸네일로 사용
     deck.newContentSlide(false);
 
     for (const b of sec.blocks || []) {
