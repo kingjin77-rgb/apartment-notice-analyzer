@@ -23,7 +23,11 @@ txt = io.open(DATA_JS, encoding="utf-8").read()
 m = re.search(r"(const COMPLEX_DATA = )(\[.*\])(;)", txt, re.S)
 prefix, arr, suffix = m.group(1), m.group(2), m.group(3)
 existing = json.loads(arr)
-existing_names = {e["nm"] for e in existing}
+# 2026-08-07 수정: 이름만으로 중복판정하면 동명이지만 실제 다른 지역인 단지가
+# 통째로 스킵된다(서울 확장 때 442건 실손실로 발견, 09_merge_region.py에서
+# (이름+동) 조합으로 교정). 이 스크립트는 이미 실행 완료된 기록용이라 재실행은
+# 안 하지만, 참고할 사람을 위해 로직만 맞춰둔다.
+existing_keys = {(e["nm"], e.get("umd", "")) for e in existing}
 print(f"기존(화성 파일럿) {len(existing)}건")
 
 FUT = re.compile(r"예정|입주예정")

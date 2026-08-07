@@ -27,7 +27,9 @@ txt = io.open(DATA_JS, encoding="utf-8").read()
 m = re.search(r"(const COMPLEX_DATA = )(\[.*\])(;)", txt, re.S)
 prefix, arr, suffix = m.group(1), m.group(2), m.group(3)
 existing = json.loads(arr)
-existing_names = {e["nm"] for e in existing}
+# 이름만으로 중복판정하면 동명이지만 실제로 다른 지역인 단지가 통째로
+# 스킵된다(서울 확장 1차 때 442건 실손실로 확인됨) — 이름+동 조합으로 판정.
+existing_keys = {(e["nm"], e.get("umd", "")) for e in existing}
 print(f"기존 {len(existing)}건")
 
 FUT = re.compile(r"예정|입주예정")
@@ -37,7 +39,8 @@ added = []
 skipped_dup = 0
 for g in gg:
     nm = g["nm"]
-    if nm in existing_names:
+    key = (nm, g.get("umd", ""))
+    if key in existing_keys:
         skipped_dup += 1
         continue
     addr = g.get("geoAddr") or f"{g.get('sido','')} {g.get('umd','')} {g.get('jibun','')}"
@@ -55,7 +58,7 @@ for g in gg:
         "scope": "gg",
     }
     added.append(rec)
-    existing_names.add(nm)
+    existing_keys.add(key)
 
 print(f"중복 스킵 {skipped_dup}건, 신규 추가 {len(added)}건")
 merged = existing + added
