@@ -4,6 +4,11 @@
 .env.*.local
 *.env
 
+# 폰트 파일 - 일부(210 옴니고딕)는 유료/라이선스 폰트라 공개 저장소에 재배포 불가 가능성.
+# secrets/와 동일한 이유로 로컬(각 PC/세션)에만 두고 git에는 안 올림. brand/fonts/README.md 참고.
+report_pipeline/template/brand/fonts/*
+!report_pipeline/template/brand/fonts/README.md
+
 # node
 node_modules/
 .next/
