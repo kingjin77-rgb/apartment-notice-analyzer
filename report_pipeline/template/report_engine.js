@@ -23,7 +23,11 @@ const COLORS = {
   GRAY: "595959", LIGHTGRAY: "F2F2F2", CREAM: "F7F3EA",
   LINE: "E2DED4", REDBG: "FBEAEA", ORANGEBG: "FBF1E3", GREENBG: "EAF3EA",
 };
-const FONT = "맑은 고딕";
+// 2026-08-07: 실제 업로드된 브랜드 폰트로 교체(사용자 확인: 옴니고딕=제목, 나눔스퀘어=본문).
+// 폰트 파일은 report_pipeline/template/brand/fonts/ (git 미포함 — README 참고, 로컬 설치 필요).
+const FONT_HEAD = "210 OmniGothic 050"; // 표지·섹션제목·소제목용
+const FONT_BODY = "NanumSquare";        // 본문 기본값(Document default)
+const FONT = FONT_BODY;
 const RATING_COLOR = { "양호": COLORS.GREEN, "보통": COLORS.ORANGE, "주의": COLORS.RED };
 const SEV_COLOR = { "상": COLORS.RED, "중": COLORS.ORANGE, "하": COLORS.GREEN,
   "주의": COLORS.RED, "확인필요": COLORS.ORANGE, "양호": COLORS.GREEN };
@@ -51,8 +55,8 @@ function sectionBar(num, text) {
         children: [new Paragraph({
           spacing: { before: 0, after: 0 },
           children: [
-            new TextRun({ text: num ? `${num}   ` : "", bold: true, color: COLORS.GOLD, size: 24 }),
-            new TextRun({ text, bold: true, color: "FFFFFF", size: 24 }),
+            new TextRun({ text: num ? `${num}   ` : "", bold: true, color: COLORS.GOLD, size: 24, font: FONT_HEAD }),
+            new TextRun({ text, bold: true, color: "FFFFFF", size: 24, font: FONT_HEAD }),
           ],
         })],
       })],
@@ -70,7 +74,7 @@ function h2(text, color = COLORS.NAVY) {
     spacing: { before: 240, after: 100, line: 276, lineRule: "auto" },
     border: { left: { style: BorderStyle.SINGLE, size: 18, color: COLORS.GOLD, space: 6 } },
     indent: { left: 80 },
-    children: [new TextRun({ text, bold: true, color, size: 22 })],
+    children: [new TextRun({ text, bold: true, color, size: 22, font: FONT_HEAD })],
   });
 }
 function p(text, opts = {}) {
@@ -201,9 +205,9 @@ function buildDocument(content) {
       border: { bottom: { style: BorderStyle.SINGLE, size: 32, color: COLORS.GOLD } },
     }),
     new Paragraph({ spacing: { before: 300, after: 60 },
-      children: [new TextRun({ text: content.title, bold: true, size: 46, color: COLORS.NAVY })] }),
+      children: [new TextRun({ text: content.title, bold: true, size: 46, color: COLORS.NAVY, font: FONT_HEAD })] }),
     new Paragraph({ spacing: { after: 240 },
-      children: [new TextRun({ text: content.subtitle, bold: true, size: 32, color: COLORS.NAVY })] }),
+      children: [new TextRun({ text: content.subtitle, bold: true, size: 32, color: COLORS.NAVY, font: FONT_HEAD })] }),
     simpleTable(content.coverTable, [2200, 7150]),
     new Paragraph({ spacing: { before: 260, after: 0 }, children: [new TextRun({ text: "" })] }),
     new Paragraph({

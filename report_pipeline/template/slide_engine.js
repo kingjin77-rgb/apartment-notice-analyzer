@@ -24,7 +24,12 @@ const C = {
   CARD: "F3F4F6", LINE: "E5E7EB", SOFT: "FAFAFA",
   RED: "C0392B", ORANGE: "C77700", OK: "2E7D32",
 };
-const FONT = "맑은 고딕";
+// 2026-08-07: 실제 업로드된 브랜드 폰트로 교체(사용자 확인: 옴니고딕=제목, 나눔스퀘어=본문).
+// 폰트 파일은 report_pipeline/template/brand/fonts/ (git 미포함 — README 참고, 로컬 설치 필요).
+// 렌더링 PC에 미설치 시 Office가 기본폰트로 자동 대체할 뿐 파일이 손상되지는 않음.
+const FONT_HEAD = "210 OmniGothic 050"; // 표지·섹션제목·타이틀용 (5단계 중 최고굵기)
+const FONT_BODY = "NanumSquare";        // 본문·표·캡션용
+const FONT = FONT_BODY; // 하위호환 별칭 — 개별 타이틀 라인만 FONT_HEAD로 명시 교체
 const SEV_COLOR = { "상": C.RED, "중": C.ORANGE, "하": C.OK, "주의": C.RED, "확인필요": C.ORANGE, "양호": C.OK };
 const RATING_COLOR = { "양호": C.OK, "보통": C.ORANGE, "주의": C.RED };
 const RATING_BG = { "주의": "FBEAEA", "확인필요": "FBF1E3", "상": "FBEAEA", "중": "FBF1E3" };
@@ -73,8 +78,7 @@ class Deck {
 
     const title = (this.sectionNum !== "" ? `${this.sectionNum}. ` : "") + (this.sectionTitle || "");
     s.addText([
-      { text: title, options: { fontFace: FONT, fontSize: 21, bold: true, color: C.INK } },
-      ...(continued ? [{ text: "  (계속)", options: { fontFace: FONT, fontSize: 13, bold: true, color: C.MUTED } }] : []),
+      { text: title, options: { fontFace: FONT_HEAD, fontSize: 21, bold: true, color: C.INK } },
     ], { x: M, y: 0.34, w: CW - 1.7, h: 0.62, valign: "middle", margin: 0 });
 
     // 우상단 JL 워드마크(실제 로고 이미지)
@@ -111,7 +115,7 @@ class Deck {
     if (this.y > TOP + 0.01) this.y += 0.12;
     this.slide.addText(String(text), {
       x: M, y: this.y, w: CW, h,
-      fontFace: FONT, fontSize: 16, bold: true, color: C.INK,
+      fontFace: FONT_HEAD, fontSize: 16, bold: true, color: C.INK,
       valign: "middle", margin: 0,
     });
     this.y += h + 0.05;
@@ -292,7 +296,7 @@ class Deck {
     // 헤더: 번호 + 카테고리 + 중요도 배지
     this.slide.addText([
       { text: String(b.index).padStart(2, "0") + "  ", options: { fontFace: FONT, fontSize: 12, bold: true, color: C.MUTED } },
-      { text: String(b.cat || ""), options: { fontFace: FONT, fontSize: 14.5, bold: true, color: C.INK } },
+      { text: String(b.cat || ""), options: { fontFace: FONT_HEAD, fontSize: 14.5, bold: true, color: C.INK } },
     ], { x: M, y: this.y, w: CW - 1.1, h: headH, valign: "middle", margin: 0 });
     this.slide.addShape(this.pres.ShapeType.roundRect, {
       x: W - M - 0.72, y: this.y + 0.03, w: 0.72, h: 0.28,
@@ -371,7 +375,7 @@ function coverSlide(deck) {
   // 대형 제목
   s.addText(`${String(c.title || "")} 검토보고서`, {
     x: M, y: 1.55, w: CW - 0.5, h: 1.5,
-    fontFace: FONT, fontSize: 40, bold: true, color: C.INK, valign: "middle", margin: 0,
+    fontFace: FONT_HEAD, fontSize: 40, bold: true, color: C.INK, valign: "middle", margin: 0,
   });
 
   // 표지 정보 카드 (연회색 라운드)
@@ -407,48 +411,16 @@ function coverSlide(deck) {
 
   // 푸터 워드마크
   s.addText([
-    { text: "법무법인 제이엘", options: { fontFace: FONT, fontSize: 12, bold: true, color: C.INK } },
+    { text: "법무법인 제이엘", options: { fontFace: FONT_HEAD, fontSize: 12, bold: true, color: C.INK } },
     { text: "  |  분양공고문 분석팀", options: { fontFace: FONT, fontSize: 11, color: C.MUTED } },
   ], { x: M, y: H - 0.62, w: 7, h: 0.35, valign: "middle", margin: 0 });
 }
 
-function tocSlide(deck) {
-  const c = deck.content;
-  const s = deck.pres.addSlide();
-  s.background = { color: C.WHITE };
-  s.addText("목차", {
-    x: M, y: 0.55, w: CW, h: 0.7,
-    fontFace: FONT, fontSize: 28, bold: true, color: C.INK, margin: 0,
-  });
-
-  const secs = c.sections || [];
-  const half = Math.ceil(secs.length / 2);
-  const cols = [secs.slice(0, half), secs.slice(half)];
-  cols.forEach((col, ci) => {
-    const x = M + ci * (CW / 2 + 0.2);
-    let y = 1.75;
-    col.forEach((sec, i) => {
-      const idx = ci * half + i + 1;
-      const th = textH(sec.title, 14, CW / 2 - 1.0, 1.28);
-      const rowH = Math.max(0.5, th + 0.2);
-      s.addText(String(idx).padStart(2, "0"), {
-        x, y, w: 0.55, h: 0.4,
-        fontFace: FONT, fontSize: 16, bold: true, color: C.BLUE, margin: 0,
-      });
-      s.addText(String(sec.title || ""), {
-        x: x + 0.62, y: y + 0.02, w: CW / 2 - 1.0, h: rowH,
-        fontFace: FONT, fontSize: 14, bold: true, color: C.INK, valign: "top", margin: 0,
-        lineSpacingMultiple: 1.22,
-      });
-      y += rowH + 0.24;
-    });
-  });
-}
+// 2026-08-07: 사용자 지시로 목차 슬라이드 영구 삭제(더 이상 호출 안 함, 함수도 제거).
 
 function buildDeck(content, slugDir) {
   const deck = new Deck(content);
   coverSlide(deck);
-  tocSlide(deck);
 
   for (const sec of content.sections || []) {
     deck.sectionNum = sec.num ?? "";
