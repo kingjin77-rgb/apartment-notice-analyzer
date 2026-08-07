@@ -6,13 +6,24 @@ LAWD_CD 41590이 화성시 행정구 개편(동탄구 신설)으로 폐지된 �
 것으로 밝혀짐 — 41597(동탄구)+41595(화성시 나머지)가 현재 코드.
 강남구(11680)·부산 코드로는 정상 응답이 왔던 게 그 증거.
 새로 실거래가 확인된 단지는 기존 proxied(est=1) 항목을 hasT=1로 승격시킨다."""
+import sys, io as _io
+if hasattr(sys.stdout, "buffer"):
+    sys.stdout = _io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    sys.stderr = _io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 import os
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_HERE))  # avm_app/pipeline -> avm_app -> repo root
 import io, json, os, re, time, statistics, collections
 import requests
 from dotenv import load_dotenv
-load_dotenv(os.path.join(_REPO, "apartment_notice_analyzer", ".env"))
+_ENV_CANDIDATES = [
+    os.path.join(_REPO, "apartment_notice_analyzer", ".env"),
+    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(_REPO))), "apartment_notice_analyzer", ".env"),
+]
+for _p in _ENV_CANDIDATES:
+    if os.path.exists(_p):
+        load_dotenv(_p)
+        break
 
 SC = os.path.join(_HERE, "data")
 DATA_JS = os.path.join(_REPO, "avm_app", "data.js")

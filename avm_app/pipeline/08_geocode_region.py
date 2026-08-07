@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-"""경기도 전역 확장 1단계 — national_comps.json(실거래 기반, 4,280개 단지)을
-카카오 지오코딩해 avm_app 지도용 좌표를 붙인다.
+"""전국 확장 — 02번(경기도 전용)을 일반화한 버전. 시/도 이름을 인자로 받는다.
+national_comps.json에서 해당 시/도만 골라 카카오 지오코딩.
+
+사용법: python 08_geocode_region.py "서울특별시"
 중단돼도 이어서 돌 수 있도록 진행상황을 매 50건마다 저장한다."""
 import sys, io as _io
 if hasattr(sys.stdout, "buffer"):
@@ -8,7 +10,7 @@ if hasattr(sys.stdout, "buffer"):
     sys.stderr = _io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 import os
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_REPO = os.path.dirname(os.path.dirname(_HERE))  # avm_app/pipeline -> avm_app -> repo root
+_REPO = os.path.dirname(os.path.dirname(_HERE))
 import json, io, os, time, sys
 import requests
 from dotenv import load_dotenv
@@ -21,10 +23,16 @@ for _p in _ENV_CANDIDATES:
         load_dotenv(_p)
         break
 
+if len(sys.argv) < 2:
+    print("사용법: python 08_geocode_region.py \"시/도 이름(national_comps.json의 sido 필드값 그대로)\"")
+    sys.exit(1)
+SIDO = sys.argv[1]
+SLUG = SIDO.replace("특별시", "").replace("광역시", "").replace("자치도", "").replace("특별자치시", "").replace("도", "").strip() or SIDO
+
 SC = os.path.join(_HERE, "data")
 SRC = f"{SC}/national_comps.json"
-DST = f"{SC}/gyeonggi_geocoded.json"
-LOG = io.open(f"{SC}/geocode_gyeonggi_log.txt", "a", encoding="utf-8")
+DST = f"{SC}/{SLUG}_geocoded.json"
+LOG = io.open(f"{SC}/geocode_{SLUG}_log.txt", "a", encoding="utf-8")
 P = lambda *a: (print(*a, file=LOG), LOG.flush(), print(*a))
 
 KAKAO = os.getenv("KAKAO_REST_API_KEY")
@@ -33,8 +41,11 @@ if not KAKAO:
     sys.exit(1)
 
 data = json.load(io.open(SRC, encoding="utf-8"))
-gg = [x for x in data if x.get("sido") == "경기도"]
-P(f"경기도 대상 {len(gg)}건")
+targets = [x for x in data if x.get("sido") == SIDO]
+P(f"{SIDO} 대상 {len(targets)}건")
+if not targets:
+    P(f"경고: sido=='{SIDO}' 매칭 0건. national_comps.json의 실제 sido 값 목록을 확인할 것.")
+    sys.exit(1)
 
 done = {}
 if os.path.exists(DST):
@@ -62,11 +73,11 @@ def geocode(query):
 
 out = list(done.values())
 n_ok = n_fail = 0
-for i, c in enumerate(gg):
+for i, c in enumerate(targets):
     key = (c["sgg"], c["umd"], c["jibun"])
     if key in done:
         continue
-    q = f"경기도 {c['umd']} {c['jibun']}"
+    q = f"{SIDO} {c['umd']} {c['jibun']}"
     geo = geocode(q)
     rec = dict(c)
     if geo:
@@ -77,9 +88,9 @@ for i, c in enumerate(gg):
     out.append(rec)
     if (i + 1) % 50 == 0:
         json.dump(out, io.open(DST, "w", encoding="utf-8"), ensure_ascii=False)
-        P(f"  진행 {i+1}/{len(gg)} (성공 {n_ok} 실패 {n_fail})")
+        P(f"  진행 {i+1}/{len(targets)} (성공 {n_ok} 실패 {n_fail})")
     time.sleep(0.08)
 
 json.dump(out, io.open(DST, "w", encoding="utf-8"), ensure_ascii=False)
-P(f"완료: 성공 {n_ok} 실패 {n_fail} / 총 {len(gg)}")
-print("DONE", n_ok, n_fail, len(gg))
+P(f"완료: 성공 {n_ok} 실패 {n_fail} / 총 {len(targets)}")
+print("DONE", n_ok, n_fail, len(targets))

@@ -1,13 +1,24 @@
 # -*- coding: utf-8 -*-
 """화성 파일럿 단지에 K-APT 실측(복도구조·주차대수)을 배치로 붙인다.
 어제/오늘 확인된 대로 41590은 죽은 코드라 41597(동탄구)+41595(화성시 나머지)로 조회."""
+import sys, io as _io
+if hasattr(sys.stdout, "buffer"):
+    sys.stdout = _io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    sys.stderr = _io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 import os
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_HERE))  # avm_app/pipeline -> avm_app -> repo root
 import sys, io, json, re, time
 sys.path.insert(0, os.path.join(_REPO, "apartment_notice_analyzer"))
 from dotenv import load_dotenv
-load_dotenv(os.path.join(_REPO, "apartment_notice_analyzer", ".env"))
+_ENV_CANDIDATES = [
+    os.path.join(_REPO, "apartment_notice_analyzer", ".env"),
+    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(_REPO))), "apartment_notice_analyzer", ".env"),
+]
+for _p in _ENV_CANDIDATES:
+    if os.path.exists(_p):
+        load_dotenv(_p)
+        break
 from modules.kapt_complex import KaptClient
 
 SC = os.path.join(_HERE, "data")

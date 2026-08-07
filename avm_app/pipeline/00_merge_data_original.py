@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """POI 단지(거래0건 포함) + 실거래 통계를 병합해 앱용 data.js 생성.
    거래 0건 단지는 '인근 유사단지 비준' 근거를 함께 저장한다."""
+import sys, io as _io
+if hasattr(sys.stdout, "buffer"):
+    sys.stdout = _io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    sys.stderr = _io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 import os, sys, json, io, math, re, statistics, collections
 
 SC=r"C:\Users\corncake\AppData\Local\Temp\claude\D--DDownloads-apartment-notice-analyzer--claude-worktrees-apartment-appraisal-ai-9c689d\999ed042-521f-471e-892b-b4d7900ac313\scratchpad"

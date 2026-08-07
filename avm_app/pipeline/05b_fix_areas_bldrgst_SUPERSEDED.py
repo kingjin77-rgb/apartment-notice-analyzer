@@ -1,13 +1,24 @@
 # -*- coding: utf-8 -*-
 """화성 파일럿 거래0건 단지(est=1)의 '인근단지 최빈면적' 임시방편을
 건축물대장 실제 전유면적(getBrHsprcInfo)으로 교체."""
+import sys, io as _io
+if hasattr(sys.stdout, "buffer"):
+    sys.stdout = _io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    sys.stderr = _io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 import os
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_HERE))  # avm_app/pipeline -> avm_app -> repo root
 import sys, io, json, re, os, time
 sys.path.insert(0, os.path.join(_REPO, "apartment_notice_analyzer"))
 from dotenv import load_dotenv
-load_dotenv(os.path.join(_REPO, "apartment_notice_analyzer", ".env"))
+_ENV_CANDIDATES = [
+    os.path.join(_REPO, "apartment_notice_analyzer", ".env"),
+    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(_REPO))), "apartment_notice_analyzer", ".env"),
+]
+for _p in _ENV_CANDIDATES:
+    if os.path.exists(_p):
+        load_dotenv(_p)
+        break
 import requests
 from modules.building_registry import BuildingRegistryClient
 

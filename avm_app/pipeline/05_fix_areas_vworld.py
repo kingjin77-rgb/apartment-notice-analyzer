@@ -4,13 +4,24 @@
 돌아오는 게 확인됨(1135세대 단지에서 12건만 옴). V-World 세대별 공시가격
 (HousingPriceClient)이 같은 단지에서 1135/1135 정확히 일치하는 걸로 검증됨 —
 이걸로 교체."""
+import sys, io as _io
+if hasattr(sys.stdout, "buffer"):
+    sys.stdout = _io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    sys.stderr = _io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 import os
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_HERE))  # avm_app/pipeline -> avm_app -> repo root
 import sys, io, json, re, os, time, collections
 sys.path.insert(0, os.path.join(_REPO, "apartment_notice_analyzer"))
 from dotenv import load_dotenv
-load_dotenv(os.path.join(_REPO, "apartment_notice_analyzer", ".env"))
+_ENV_CANDIDATES = [
+    os.path.join(_REPO, "apartment_notice_analyzer", ".env"),
+    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(_REPO))), "apartment_notice_analyzer", ".env"),
+]
+for _p in _ENV_CANDIDATES:
+    if os.path.exists(_p):
+        load_dotenv(_p)
+        break
 import requests
 from modules.housing_price import HousingPriceClient, make_pnu
 

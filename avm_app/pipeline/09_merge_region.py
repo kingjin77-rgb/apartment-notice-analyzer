@@ -1,21 +1,25 @@
 # -*- coding: utf-8 -*-
-"""지오코딩된 경기도 4,278개 단지(실거래 기반)를 기존 화성시 파일럿 604개에 병합.
-화성시 파일럿과 이름 중복되는 건 파일럿 쪽(더 정제됨)을 우선하고 스킵한다.
-경기도 전역 건은 전부 hasT=1(실거래 기반)이라 거래0건 비준(comps)은 없다 —
-아직 안 만든 전국 POI 수집이 선행돼야 하는 부분이라 정직하게 비워둔다."""
+"""03번(경기도 전용 병합)을 일반화. 08번이 만든 {SLUG}_geocoded.json을 data.js에 병합.
+사용법: python 09_merge_region.py 서울"""
 import sys, io as _io
 if hasattr(sys.stdout, "buffer"):
     sys.stdout = _io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
     sys.stderr = _io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 import os
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_REPO = os.path.dirname(os.path.dirname(_HERE))  # avm_app/pipeline -> avm_app -> repo root
-import json, re, io
+_REPO = os.path.dirname(os.path.dirname(_HERE))
+import json, re, io, sys
+
+if len(sys.argv) < 2:
+    print("사용법: python 09_merge_region.py <SLUG>  (예: 서울, 인천 — 08번이 만든 파일명과 맞출 것)")
+    sys.exit(1)
+SLUG = sys.argv[1]
 
 SC = os.path.join(_HERE, "data")
 DATA_JS = os.path.join(_REPO, "avm_app", "data.js")
+SRC = f"{SC}/{SLUG}_geocoded.json"
 
-gg = json.load(io.open(f"{SC}/gyeonggi_geocoded.json", encoding="utf-8"))
+gg = json.load(io.open(SRC, encoding="utf-8"))
 gg = [g for g in gg if g.get("lat") and g.get("lng")]
 print(f"지오코딩 성공 {len(gg)}건")
 
@@ -24,7 +28,7 @@ m = re.search(r"(const COMPLEX_DATA = )(\[.*\])(;)", txt, re.S)
 prefix, arr, suffix = m.group(1), m.group(2), m.group(3)
 existing = json.loads(arr)
 existing_names = {e["nm"] for e in existing}
-print(f"기존(화성 파일럿) {len(existing)}건")
+print(f"기존 {len(existing)}건")
 
 FUT = re.compile(r"예정|입주예정")
 LH = re.compile(r"LH|엘에이치|행복주택|국민임대|공공임대|뉴스테이|영구임대")
@@ -48,9 +52,10 @@ for g in gg:
         "est": 0,
         "future": 1 if FUT.search(nm) else 0,
         "lh": 1 if LH.search(nm) else 0,
-        "scope": "gg",  # 경기도 전역 확장분 — 화성 파일럿과 품질 다름을 구분하는 태그
+        "scope": "gg",
     }
     added.append(rec)
+    existing_names.add(nm)
 
 print(f"중복 스킵 {skipped_dup}건, 신규 추가 {len(added)}건")
 merged = existing + added
