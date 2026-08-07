@@ -196,6 +196,9 @@ table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
       <i style="background:var(--navy)"></i>실거래 충분<br>
       <span style="color:var(--gray-500);font-size:10px">마커 = 전용 84㎡ 환산 추정가</span>
     </div>
+    <div id="pinNotice" style="display:none;position:absolute;top:11px;right:11px;z-index:10;
+      background:var(--gold);color:#fff;padding:7px 12px;border-radius:2px;font-size:12px;font-weight:700;
+      box-shadow:0 1px 6px rgba(0,0,0,.15)">단지가 너무 많습니다 — 확대하거나 검색해 주세요</div>
   </div>
 
   <div class="panel" id="panel">
@@ -223,7 +226,7 @@ table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
   </div>
 </div>
 
-<script src="data.js?v=20260807d"></script>
+<script src="data.js?v=20260807f"></script>
 <script>
 const KAKAO_KEY="6dd941689e3c39956d9ba809f127c947";
 let map=null, ovs=[], selNm=null, filter="all", cur=null;
@@ -428,6 +431,7 @@ function initMap(){
   map=new kakao.maps.Map(document.getElementById("map"),
       {center:new kakao.maps.LatLng(37.2000,127.0900),level:7});
   map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
+  kakao.maps.event.addListener(map, "idle", draw);  // 팬/줌 끝나면 보이는 영역만 다시 그림
   draw();
 }
 function pass(c){
@@ -437,9 +441,25 @@ function pass(c){
   if(filter==="future") return !!c.future;
   return true;
 }
+// 전국 14,798개를 한번에 다 찍으면(특히 축소된 전체지도에서) 렌더링이 멈춘다.
+// 실제 지도앱처럼 "현재 보이는 영역 안"만 그리고, 팬/줌 하면 다시 그린다.
+// 그래도 한 화면에 너무 많으면(도심 밀집지) 상한을 두고 안내한다.
+const MAX_PINS = 600;
 function draw(){
   ovs.forEach(o=>o.setMap(null)); ovs=[];
-  C.filter(pass).forEach(c=>{
+  let pool = C.filter(pass);
+  const notice = document.getElementById("pinNotice");
+  if(map){
+    const b = map.getBounds();
+    pool = pool.filter(c => b.contain(new kakao.maps.LatLng(c.lat, c.lng)));
+  }
+  let overflow = false;
+  if(pool.length > MAX_PINS){
+    overflow = true;
+    pool = pool.slice(0, MAX_PINS);
+  }
+  if(notice) notice.style.display = overflow ? "block" : "none";
+  pool.forEach(c=>{
     const d=document.createElement("div");
     d.className="pin"+(c.rare?" rare":"")+(c.nm===selNm?" on":"");
     const price=pin84(c);
