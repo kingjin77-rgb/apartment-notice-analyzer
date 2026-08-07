@@ -99,6 +99,7 @@ class Deck {
     this.y = TOP;
     this.sectionTitle = "";
     this.sectionNum = "";
+    this.sectionThumb = null;
     this.pageNo = 0;
   }
 
@@ -107,14 +108,28 @@ class Deck {
     const s = this.pres.addSlide();
     s.background = { color: C.WHITE };
 
+    // 섹션 첫 페이지에만 작은 썸네일(내용에 맞는 스톡사진, 전면사진 아님 —
+    // "간지 필요없음, 썸네일 정도" 사용자 피드백 반영. 2026-08-07)
+    const showThumb = !continued && this.sectionThumb;
+    const logoH = 0.34, logoW = logoH * LOGO_RATIO;
+    const thumbW = 0.95, thumbH = 0.62, thumbGap = 0.12;
+    const rightReserve = showThumb ? (thumbW + thumbGap + logoW + thumbGap + 0.15) : (logoW + 0.35);
+
     const title = (this.sectionNum !== "" ? `${this.sectionNum}. ` : "") + (this.sectionTitle || "");
     s.addText([
       { text: title, options: { fontFace: FONT_HEAD, fontSize: 21, bold: true, color: C.INK } },
-    ], { x: M, y: 0.34, w: CW - 1.7, h: 0.62, valign: "middle", margin: 0 });
+    ], { x: M, y: 0.34, w: CW - rightReserve, h: 0.62, valign: "middle", margin: 0 });
+
+    if (showThumb) {
+      s.addImage({ path: this.sectionThumb, x: W - M - logoW - thumbGap - thumbW, y: 0.30, w: thumbW, h: thumbH });
+      s.addShape(this.pres.ShapeType.rect, {
+        x: W - M - logoW - thumbGap - thumbW, y: 0.30, w: thumbW, h: thumbH,
+        fill: { type: "none" }, line: { color: C.LINE, width: 0.75 },
+      });
+    }
 
     // 우상단 JL 워드마크(실제 로고 이미지)
     if (fs.existsSync(LOGO_PATH)) {
-      const logoH = 0.34, logoW = logoH * LOGO_RATIO;
       s.addImage({ path: LOGO_PATH, x: W - M - logoW, y: 0.32, w: logoW, h: logoH });
     } else {
       s.addText([
@@ -447,45 +462,18 @@ function coverSlide(deck) {
   ], { x: M, y: H - 0.62, w: 7, h: 0.35, valign: "middle", margin: 0 });
 }
 
-// 2026-08-07: 사용자 지시로 목차 슬라이드 영구 삭제(더 이상 호출 안 함, 함수도 제거).
-
-/* ── 섹션 표지 (전면 사진 + 다크오버레이, 좌하단 "0N 제목") ──────
- * 실제 JL 제안서 샘플 톤앤매너 반영(2026-08-07). 이미지가 없으면(스톡 미수집
- * 등) 조용히 건너뛰고 기존 화이트 콘텐츠 슬라이드로만 진행 — 필수 아님. */
-function sectionDividerSlide(deck, sec) {
-  const imgPath = pickSectionImage(sec.title);
-  if (!imgPath) return; // 스톡 이미지 없으면 스킵(다운그레이드 아님 — 자산 미보유 시 안전 폴백)
-
-  const s = deck.pres.addSlide();
-  s.addImage({ path: imgPath, x: 0, y: 0, w: W, h: H });
-  s.addShape(deck.pres.ShapeType.rect, {
-    x: 0, y: 0, w: W, h: H,
-    fill: { color: C.NAVY_DARK, transparency: 38 },
-    line: { type: "none" },
-  });
-
-  const num = sec.num ? String(sec.num).padStart(2, "0") : "";
-  s.addText([
-    { text: num ? `${num}  ` : "", options: { fontFace: FONT_HEAD, fontSize: 20, bold: true, color: "9DB2CC" } },
-    { text: sec.title || "", options: { fontFace: FONT_HEAD, fontSize: 34, bold: true, color: C.WHITE } },
-  ], { x: M, y: H - 1.6, w: CW - 2.2, h: 1.1, valign: "bottom", margin: 0 });
-
-  // 로고(jl_logo_crop.png)는 짙은 네이비 단색이라 이 어두운 오버레이 배경에서는
-  // 거의 안 보임 — 흰색/밝은 버전 로고 파일이 생기기 전까진 여기서는 생략.
-  s.addText([
-    { text: "법무법인 ", options: { fontFace: FONT_HEAD, fontSize: 11, bold: true, color: C.WHITE } },
-    { text: "JL", options: { fontFace: FONT_HEAD, fontSize: 13, bold: true, color: "7FB88F" } },
-  ], { x: W - M - 1.6, y: 0.36, w: 1.6, h: 0.3, align: "right", valign: "middle", margin: 0 });
-}
+// 2026-08-07: 사용자 지시로 목차 슬라이드 영구삭제. 전면사진 섹션표지(간지)도
+// 시도했다가 "필요없다, 그런 스타일 아니다"는 피드백으로 폐기(→ 아래 작은
+// 썸네일 방식으로 교체). 두 함수 모두 더 이상 호출 안 함, 코드도 제거함.
 
 function buildDeck(content, slugDir) {
   const deck = new Deck(content);
   coverSlide(deck);
 
   for (const sec of content.sections || []) {
-    sectionDividerSlide(deck, sec);
     deck.sectionNum = sec.num ?? "";
     deck.sectionTitle = sec.title || "";
+    deck.sectionThumb = pickSectionImage(sec.title); // 섹션 첫 페이지에만 작은 썸네일로 사용
     deck.newContentSlide(false);
 
     for (const b of sec.blocks || []) {
