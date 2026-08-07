@@ -11,6 +11,10 @@ const pptxgen = require("pptxgenjs");
 const fs = require("fs");
 const path = require("path");
 
+/* ── 브랜드 자산 ──────────────────────────────────────────────── */
+const LOGO_PATH = path.join(__dirname, "brand", "jl_logo_crop.png");
+const LOGO_RATIO = 409 / 138; // 실제 로고 crop 비율(가로/세로)
+
 /* ── 팔레트 (JL 제안서 샘플 기준) ─────────────────────────────── */
 const C = {
   WHITE: "FFFFFF", INK: "111827", BODY: "374151", MUTED: "6B7280",
@@ -73,15 +77,16 @@ class Deck {
       ...(continued ? [{ text: "  (계속)", options: { fontFace: FONT, fontSize: 13, bold: true, color: C.MUTED } }] : []),
     ], { x: M, y: 0.34, w: CW - 1.7, h: 0.62, valign: "middle", margin: 0 });
 
-    // 우상단 JL 워드마크
-    s.addText([
-      { text: "법무법인 ", options: { fontFace: FONT, fontSize: 11, bold: true, color: C.INK } },
-      { text: "JL", options: { fontFace: FONT, fontSize: 13, bold: true, color: C.GREEN } },
-    ], { x: W - M - 1.5, y: 0.36, w: 1.5, h: 0.3, align: "right", valign: "middle", margin: 0 });
-    s.addText("JL LAW FIRM", {
-      x: W - M - 1.5, y: 0.62, w: 1.5, h: 0.2, align: "right",
-      fontFace: FONT, fontSize: 7.5, color: C.MUTED, charSpacing: 2, margin: 0,
-    });
+    // 우상단 JL 워드마크(실제 로고 이미지)
+    if (fs.existsSync(LOGO_PATH)) {
+      const logoH = 0.34, logoW = logoH * LOGO_RATIO;
+      s.addImage({ path: LOGO_PATH, x: W - M - logoW, y: 0.32, w: logoW, h: logoH });
+    } else {
+      s.addText([
+        { text: "법무법인 ", options: { fontFace: FONT, fontSize: 11, bold: true, color: C.INK } },
+        { text: "JL", options: { fontFace: FONT, fontSize: 13, bold: true, color: C.GREEN } },
+      ], { x: W - M - 1.5, y: 0.36, w: 1.5, h: 0.3, align: "right", valign: "middle", margin: 0 });
+    }
 
     s.addText(String(this.pageNo), {
       x: W - M - 0.6, y: H - 0.36, w: 0.6, h: 0.24, align: "right",
