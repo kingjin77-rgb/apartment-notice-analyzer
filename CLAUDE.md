@@ -49,6 +49,16 @@ node scripts/verify.js <slug>                      # 규칙 검사
 - 입주예정자협의회 언급은 사실 나열이 아니라 "개선사항 제시" 위주로 작성(comment 블록에 "입주예정자협의회에 공유·요청" 형태로 — anyang-ipark-sujain 4부 예시가 올바른 패턴)
 - **제안서 스타일 초점 확정: 건축·마감재·조경·주변유해시설·동별·세대별 문제점 발견.** 법조문 분석보다 이 6개 축의 "발견"에 집중.
 
+## ⚠ 보안사고 (2026-08-07 발견)
+- `apartment_notice_analyzer/.env.example`, `.env.example.txt` 두 파일에 **실제 API 키 값이 그대로 커밋**되어 있었음(ANTHROPIC_API_KEY, KAKAO_REST_API_KEY, NEIS_API_KEY, MOLIT_API_KEY, BLDRGST_API_KEY, LAW_GO_KR_OC, NAVER_SEARCH_CLIENT_ID/SECRET, CLOVA_OCR_SECRET_KEY). 커밋 8f12c23(이 세션 이전, 이미 원격에 존재)부터 있었음 — 저장소가 공개 접근 가능하다는 점(위 GitHub 항목 참고)을 고려하면 노출된 것으로 간주해야 함.
+- 조치: 두 파일 모두 값 제거(빈 템플릿화), `.env.example.txt`는 완전 삭제. **커밋 히스토리에는 여전히 원래 값이 남아있음** — `git filter-repo`/BFG로 히스토리 재작성 필요(파괴적 작업이라 사용자 승인 필요) 또는 최소한 위 키 전부 재발급(rotate) 필수. 특히 ANTHROPIC_API_KEY는 즉시 폐기·재발급 권장.
+- 이 노출 때문에 실제로는 이 키들이 `os.getenv()`로 로드된 적이 없었을 가능성이 높음(dotenv는 `secrets/.env`나 리포지토리 루트 `.env`를 읽지, `.env.example`류는 안 읽음) — "API가 없어진 것 같다"는 사용자 체감은 애초에 한 번도 배선된 적이 없었기 때문일 가능성.
+
+## 파이프라인 지능 수준 (2026-08-07 확인)
+- `toxic_clause.py` 자체 설계는 2단계: ① `ANTHROPIC_API_KEY` 있으면 Claude가 `standard_contract_reference.json`과 의미 비교해 판정(스마트 모드) ② 없으면 정규식 12종(RED_FLAG_PATTERNS) 매칭(폴백). **위 보안사고로 키가 정상 배선된 적이 없어 스마트 모드가 한 번도 가동되지 않았을 가능성이 큼** — 지금까지 전부 폴백(키워드/정규식) 모드로 돌았을 것.
+- `law_mapping.json`의 8개 카테고리 키워드에 **내진·소음이 아예 없음**, `RED_FLAG_PATTERNS` 12종도 전부 "계약조항 면책/위약금류"이지 구조·소음·환경 실질 리스크가 아님 → section_splitter.py의 "미매칭 문장 버려짐" 결함(위 1순위 항목)과 겹쳐 내진/소음은 자동 파이프라인에서 구조적으로 누락됨. A1BL/A2BL의 내진 발견은 에이전트가 원문을 직접 grep해서 수동으로 잡은 것이지 파이프라인 산출물이 아님.
+- 사실 내진(건축물대장 BLDRGST_API_KEY)·소음(EIASS, environment_analysis.py, MOLIT_API_KEY)용 전용 모듈은 이미 존재함(building_registry.py, environment_analysis.py) — 키 배선 + (클라우드 세션은 egress 차단이라) PC 등 실제 네트워크 환경에서 실행이 관건.
+
 ## 인프라·계정
 - GitHub: github.com/kingjin77-rgb/apartment-notice-analyzer ← **이 저장소가 유일한 소스 저장소**
   - PC 로컬 사본: D:\DDownloads\apartment_notice_analyzer
