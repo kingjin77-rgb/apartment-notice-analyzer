@@ -19,13 +19,15 @@ from modules.project_classifier import classify  # noqa: E402
 
 
 def load_content_text(slug: str) -> str:
-    """content.js 전체를 문자열 하나로 덤프 (node로 평가)."""
+    """content_v2.js(우선) 또는 content.js 전체를 문자열 하나로 덤프 (node로 평가)."""
     out = subprocess.run(
         ["node", "-e",
-         f"const c=require('./content/{slug}/content.js');console.log(JSON.stringify(c))"],
+         "let c; try { c = require('./content/" + slug + "/content_v2.js'); } "
+         "catch(e) { c = require('./content/" + slug + "/content.js'); } "
+         "console.log(JSON.stringify(c))"],
         capture_output=True, text=True, cwd=os.path.join(REPO, "report_pipeline"))
     if out.returncode != 0:
-        raise SystemExit(f"content.js 로드 실패: {out.stderr[:300]}")
+        raise SystemExit(f"content 로드 실패: {out.stderr[:300]}")
     return out.stdout
 
 

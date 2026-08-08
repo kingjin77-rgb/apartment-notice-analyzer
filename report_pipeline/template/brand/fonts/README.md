@@ -16,3 +16,10 @@
   어디에 쓰이는지 시각적으로 대조 못 함. 굵기 5단계(옴니고딕)라 헤더용으로 추정되지만 확정은 아님.
 - `template/report_engine.js`, `template/slide_engine.js`의 `FONT = "맑은 고딕"` 상수를
   실제로 바꾸는 건 사용자 확인 후 진행 예정(RULES.md 15번 — 임의 폰트명 사용 금지 원칙).
+
+## 2026-08-08 추가 — 주 폰트 교체: 에스코어드림(S-Core Dream)
+- 대장님 확인: 실제 JL 주 제안서 폰트는 **에스코어드림**. v2 엔진(slide_engine_v2.js)은
+  제목 "S-Core Dream 6 Bold" / 본문 "S-Core Dream 4 Regular"를 참조함.
+- 무료(상업용 가능), 9단계 굵기. 다운로드: https://s-core.co.kr/company/font/ (에스코어 공식 무료배포)
+- **PC와 클라우드 세션 각각에 설치 필요** — 이 폴더에 TTF를 넣고, 렌더/납품 PC에도 설치할 것.
+  미설치 시 Office가 기본체로 대체됨(파일 손상은 없음). HTML 템플릿은 나눔스퀘어로 자동 폴백.

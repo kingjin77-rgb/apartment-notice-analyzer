@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareR.ttf"); font-weight: 400; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareB.ttf"); font-weight: 700; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareEB.ttf"); font-weight: 800; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1332px; height:750px; overflow:hidden; }
+  body { font-family:"NanumSquare",sans-serif; background:#fff; position:relative; }
+  .head { position:absolute; left:52px; top:36px; }
+  .head .eyebrow { font-size:14px; font-weight:700; color:#C89B3C; letter-spacing:1.2px; margin-bottom:7px; }
+  .head h1 { font-size:29px; font-weight:800; color:#1F3864; }
+  .brand { position:absolute; right:52px; top:40px; font-size:15px; font-weight:800; color:#1F3864; }
+  .brand small { display:block; font-size:9px; color:#8a93a0; letter-spacing:2px; text-align:right; }
+  .canvas { position:absolute; left:390px; top:130px; width:552px; height:520px; }
+  .co { position:absolute; width:290px; border-radius:10px; background:#fff; border:1.5px solid #D8DDE5;
+    box-shadow:0 3px 12px rgba(31,56,100,.09); padding:14px 16px; }
+  .co .dong { font-size:16px; font-weight:800; color:#1F3864; margin-bottom:5px; display:flex; align-items:center; gap:7px; }
+  .co .dot { width:9px; height:9px; border-radius:50%; }
+  .dot.r { background:#C0392B; } .dot.o { background:#C77700; }
+  .co .txt { font-size:12.8px; line-height:1.5; color:#4b5563; }
+  .co b { color:#C0392B; }
+  .l1 { left:52px; top:150px; } .l2 { left:52px; top:440px; }
+  .r1 { right:52px; top:150px; width:290px; } .r2 { right:52px; top:440px; width:290px; }
+  .caption { position:absolute; left:0; right:0; bottom:14px; text-align:center; font-size:12px; color:#9aa3ad; }
+  svg text { font-family:"NanumSquare",sans-serif; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <div class="eyebrow">안양 에버포레 자연&e편한세상 (A1BL) · 4개동 60세대</div>
+    <h1>동별 유의사항 — 배치 모식도 기반 요약</h1>
+  </div>
+  <div class="brand">법무법인 JL<small>JL LAWFIRM</small></div>
+
+  <!-- 중앙: 배치 모식도 (SVG 직접 작도) -->
+  <div class="canvas">
+    <svg width="552" height="520" viewBox="0 0 552 520">
+      <!-- 부지 -->
+      <rect x="16" y="26" width="520" height="452" rx="22" fill="#F7F9FC" stroke="#C6D2E4" stroke-width="2"/>
+      <!-- 진입도로/문주 -->
+      <rect x="216" y="440" width="120" height="38" fill="#E8EDF5" stroke="#C6D2E4" stroke-width="1.5"/>
+      <text x="276" y="464" text-anchor="middle" font-size="13" font-weight="700" fill="#1F3864">문주·주출입구</text>
+      <!-- 동 4개 -->
+      <g font-weight="800" font-size="17">
+        <rect x="56"  y="66"  width="150" height="110" rx="8" fill="#1F3864"/>
+        <text x="131" y="128" text-anchor="middle" fill="#fff">101동</text>
+        <rect x="346" y="66"  width="150" height="110" rx="8" fill="#3D5A8E"/>
+        <text x="421" y="128" text-anchor="middle" fill="#fff">102동</text>
+        <rect x="56"  y="300" width="150" height="110" rx="8" fill="#1F3864"/>
+        <text x="131" y="362" text-anchor="middle" fill="#fff">103동</text>
+        <rect x="346" y="300" width="150" height="110" rx="8" fill="#3D5A8E"/>
+        <text x="421" y="362" text-anchor="middle" fill="#fff">104동</text>
+      </g>
+      <!-- 시설 마커 -->
+      <g font-size="12" font-weight="700">
+        <circle cx="131" cy="212" r="9" fill="#C0392B"/>
+        <text x="131" y="243" text-anchor="middle" fill="#C0392B">부대복리시설(지하)</text>
+        <circle cx="276" cy="420" r="9" fill="#C77700"/>
+        <text x="276" y="404" text-anchor="middle" fill="#C77700">데크주차장</text>
+        <circle cx="460" cy="440" r="9" fill="#7A5C2E"/>
+        <text x="460" y="425" text-anchor="middle" fill="#7A5C2E">쓰레기·재활용</text>
+        <circle cx="131" cy="285" r="9" fill="#C0392B"/>
+        <text x="212" y="290" text-anchor="middle" fill="#C0392B">생활지원센터</text>
+      </g>
+      <!-- 영향 파동(소음) -->
+      <g stroke="#C0392B" fill="none" opacity=".45">
+        <circle cx="131" cy="212" r="22" stroke-width="2" stroke-dasharray="4 5"/>
+        <circle cx="131" cy="212" r="36" stroke-width="1.5" stroke-dasharray="3 6"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- 좌우 콜아웃 -->
+  <div class="co l1"><div class="dong"><span class="dot r"></span>101동</div>
+    <div class="txt">지하1층 <b>부대복리시설(라운지카페·도담누리터)</b> 직접 인접 — 진동·소음 영향 원문에 명시 고지</div></div>
+  <div class="co l2"><div class="dong"><span class="dot r"></span>103동</div>
+    <div class="txt">지하1층 <b>생활지원센터·멀티룸</b>, 지상1층 <b>스터디라운지</b> 인접 — 소음·사생활 침해 고지</div></div>
+  <div class="co r1"><div class="dong"><span class="dot o"></span>102동</div>
+    <div class="txt"><b>문주·데크주차장</b> 인접 — 차량 출입 소음·야간 조명 영향 가능</div></div>
+  <div class="co r2"><div class="dong"><span class="dot o"></span>104동</div>
+    <div class="txt"><b>쓰레기·재활용 보관소</b> 인접 — 악취·수거차량 소음 유의</div></div>
+
+  <div class="caption">※ 위 배치도는 이해를 돕기 위한 모식도로 실제 축척·배치와 다를 수 있음 — 시설 인접 관계는 입주자모집공고 원문 기재 기준, 정밀 검토 시 원문 배치도 크롭 이미지 사용</div>
+</body>
+</html>

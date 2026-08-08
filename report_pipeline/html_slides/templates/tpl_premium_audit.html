@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareR.ttf"); font-weight: 400; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareB.ttf"); font-weight: 700; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareEB.ttf"); font-weight: 800; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1332px; height:750px; overflow:hidden; }
+  body { font-family:"S-Core Dream","NanumSquare",sans-serif; background:#fff; position:relative; }
+  /* AI여백 금지: 콘텐츠 영역을 지면 전체에 스트레치 */
+  .wrap { position:absolute; left:40px; top:30px; right:40px; bottom:52px; display:flex; flex-direction:column; }
+  .row { flex:1; min-height:0; }
+  .left { display:flex; flex-direction:column; }
+  .bars { flex:1; display:flex; flex-direction:column; justify-content:space-evenly; }
+  .right table { height:100%; }
+  h1 { font-size:21px; font-weight:800; color:#1F3864; }
+  .sub { font-size:11.5px; color:#6b7480; margin:4px 0 14px; }
+  .row { display:flex; gap:16px; }
+  .left { width:465px; }
+  .kpi { display:flex; gap:10px; margin-bottom:12px; }
+  .k { flex:1; border:1px solid #E5E7EB; padding:10px 12px; }
+  .k .l { font-size:10.5px; font-weight:700; color:#6b7480; }
+  .k .v { font-size:25px; font-weight:800; color:#1F3864; margin-top:3px; }
+  .k.hl .v { color:#C0392B; }
+  .bars { border:1px solid #E5E7EB; padding:12px 14px; }
+  .bars .t { font-size:11.5px; font-weight:800; color:#1F3864; margin-bottom:8px; }
+  .b { display:flex; align-items:center; }
+  .b .n { width:128px; font-size:10.5px; font-weight:700; color:#33404f; }
+  .b .bar { height:20px; background:#1F3864; }
+  .b.hot .bar { background:#C0392B; }
+  .b .val { font-size:10.5px; font-weight:800; color:#1F3864; margin-left:6px; white-space:nowrap; }
+  .b.hot .val { color:#C0392B; }
+  .right { flex:1; }
+  table { border-collapse:collapse; width:100%; }
+  th { background:#1F3864; color:#fff; font-size:12px; font-weight:800; padding:10px 12px; text-align:left; }
+  td { border:1px solid #E5E7EB; font-size:12px; color:#3d4854; padding:11px 12px; line-height:1.55; vertical-align:middle; }
+  td.item { font-weight:800; color:#1F3864; white-space:nowrap; }
+  td.amt { font-weight:800; color:#C0392B; white-space:nowrap; text-align:right; }
+  tr:nth-child(even) td { background:#F8F9FB; }
+  .foot { position:absolute; left:40px; bottom:14px; right:40px; font-size:10px; color:#9aa3ad; line-height:1.4; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>가산비 산출내역 교차검증 — "비용은 계상됐는데, 사양은 어디에 있는가"</h1>
+    <div class="sub">A1BL 공고문 38면 「택지비 및 건축비 가산비 산출내역」 원문 전수 판독 (주택법 제57조·주택공급규칙 제21조③에 따른 공개 자료) — 60세대 기준</div>
+
+    <div class="row">
+      <div class="left">
+        <div class="kpi">
+          <div class="k hl"><div class="l">건축비 가산비 합계</div><div class="v">163.2억</div></div>
+          <div class="k"><div class="l">택지비 가산비</div><div class="v">12.4억</div></div>
+          <div class="k hl"><div class="l">세대당 건축가산비</div><div class="v">2.7억</div></div>
+        </div>
+        <div class="bars">
+          <div class="t">건축비 가산비 상위 항목 (억원)</div>
+          <div class="b"><span class="n">지반(흙막이+암석)</span><div class="bar" style="width:220px"></div><span class="val">31.5</span></div>
+          <div class="b hot"><span class="n">특수형태주택</span><div class="bar" style="width:191px"></div><span class="val">27.4</span></div>
+          <div class="b hot"><span class="n">입면마감특화</span><div class="bar" style="width:181px"></div><span class="val">25.9</span></div>
+          <div class="b"><span class="n">건설사업관리 추가</span><div class="bar" style="width:109px"></div><span class="val">15.7</span></div>
+          <div class="b hot"><span class="n">홈네트워크</span><div class="bar" style="width:84px"></div><span class="val">12.0</span></div>
+          <div class="b"><span class="n">기계환기</span><div class="bar" style="width:62px"></div><span class="val">8.9</span></div>
+          <div class="b hot"><span class="n">건강친화형 기준</span><div class="bar" style="width:55px"></div><span class="val">7.8</span></div>
+          <div class="b"><span class="n">법정초과 복리시설</span><div class="bar" style="width:39px"></div><span class="val">5.6</span></div>
+          <div class="b hot"><span class="n">지하주차장 층고증가</span><div class="bar" style="width:36px"></div><span class="val">5.1</span></div>
+          <div class="b"><span class="n">성능등급</span><div class="bar" style="width:35px"></div><span class="val">4.9</span></div>
+          <div class="b hot"><span class="n">문주특화</span><div class="bar" style="width:9px"></div><span class="val">1.2</span></div>
+        </div>
+      </div>
+
+      <div class="right">
+        <table>
+          <tr><th style="width:118px">가산비 항목</th><th style="width:64px">계상액</th><th>검증 요구 (입주예정자협의회 → 사업주체)</th></tr>
+          <tr><td class="item">입면마감특화</td><td class="amt">25.9억</td><td>특화 외벽마감의 자재·범위 명세 요구. 마감재 목록의 "동등 이상 자재로 변경 가능" 조항(원문 6회)에 따라 변경 시 <b>가산비 정산 여부</b> 확인</td></tr>
+          <tr><td class="item">지하주차장 층고증가</td><td class="amt">5.1억</td><td>층고증가 비용은 계상됐으나 공고문엔 차로높이 2.7m만 기재 — <b>증가된 층고 수치(설계기준 대비)</b>를 서면 공개 요구</td></tr>
+          <tr><td class="item">문주특화</td><td class="amt">1.2억</td><td>특화비를 받은 그 문주가 102·103동 인접 세대의 <b>소음·시야차단 리스크로 고지</b>됨 — 특화 설계에 차폐·소음저감이 포함됐는지 확인</td></tr>
+          <tr><td class="item">홈네트워크+초고속</td><td class="amt">13.5억</td><td>인텔리전트 설비 비용 계상과 동시에 <b>이동통신 중계설비 위치는 "이의제기 불가"</b> — 설비 사양서와 확정 위치 동시 공개 요구</td></tr>
+          <tr><td class="item">성능등급</td><td class="amt">4.9억</td><td>성능등급 인증서가 <b>판독 곤란한 저해상 이미지</b>로만 게재 — 등급 원문(소음·구조·환경 항목별) 텍스트 공개 및 내진능력 수치 별도 고지 요구</td></tr>
+          <tr><td class="item">건강친화형 기준</td><td class="amt">7.8억</td><td>건강친화형 건설기준 적용 비용 — 실내공기질 측정계획·자재 등급(HB마크 등) <b>구체 항목 대조표</b> 요구</td></tr>
+          <tr><td class="item">조경특화</td><td class="amt">0.6억</td><td>조경특화 계상 vs "조경선형·식재는 시공여건에 따라 변경 가능" 면책 — 변경 시 <b>특화 수준 유지 의무</b> 명시 요구</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="foot">※ 금액은 공고문 38면 기재 그대로(천원 단위→억원 환산). 원문 단서: "입주자모집공고에 분양가격의 항목별 공시내용은 사업에 실제 소요된 비용과 다를 수 있습니다"(주택법 시행령 제60조) — 바로 이 단서 때문에 '계상 항목의 실제 이행 여부'를 묻는 것이 정당한 검증 절차가 됨. | 법무법인 제이엘 분양공고문 분석팀</div>
+</body>
+</html>
