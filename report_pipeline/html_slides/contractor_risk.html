@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareR.ttf"); font-weight: 400; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareB.ttf"); font-weight: 700; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareEB.ttf"); font-weight: 800; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1332px; height:750px; overflow:hidden; }
+  body { font-family:"NanumSquare",sans-serif; background:#fff; position:relative; }
+  .wrap { position:absolute; left:40px; top:28px; right:40px; }
+  h1 { font-size:21px; font-weight:800; color:#1F3864; }
+  .sub { font-size:11.5px; color:#6b7480; margin:4px 0 14px; }
+  .quote { background:#F8FBFD; border:1px solid #D9DDE2; border-left:4px solid #C0392B; padding:12px 16px; margin-bottom:14px; }
+  .quote .l { font-size:10px; font-weight:800; color:#C0392B; margin-bottom:4px; }
+  .quote .t { font-size:13px; color:#2c3543; line-height:1.55; }
+  .quote b { background:#FBEAEA; }
+  .cards { display:flex; gap:10px; margin-bottom:14px; }
+  .c { flex:1; border:1px solid #E5E7EB; border-top:4px solid #1F3864; padding:10px 12px; }
+  .c.warn { border-top-color:#C0392B; }
+  .c .nm { font-size:13px; font-weight:800; color:#1F3864; }
+  .c .role { font-size:10px; color:#8a93a0; margin:2px 0 6px; }
+  .c .st { font-size:10.8px; line-height:1.45; color:#3d4854; }
+  .c.warn .st b { color:#C0392B; }
+  .flow { display:flex; align-items:stretch; gap:0; margin-bottom:12px; }
+  .f { flex:1; border:1.5px solid #D8DDE5; padding:10px 14px; font-size:11.5px; line-height:1.5; color:#2c3543; }
+  .f .h { font-size:11px; font-weight:800; color:#1F3864; margin-bottom:4px; }
+  .f.mid { background:#1F3864; border-color:#1F3864; color:#fff; margin:0 26px; position:relative; }
+  .f.mid .h { color:#C89B3C; }
+  .arr { align-self:center; width:0; height:0; border-top:12px solid transparent; border-bottom:12px solid transparent; border-left:16px solid #C89B3C; margin:0 -21px; z-index:2; }
+  .demand { background:#EAF3EA; border:1px solid #BFDCC2; padding:12px 16px; }
+  .demand .l { font-size:10px; font-weight:800; color:#2E7D32; margin-bottom:5px; }
+  .demand .t { font-size:12.5px; font-weight:700; color:#1c3a1e; line-height:1.55; }
+  .foot { position:absolute; left:40px; bottom:14px; right:40px; font-size:10px; color:#9aa3ad; line-height:1.4; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>사업주체 변경 동의간주 조항 × 시공 컨소시엄 재무 현황 — 결합 리스크</h1>
+    <div class="sub">A1BL 공고문 38면 사업주체 현황 원문 + 시공 4사 공개정보 조사(2026.08. 기준) — A2BL 동일 구조</div>
+
+    <div class="quote">
+      <div class="l">문제 조항 (원문 — 공고문 38면)</div>
+      <div class="t">"본 사업은 경기주택도시공사와 민간사업자[디엘이앤씨㈜, ㈜태영건설, 금호건설㈜, 신동아종합건설㈜]가 공동사업주체로 시행하며, 분양계약자는 주택법 제49조에 따른 <b>사용검사 신청 전 사업주체를 경기주택도시공사 단독으로 변경하는 것에 동의가 있는 것으로 간주합니다.</b>"</div>
+    </div>
+
+    <div class="cards">
+      <div class="c"><div class="nm">경기주택도시공사(GH)</div><div class="role">공공시행자 → 사용검사 전 단독 사업주체 예정</div><div class="st">공공기관 — 최종 하자담보·대금보전 책임이 GH로 귀속되는 구조인지가 핵심 확인점</div></div>
+      <div class="c"><div class="nm">디엘이앤씨㈜</div><div class="role">민간사업자·시공</div><div class="st">대형 건설사(e편한세상 브랜드 주관)</div></div>
+      <div class="c warn"><div class="nm">㈜태영건설</div><div class="role">민간사업자·시공</div><div class="st"><b>2024 워크아웃 개시, 2026 현재 졸업 준비 단계</b>(부채비율 720%→488% 개선 중) — 재무 정상화 진행 중이나 아직 워크아웃 관리 하</div></div>
+      <div class="c"><div class="nm">금호건설㈜ · 신동아종합건설㈜</div><div class="role">민간사업자·시공</div><div class="st">중견 2사 — 공동도급 지분·하자보수 연대 범위 미공개</div></div>
+    </div>
+
+    <div class="flow">
+      <div class="f"><div class="h">현재 (계약~공사)</div>공동사업주체 5자<br>공사 이행·품질 책임 민간 4사 분담<br><b>지분·연대 범위 공고문 미기재</b></div>
+      <div class="arr"></div>
+      <div class="f mid"><div class="h">사용검사 신청 전</div>사업주체 → GH 단독 변경<br>(분양계약자 동의 <b>자동 간주</b>)</div>
+      <div class="arr"></div>
+      <div class="f"><div class="h">입주 후 (하자담보기간)</div>하자보수 청구 상대방은?<br>민간 4사 이탈 후 책임구조가<br>계약서에 명기돼 있는지 확인 필요</div>
+    </div>
+
+    <div class="demand">
+      <div class="l">✓ 개선요청 (입주예정자협의회 → 사업주체)</div>
+      <div class="t">① 사업주체 변경 후에도 시공 4사의 하자담보책임(공동주택관리법 제36조·별표4 기간)이 존속함을 계약서에 명기하고, 4사 간 연대책임 범위·공동도급 지분을 공개할 것 &nbsp;② 분양대금 보전 장치(HUG 분양보증 여부 또는 GH 보전 구조)를 서면으로 고지할 것 &nbsp;③ 워크아웃 관리 중인 시공 참여사에 대해 공사이행보증·하자보수보증의 보증서 사본을 협의회에 제공할 것</div>
+    </div>
+  </div>
+  <div class="foot">※ 태영건설 재무 현황은 공개 보도(2026.4~6. 워크아웃 졸업 준비, 부채비율 개선) 기준 참고자료이며 원문(공고문) 기재사항이 아님 — RULES.md 20번에 따라 출처 구분 표기. 특정 회사의 신용도에 대한 단정적 평가가 아니라 '보증구조 서면 확인'을 요구하기 위한 배경자료임. | 법무법인 제이엘 분양공고문 분석팀</div>
+</body>
+</html>
