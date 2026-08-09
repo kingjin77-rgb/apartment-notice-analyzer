@@ -19,12 +19,12 @@ h1 u{text-decoration:none;background:linear-gradient(transparent 62%,#FFE08A 62%
 .bar .r{color:#8FA3C0;font-size:12px}
 .pg{position:absolute;right:64px;top:44px;font-size:13px;font-weight:800;color:#B9C4D2}
 /* metric row */
-.mrow{display:flex;gap:16px;margin-top:26px}
-.m{flex:1;border:1.5px solid #E1E7EE;border-radius:14px;padding:18px 20px;background:#fff}
+.mrow{display:flex;gap:14px;margin-top:22px}
+.m{flex:1;border:1.5px solid #E1E7EE;border-radius:14px;padding:15px 17px;background:#fff}
 .m.hot{border-color:#F0C6C0;background:#FDF6F5}
 .m b{display:block;font-size:40px;font-weight:800;color:#0F2548;letter-spacing:-1.5px;line-height:1}
 .m.hot b{color:#C0392B}
-.m small{display:block;font-size:14px;color:#5B6673;font-weight:700;margin-top:8px;line-height:1.4}
+.m small{display:block;font-size:13.5px;color:#5B6673;font-weight:700;margin-top:8px;line-height:1.4}
 /* two col */
 .two{display:flex;gap:26px;margin-top:24px;align-items:stretch}
 .col{flex:1;display:flex;flex-direction:column;gap:12px}
@@ -40,9 +40,9 @@ h1 u{text-decoration:none;background:linear-gradient(transparent 62%,#FFE08A 62%
 .ask{background:#0F2548;color:#fff;border-radius:12px;padding:16px 20px;font-size:16px;font-weight:700;line-height:1.5}
 .ask b{color:#FFD479}
 .ask .tag{display:inline-block;font-size:12px;font-weight:800;color:#7FA9E8;letter-spacing:1px;margin-bottom:5px}
-table.t{width:100%;border-collapse:collapse;font-size:15.5px;background:#fff;margin-top:22px}
-table.t th{background:#0F2548;color:#fff;font-size:14px;font-weight:800;padding:14px;text-align:left}
-table.t td{padding:16px 14px;border-bottom:1px solid #E5EAF0;font-weight:600;color:#31404F}
+table.t{width:100%;border-collapse:collapse;font-size:14.5px;background:#fff;margin-top:20px}
+table.t th{background:#0F2548;color:#fff;font-size:13.5px;font-weight:800;padding:11px 14px;text-align:left}
+table.t td{padding:10.5px 14px;border-bottom:1px solid #E5EAF0;font-weight:600;color:#31404F}
 table.t td.n{white-space:nowrap;font-weight:800}
 table.t td.red{color:#C0392B;font-weight:800}
 """
@@ -80,11 +80,11 @@ body:before{content:"";position:absolute;inset:auto -6% -30% 52%;height:520px;
   <h1>공고문 69면,<br><em>한 면도 빼지 않고</em> 읽었습니다</h1>
   <div class="rule"></div>
   <p>번영로 롯데캐슬 센트럴스카이 · 634세대 · 울산 중구 학산동 167-4 일원<br>
-  키워드 검색이 아니라 전면 통독 — 서로 다른 면의 표를 겹쳐 <b style="color:#fff">28건</b>을 찾았고, 수치는 모두 원문과 재대조했습니다.</p>
+  키워드 검색이 아니라 전면 통독 — 서로 다른 면의 표를 겹쳐 <b style="color:#fff">31건</b>을 찾았고, 수치는 모두 원문과 재대조했습니다.</p>
   <div class="kpi">
     <div class="k"><b>69 / 69면</b><small>통독 커버리지 · 미통독 0면</small></div>
-    <div class="k"><b>28건</b><small>발견 항목 · 즉시 시정 7건</small></div>
-    <div class="k"><b>63%</b><small>21층 이상 · 진입창 없는 구간</small></div>
+    <div class="k"><b>31건</b><small>발견 항목 · 즉시 시정 7건</small></div>
+    <div class="k"><b>396세대</b><small>21층 이상 · 진입창 없는 구간</small></div>
     <div class="k"><b>231.9억</b><small>보증 밖 발코니 확장금액</small></div>
   </div>
 </div>
@@ -125,21 +125,23 @@ page("s02", f"""
 page("s03", """
 <div class="pad">
   <div class="eyebrow">DIAGNOSIS</div>
-  <h1>찾은 것은 <em>28건</em>, 그중 즉시 시정을 요구할 항목이 <em>7건</em></h1>
+  <h1>찾은 것은 <em>31건</em>, 그중 즉시 시정을 요구할 항목이 <em>7건</em></h1>
   <div class="mrow">
-    <div class="m hot"><b>1,500만</b><small>103동 21층(소화수조 층)이<br>19층보다 더 내는 금액</small></div>
-    <div class="m hot"><b>63%</b><small>21층 이상 세대 —<br>소방관 진입창 없는 구간</small></div>
+    <div class="m hot"><b style="font-size:31px">1억 1,400만</b><small>103동 21·22층 8세대가<br>11~19층보다 더 내는 금액</small></div>
+    <div class="m hot"><b>396세대</b><small>21층 이상 62.5% —<br>소방관 진입창 없는 구간</small></div>
     <div class="m hot"><b>231.9억</b><small>발코니 확장금액 전액이<br>HUG 보증 대상 밖</small></div>
     <div class="m hot"><b>0.4m</b><small>택배차량 운행층 높이<br>53면 2.7m ↔ 64면 2.3m</small></div>
     <div class="m hot"><b>7일?</b><small>"7일 이상"이라면서<br>상한은 "계약 체결 이전"</small></div>
   </div>
   <table class="t">
     <tr><th style="width:210px">분류</th><th>공고문이 말한 것</th><th>두 면을 겹쳐 보면</th><th style="width:150px">근거 면</th></tr>
-    <tr><td class="n">동별·세대별</td><td>103동 21층 소화수조 · 22층 제연휀룸 (52면)</td><td>가격표는 21~30층을 한 밴드로 묶음 — 감액 없음</td><td class="n red">7 ↔ 52</td></tr>
+    <tr><td class="n">동별·세대별</td><td>103동 21층 소화수조 · 22층 제연휀룸 (52면)</td><td>가격표는 21~30층을 한 밴드로 묶음 — 8세대 1억 1,400만원</td><td class="n red">7 ↔ 52</td></tr>
     <tr><td class="n">비용·보증</td><td>발코니 확장금액을 별도 계좌로 수납 (40면)</td><td>그 231억 9,276만원이 보증 대상에서 제외 (66면)</td><td class="n red">40 ↔ 66</td></tr>
     <tr><td class="n">책임구조</td><td>매도인 책임 = 신탁재산(현금) 한도</td><td>그 잔액은 69면 어디에도 없음</td><td class="n red">68</td></tr>
     <tr><td class="n">마감·옵션</td><td>홍보물 우선(57면)</td><td>68·69면이 이를 두 번 뒤집음</td><td class="n red">57 ↔ 68 ↔ 69</td></tr>
     <tr><td class="n">절차·자격</td><td>"통보받은 날부터 7일 이상" (4면)</td><td>상한이 "계약 체결 이전" — 통보가 늦으면 7일이 없음</td><td class="n red">4 ↔ 25</td></tr>
+    <tr><td class="n">승강기</td><td>101·102동 5대 / 103동 아파트 4대 (53면)</td><td>103동 오피스텔 2대는 코어 분리로 사용 불가 (50면)</td><td class="n red">50 ↔ 53</td></tr>
+    <tr><td class="n">피난</td><td>소방관 진입창 위치가 타입마다 다름 (50면)</td><td>84A는 침실3, 84E·105는 안방발코니 — 가구 놓이는 자리</td><td class="n red">50</td></tr>
     <tr><td class="n">공백</td><td>총 주차대수 · 신탁 잔액 · 실외기 호수</td><td>세 가지 모두 69면 어디에도 없음</td><td class="n red">전면</td></tr>
   </table>
 </div>
@@ -150,6 +152,7 @@ page("s04", """
 <style>
 .wrapx{display:flex;gap:26px;margin-top:22px;align-items:stretch;flex:1}
 .tower{width:330px;border:2px solid #0F2548;border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.tower .fl{flex:1}
 .fl{padding:9px 14px;font-size:14px;font-weight:700;color:#5B6673;background:#fff;border-bottom:1px solid #E5EAF0;
   display:flex;justify-content:space-between;align-items:center}
 .fl.mech{background:#EDF2F9;color:#0F2548;font-weight:800}
@@ -180,13 +183,13 @@ page("s04", """
     <div class="right">
       <div class="quote">"103동 20층에 피난안전구역, 소화수조 및 제연휀룸실이, 21층에 소화수조가, 22층에 제연휀룸 계획되어 있어서 21층, 22층 공동주택 세대 및 아래 위 …" — 공고문 52면이 스스로 적은 문장입니다.</div>
       <div class="calc"><table>
-        <tr><td>84B · 11~19층</td><td class="v">707,000,000 원</td></tr>
-        <tr><td>84B · 21~30층 (21층 = 30층 동일가)</td><td class="v">722,000,000 원</td></tr>
-        <tr><td>84C · 11~19층 → 21~30층</td><td class="v">690,000,000 → 704,000,000</td></tr>
-        <tr><td>84D · 11~19층 → 21~30층</td><td class="v">693,000,000 → 707,000,000</td></tr>
-        <tr class="sum"><td>103동 21·22층 확인 3개 라인 6세대 합계</td><td class="v">+ 86,000,000 원</td></tr>
+        <tr><td>84B · 11~19층 → 21~30층</td><td class="v">+ 15,000,000 원</td></tr>
+        <tr><td>84C · 690,000,000 → 704,000,000</td><td class="v">+ 14,000,000 원</td></tr>
+        <tr><td>84D · 693,000,000 → 707,000,000</td><td class="v">+ 14,000,000 원</td></tr>
+        <tr><td>84F · 700,000,000 → 714,000,000</td><td class="v">+ 14,000,000 원</td></tr>
+        <tr class="sum"><td>103동 21·22층 8세대 합계</td><td class="v">+ 114,000,000 원</td></tr>
       </table></div>
-      <div class="ask"><span class="tag">개선요구</span>103동 20~22층 세대에 대해 <b>층별 가격 재산정 또는 방진·방음 보강 시공</b>을 요구하고, 미이행 시 해당 호수에 한해 계약 전 사전고지 확인서를 별도 징구할 것. <span style="color:#8FA3C0;font-size:13px">※ 84F 라인은 원문 표 파손으로 미확인 — 사업주체에 확인 요청</span></div>
+      <div class="ask"><span class="tag">개선요구</span>103동 20~22층 세대에 대해 <b>층별 가격 재산정 또는 방진·방음 보강 시공</b>을 요구하고, 미이행 시 해당 호수에 한해 계약 전 사전고지 확인서를 별도 징구할 것. <span style="color:#8FA3C0;font-size:13px">※ 103동 4개 라인(84B·84C·84D·84F) 전부 원문 대조 완료</span></div>
     </div>
   </div>
 </div>
@@ -205,13 +208,14 @@ page("s05", """
 </style>
 <div class="pad">
   <div class="eyebrow">FINDING 02 · 안전 · 피난</div>
-  <h1>소방관 진입창은 <em>20층 이하에만</em> 있습니다<br>피난안전구역도 <u>각 동 20층 한 곳</u>입니다</h1>
+  <h1>소방관 진입창은 <em>20층 이하에만</em> 있습니다<br>21층 이상 <u>396세대</u>가 그 밖에 있습니다</h1>
   <div class="viz">
     <div class="bars">
-      <div class="b"><div class="lb"><span>진입창 있는 세대 (20층 이하)</span><span>84A 기준 34세대 · 37.0%</span></div>
-        <div class="tr"><div class="fi" style="width:37%;background:#3E6CB5">37.0%</div></div></div>
-      <div class="b"><div class="lb"><span>진입창 없는 세대 (21층 이상)</span><span style="color:#C0392B">84A 기준 58세대 · 63.0%</span></div>
-        <div class="tr"><div class="fi" style="width:63%;background:#C0392B">63.0% — 전체 634세대 환산 약 400세대</div></div></div>
+      <div class="b"><div class="lb"><span>진입창 있는 세대 (20층 이하)</span><span>238세대 · 37.5%</span></div>
+        <div class="tr"><div class="fi" style="width:37.5%;background:#3E6CB5">37.5%</div></div></div>
+      <div class="b"><div class="lb"><span>진입창 없는 세대 (21층 이상)</span><span style="color:#C0392B">396세대 · 62.5%</span></div>
+        <div class="tr"><div class="fi" style="width:62.5%;background:#C0392B">62.5%</div></div>
+        <div style="font-size:12px;color:#5B6673;font-weight:700;margin-top:6px">84A 58 + 84B 27 + 84C 83 + 84D 85 + 84E 58 + 84F 27 + 105형 58 = 396세대 (7면 층별 세대수표 합산, 총 634세대 검증 완료)</div></div>
       <div class="b"><div class="lb"><span>최상층(49층)에서 피난안전구역(20층)까지</span><span style="color:#C0392B">29개 층</span></div>
         <div class="tr"><div class="fi" style="width:100%;background:#0F2548">계단으로 29개 층 하강</div></div></div>
       <div class="quote" style="margin-top:20px">"각동 20층이하는 소방관 진입을 위한 소방관진입창이 계획되어져 있으며" — 공고문 50면. 21층 이상은 그 문장에 포함되지 않습니다.</div>
@@ -225,30 +229,59 @@ page("s05", """
 </div>
 """, "05")
 
-# ── 06 주차
+# ── 06 동·호수별 지도
 page("s06", """
 <style>
-.face{display:flex;gap:20px;margin-top:24px;flex:1;align-items:stretch}
-.f{flex:1;border-radius:16px;padding:24px 26px;border:2px solid #E1E7EE;background:#fff;position:relative;display:flex;flex-direction:column;justify-content:center}
-.f.a{border-color:#3E6CB5}.f.b{border-color:#C0392B;background:#FDF3F2}
-.f .pg2{font-size:14px;font-weight:800;color:#5B6673;letter-spacing:1px}
-.f .v{font-size:66px;font-weight:800;color:#0F2548;letter-spacing:-3px;line-height:1.05;margin:6px 0 4px}
-.f.b .v{color:#C0392B}
-.f .d{font-size:15px;color:#5B6673;font-weight:700;line-height:1.5}
-.vs{align-self:center;font-size:26px;font-weight:800;color:#B9C4D2}
+.map{display:flex;gap:16px;margin-top:20px;flex:1}
+.bd{flex:1;border:1.5px solid #E1E7EE;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;background:#fff}
+.bd .h{background:#0F2548;color:#fff;padding:11px 15px}
+.bd .h b{font-size:19px;font-weight:800}
+.bd .h small{display:block;font-size:11.5px;color:#B9C8DE;font-weight:700;margin-top:3px;line-height:1.4}
+.bd ul{list-style:none;flex:1;display:flex;flex-direction:column;justify-content:space-evenly}
+.bd li{display:flex;gap:9px;padding:7px 15px;border-bottom:1px solid #F0F3F7;align-items:baseline}
+.bd li:last-child{border-bottom:0}
+.bd li i{font-style:normal;flex:none;width:72px;font-size:11.5px;font-weight:800;color:#3E6CB5}
+.bd li span{font-size:12.3px;color:#43525F;font-weight:700;line-height:1.4}
+.bd li.hot{background:#FDF2F1}.bd li.hot i{color:#C0392B}.bd li.hot span{color:#C0392B;font-weight:800}
+.bd li.warn i{color:#B7791F}
 </style>
 <div class="pad">
-  <div class="eyebrow">FINDING 03 · 주차 · 공백</div>
-  <h1>택배차량이 다니는 층의 높이를<br>같은 공고문이 <em>두 번 다르게</em> 적었습니다</h1>
-  <p class="lead">일반 주행통로 2.3m · 주차면 2.1m는 두 면이 같습니다. 다른 것은 <b style="color:#0F2548">택배차량 운행층의 주행통로 높이</b>뿐입니다. 2.3m라면 "택배차량 이동을 고려하여 높였다"는 문장 자체가 성립하지 않습니다.</p>
-  <div class="face">
-    <div class="f a"><div class="pg2">공고문 53면</div><div class="v">2.7 m</div><div class="d">"택배차량의 이동을 고려하여<br>주행통로 높이는 2.7m 이상"</div></div>
-    <div class="vs">↔</div>
-    <div class="f b"><div class="pg2">공고문 64면</div><div class="v">2.3 m</div><div class="d">같은 문장, 같은 공고문<br>— 0.4m 낮게 표기</div></div>
-    <div class="vs">＋</div>
-    <div class="f b"><div class="pg2">69면 전체</div><div class="v">없음</div><div class="d"><b>총 주차대수 미기재</b><br>"주차대수"는 53면 기둥 간섭<br>안내에만 등장</div></div>
+  <div class="eyebrow">FINDING 03 · 동별 · 세대별</div>
+  <h1>같은 단지여도 <u>동에 따라 겪는 것이 다릅니다</u></h1>
+  <p class="lead">공고문 50~54면은 동별로 따로 적어 두었습니다. 흩어져 있어 한 번에 읽히지 않을 뿐, 이미 다 쓰여 있습니다.</p>
+  <div class="map">
+    <div class="bd"><div class="h"><b>101동</b><small>1·2·3·4·5호 &nbsp;|&nbsp; 승강기 5대 &nbsp;|&nbsp; 번영로 면하지 않음</small></div>
+      <ul>
+        <li class="warn"><i>옥탑</i><span>소화수조·펌프실·EV기계실 — 최상층 진동</span></li>
+        <li class="warn"><i>20층</i><span>피난안전구역 + 제연휀룸실</span></li>
+        <li class="hot"><i>1층 3곳</i><span>북동 램프 · 남측 진입구 · 동측 DA+램프</span></li>
+        <li><i>2층</i><span>돌봄센터 · 어린이집 · 맘&amp;키즈카페</span></li>
+        <li><i>지상</i><span>어린이놀이터 2개소 · 공개공지 · 키즈스테이션</span></li>
+        <li><i>지하2층</i><span>급기휀룸</span></li>
+        <li><i>5호라인</i><span>2층 필로티 직상부</span></li>
+      </ul></div>
+    <div class="bd"><div class="h"><b>102동</b><small>1·2·3·4·5호 &nbsp;|&nbsp; 승강기 5대 &nbsp;|&nbsp; 남동측 번영로 직접 면함</small></div>
+      <ul>
+        <li class="warn"><i>옥탑</i><span>소화수조·펌프실·EV기계실 — 최상층 진동</span></li>
+        <li class="warn"><i>20층</i><span>피난안전구역 + 제연휀룸실</span></li>
+        <li class="hot"><i>남동 전층</i><span>50M 대로(번영로) — 소음·빛공해</span></li>
+        <li class="hot"><i>1층 북측</i><span>재활용보관소 — 소음·냄새</span></li>
+        <li><i>1층 서측</i><span>차량 진입구</span></li>
+        <li><i>1·2층</i><span>관리사무소 · 경로당 · 다이닝카페 · 게스트하우스</span></li>
+        <li><i>5호라인</i><span>2층 필로티 직상부</span></li>
+      </ul></div>
+    <div class="bd"><div class="h"><b>103동</b><small>1·2·3·4호 + 오피스텔(코어 분리) &nbsp;|&nbsp; 아파트 승강기 4대 &nbsp;|&nbsp; 남동측 번영로 직접 면함</small></div>
+      <ul>
+        <li class="hot"><i>22층</i><span>제연휀룸이 세대와 같은 층</span></li>
+        <li class="hot"><i>21층</i><span>소화수조가 세대와 같은 층 — 감액 없음</span></li>
+        <li class="warn"><i>20층</i><span>피난안전구역 + 소화수조 + 제연휀룸</span></li>
+        <li class="hot"><i>승강기</i><span>아파트 4대 — 오피스텔 2대는 코어 분리로 사용 불가</span></li>
+        <li class="hot"><i>남동 전층</i><span>50M 대로(번영로) — 소음·빛공해</span></li>
+        <li><i>1층 서측</i><span>재활용보관소 / 동측 차량 출구</span></li>
+        <li><i>2층</i><span>작은도서관 · 독서실 · 오피스텔 라운지</span></li>
+      </ul></div>
   </div>
-  <div class="ask" style="margin-top:22px"><span class="tag">개선요구</span>택배차량 운행층 주행통로의 실제 시공 유효높이를 확정해 <b>정정공고</b>하고, 2.3m로 시공될 경우 진입 제한 차종과 택배 하역 동선을 계약 전 명시할 것. 아울러 <b>주거·오피스텔·근생 구분 총 주차대수와 세대당 주차대수</b>를 공고 정정으로 반드시 밝힐 것.</div>
+  <div class="ask" style="margin-top:16px"><span class="tag">이것이 우리가 하는 일</span>법무법인 제이엘은 이 표를 <b>634세대 전 호수 단위로</b> 만들어 드립니다. 계약 전에는 호수 선택 기준으로, 사전점검에서는 세대별 확인 항목으로, 하자 대응에서는 근거 자료로 그대로 이어집니다.</div>
 </div>
 """, "06")
 
@@ -378,7 +411,7 @@ page("s10", """
   <div class="eyebrow">WHAT WE DO NEXT</div>
   <h1>검토는 시작입니다. <u>입주까지 같은 자료로 이어갑니다</u></h1>
   <div class="rm">
-    <div class="st now"><div class="no">01</div><b>공고문 전수 통독</b><small>69면 5개 구간 병렬 통독<br>발견 28건 · 즉시 시정 7건<br><b style="color:#FFD479">완료</b></small></div>
+    <div class="st now"><div class="no">01</div><b>공고문 전수 통독</b><small>69면 5개 구간 병렬 통독<br>발견 31건 · 즉시 시정 7건<br><b style="color:#FFD479">완료</b></small></div>
     <div class="st"><div class="no">02</div><b>개선요구서 제출</b><small>협의회 명의 공문 작성<br>사업주체·시공사·감리 동시 발송</small></div>
     <div class="st"><div class="no">03</div><b>회신 관리 · 협의</b><small>항목별 회신 대장 운영<br>미회신·형식회신 재요구</small></div>
     <div class="st"><div class="no">04</div><b>사전점검 체크리스트</b><small>발견 항목을 세대별 점검표로<br>21~22층 · 저층부 별도 항목</small></div>
@@ -386,7 +419,7 @@ page("s10", """
   </div>
   <div class="close">
     <b>"공고문에 다 적혀 있었다"는 말을, 입주 후가 아니라 지금 듣게 해드립니다.</b>
-    <p>이번 검토에서 나온 28건은 모두 <b>공고문 원문에 근거</b>합니다. 새로 만들어낸 문제가 아니라, 한 면만 보아서는 보이지 않던 것을 서로 겹쳐 꺼낸 것입니다.
+    <p>이번 검토에서 나온 31건은 모두 <b>공고문 원문에 근거</b>합니다. 새로 만들어낸 문제가 아니라, 한 면만 보아서는 보이지 않던 것을 서로 겹쳐 꺼낸 것입니다.
     법무법인 제이엘은 634세대 전 호수를 같은 방식으로 검토하고, 그 결과를 사전점검과 하자 대응까지 하나의 자료로 연결합니다.</p>
   </div>
 </div>
