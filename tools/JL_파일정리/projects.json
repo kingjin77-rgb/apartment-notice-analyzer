@@ -1,0 +1,25 @@
+﻿{
+  "_설명": "단지 사전 — 새 단지가 생기면 이 파일에만 한 줄 추가하면 됩니다. keywords 중 하나라도 파일명에 있으면 folder 로 분류합니다.",
+  "projects": [
+    { "folder": "번영로_롯데캐슬_센트럴스카이", "keywords": ["번영로", "롯데캐슬", "센트럴스카이", "lottecastle", "beonyeongro"] },
+    { "folder": "동탄_파라곤3차_민간임대",       "keywords": ["파라곤", "동탄", "paragon"] },
+    { "folder": "안양역_센트럴_아이파크_수자인", "keywords": ["안양", "수자인", "아이파크", "sujain"] },
+    { "folder": "부천_e편한세상_어반스퀘어",     "keywords": ["부천", "어반스퀘어", "urban", "이편한", "e편한"] },
+    { "folder": "천안_엘리프_성성호수공원",       "keywords": ["천안", "엘리프", "성성", "elif"] },
+    { "folder": "광명_힐스테이트11구역",         "keywords": ["광명", "힐스테이트", "hillstate"] },
+    { "folder": "더플래티넘_스카이헤론",         "keywords": ["플래티넘", "스카이헤론", "헤론", "platinum", "heron"] },
+    { "folder": "에코델타시티_푸르지오_트레파크", "keywords": ["에코델타", "푸르지오", "트레파크", "ecodelta"] },
+    { "folder": "상주_자이르네",                 "keywords": ["상주", "자이르네"] },
+    { "folder": "엘리프한신더휴_수원",           "keywords": ["한신더휴", "수원"] },
+    { "folder": "에버포레_A1_A2BL",              "keywords": ["에버포레", "everfore", "A1BL", "A2BL"] }
+  ],
+  "categories": [
+    { "folder": "01_공고문원본",   "match_name": ["공고", "모집공고", "원본", "정정공고", "변경공고"], "ext": [] },
+    { "folder": "02_분석데이터",   "match_name": ["findings", "matrix", "price_table", "unit_matrix", "분석", "데이터"], "ext": [".json", ".csv", ".xlsx"] },
+    { "folder": "03_검토보고서",   "match_name": ["검토보고서", "보고서", "report"], "ext": [] },
+    { "folder": "04_제안서_PT",    "match_name": ["PT", "제안서", "선정", "슬라이드", "deck"], "ext": [".pptx", ".ppt"] },
+    { "folder": "05_공문_요구서",  "match_name": ["개선요구", "공문", "요구서", "질의", "협의회"], "ext": [".docx", ".doc", ".hwp"] },
+    { "folder": "06_웹앱",         "match_name": ["웹앱", "webapp"], "ext": [".html", ".htm"] },
+    { "folder": "99_저장소백업",   "match_name": ["bundle", "delta", "backup"], "ext": [".bundle", ".zip"] }
+  ]
+}

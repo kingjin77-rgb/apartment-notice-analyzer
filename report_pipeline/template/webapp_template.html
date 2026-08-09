@@ -457,14 +457,13 @@ footer .r{font-size:12px;color:#8FA3C0;text-align:right}
 
 <section id="dlsec">
   <div class="s-head"><span class="s-num">07</span><h2 class="s-title">다운로드</h2>
-    <p class="s-desc">이 페이지는 파일 하나로 동작합니다. 저장해서 어디서든 열어보실 수 있습니다.</p></div>
+    <p class="s-desc">제안서·검토보고서·요약표를 내려받으실 수 있습니다.</p></div>
   <div class="dlgrid">
-    <button class="dl" onclick="dlSelf()"><span class="ic">⬇</span><b>이 보고서 (HTML)</b><span>인터넷 없이도 열립니다. 휴대폰·태블릿 모두 대응.</span></button>
-    <button class="dl" onclick="dlJSON()"><span class="ic">{ }</span><b>원자료 (JSON)</b><span>발견 목록 + 동·호수별 유의사항 매트릭스.</span></button>
-    <button class="dl" onclick="dlCSV()"><span class="ic">▦</span><b>발견 목록 (CSV)</b><span>엑셀에서 바로 정렬·필터.</span></button>
-    <button class="dl" onclick="dlAsk()"><span class="ic">✎</span><b>개선요구서 초안 (TXT)</b><span>협의회 명의로 제출할 문안.</span></button>
-    <button class="dl" onclick="window.print()"><span class="ic">🖨</span><b>PDF로 저장 / 인쇄</b><span>인쇄 대화상자에서 'PDF로 저장' 선택.</span></button>
+    <a class="dl" href="./번영로롯데캐슬_JL선정PT_69면통독_10장.pptx" download><span class="ic">▶</span><b>제안서 (PowerPoint)</b><span>선정 PT 10장 · 16:9 · 편집 가능</span></a>
+    <a class="dl" href="./번영로롯데캐슬_JL검토보고서.pdf" download><span class="ic">▤</span><b>검토보고서 (PDF)</b><span>69면 전수 통독 결과 · 인쇄용</span></a>
+    <button class="dl" onclick="dlXLS()"><span class="ic">▦</span><b>발견 요약 (Excel)</b><span>등급·근거 면·쟁점 목록 · 정렬/필터 가능</span></button>
   </div>
+  <p style="font-size:12px;color:var(--sub);font-weight:600;margin-top:12px">※ PowerPoint·PDF 파일은 이 문서와 같은 폴더에 함께 보관해 주세요. 파일을 옮기면 위 버튼이 동작하지 않습니다.</p>
 </section>
 
 </div>
@@ -544,27 +543,40 @@ document.getElementById('fw').innerHTML =
 document.getElementById('asks').innerHTML = ALL.map((f,i)=>
   `<tr><td class="n">${i+1}</td><td class="n">${f.pages.join('·')}면</td><td><b>${esc(f.title)}</b><br><span style="color:#5B6673">${esc(f.ask)}</span></td></tr>`).join('');
 
-// 다운로드
+// 다운로드 — 배포용은 PPT / PDF / Excel 만 노출
 function save(name, content, type){
   const b=new Blob([content],{type:type+';charset=utf-8'});
   const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;
   document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(u),1500);
 }
-function dlSelf(){save('번영로롯데캐슬_JL검토보고서.html','﻿'+document.documentElement.outerHTML,'text/html');}
-function dlJSON(){save('번영로롯데캐슬_발견목록.json',JSON.stringify({findings:DATA,unit_matrix:MATRIX},null,2),'application/json');}
-function dlCSV(){
-  const rows=[['번호','분류','등급','레벨','근거면','제목','원문인용','문제점','정량환산','개선요구']];
-  ALL.forEach((f,i)=>rows.push([i+1,f.cat,f.grade,f.level,f.pages.join(' '),f.title,f.quote,f.problem,f.quant,f.ask]));
-  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
-  save('번영로롯데캐슬_발견목록.csv','﻿'+csv,'text/csv');
-}
-function dlAsk(){
-  let t='번영로 롯데캐슬 센트럴스카이 입주예정자협의회 개선요구서 (초안)\n';
-  t+='작성: 법무법인 제이엘 분양공고문 분석팀 / 근거: 입주자모집공고 69면 전수 통독\n';
-  t+='='.repeat(72)+'\n\n';
-  ALL.forEach((f,i)=>{t+=`${i+1}. ${f.title}  [공고문 ${f.pages.join('·')}면]\n   원문: "${f.quote}"\n   문제: ${f.problem}\n   정량: ${f.quant}\n   요구: ${f.ask}\n\n`;});
-  t+='='.repeat(72)+'\n※ 본 초안은 공고문 원문 기재사항에 근거하며, 제출 전 협의회 검토를 거쳐 주시기 바랍니다.\n';
-  save('번영로롯데캐슬_개선요구서_초안.txt','﻿'+t,'text/plain');
+function dlXLS(){
+  const order={'치명':0,'높음':1,'중간':2};
+  const list=[...ALL].sort((a,b)=>order[a.grade]-order[b.grade]);
+  let rows='';
+  list.forEach((f,i)=>{
+    const bg = f.grade==='치명' ? '#FDF2F1' : (f.grade==='높음' ? '#FCF8EE' : '#FFFFFF');
+    const gc = f.grade==='치명' ? '#C0392B' : (f.grade==='높음' ? '#B7791F' : '#3E6CB5');
+    rows += `<tr style="background:${bg}">
+      <td style="text-align:center">${i+1}</td>
+      <td style="text-align:center;color:${gc};font-weight:bold">${esc(f.grade)}</td>
+      <td style="text-align:center">${esc(f.cat)}</td>
+      <td style="text-align:center">${f.pages.join('·')}면</td>
+      <td>${esc(f.title)}</td>
+      <td>${esc(f.quote)}</td>
+      <td></td></tr>`;
+  });
+  const html = `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8">
+  <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+  <x:Name>검토결과</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+  </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+  <style>td,th{border:1px solid #C8D0DA;padding:6px 8px;font-family:"맑은 고딕";font-size:10pt;vertical-align:top}
+  th{background:#0F2548;color:#fff;font-weight:bold;text-align:center}</style></head><body>
+  <table><tr><th colspan="7" style="background:#fff;color:#0F2548;font-size:14pt;text-align:left;border:0">
+  번영로 롯데캐슬 센트럴스카이 · 입주자모집공고 69면 전수 검토 결과 (법무법인 제이엘)</th></tr>
+  <tr><th style="width:40px">연번</th><th style="width:55px">등급</th><th style="width:95px">분류</th>
+  <th style="width:85px">근거 면</th><th style="width:330px">쟁점</th><th style="width:420px">공고문 원문</th>
+  <th style="width:200px">협의회 확인란</th></tr>${rows}</table></body></html>`;
+  save('번영로롯데캐슬_검토결과_요약.xls','\ufeff'+html,'application/vnd.ms-excel');
 }
 // 스크롤 스파이
 const secs=[...document.querySelectorAll('section')];
