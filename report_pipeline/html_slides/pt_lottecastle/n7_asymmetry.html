@@ -1,0 +1,47 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><style>
+@font-face { font-family:"NanumSquare"; src:url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareR.ttf"); font-weight:400; }
+@font-face { font-family:"NanumSquare"; src:url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareB.ttf"); font-weight:700; }
+@font-face { font-family:"NanumSquare"; src:url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareEB.ttf"); font-weight:800; }
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1332px;height:750px;overflow:hidden}
+body{font-family:"S-Core Dream","NanumSquare",sans-serif;position:relative;background:linear-gradient(180deg,#F4F8FC 0%,#FFF 40%)}
+.head{position:absolute;left:0;right:0;top:36px;text-align:center;z-index:5}
+.head .q{font-size:38px;font-weight:800;color:#0F2548;letter-spacing:-1px}
+.head .q em{font-style:normal;color:#C0392B}
+.head .q em.b{color:#3E6CB5}
+.head .sub{font-size:15px;color:#5b6673;margin-top:7px;font-weight:700}
+.brand{position:absolute;left:0;right:0;bottom:0;height:52px;background:#0F2548;display:flex;align-items:center;justify-content:space-between;padding:0 44px;z-index:5}
+.brand .l{color:#fff;font-size:15px;font-weight:800}
+.brand .l span{color:#3E6CB5}
+.brand .r{color:#8FA3C0;font-size:11.5px}
+
+.cols{position:absolute;left:56px;right:56px;top:132px;bottom:230px;display:flex;gap:16px}
+.col{flex:1;border-radius:14px;padding:20px 24px;display:flex;flex-direction:column;gap:10px}
+.col.them{background:#0F2548}
+.col.us{background:#fff;border:1.5px solid #E1E7EE}
+.col h3{font-size:18px;font-weight:800;color:#fff}
+.col.us h3{color:#C0392B}
+.col .item{background:rgba(255,255,255,.08);border-radius:9px;padding:10px 14px;font-size:13px;line-height:1.5;color:#DCE4F0}
+.col.us .item{background:#FBF4F4;color:#5b3a37}
+.col .item b{color:#7FA8E0}
+.col.us .item b{color:#C0392B}
+.fix{position:absolute;left:56px;right:56px;bottom:76px;background:#0F2548;border-radius:12px;padding:16px 22px;display:flex;align-items:center;gap:16px}
+.fix .flb{flex:none;background:#3E6CB5;color:#fff;font-size:13px;font-weight:800;padding:8px 14px;border-radius:8px}
+.fix .ftx{font-size:14px;font-weight:700;color:#fff;line-height:1.5}
+</style></head><body>
+<div class="head"><div class="q">계약서의 저울이 <em>한쪽으로 기울어</em> 있습니다</div>
+<div class="sub">같은 계약인데 변경의 자유가 다릅니다 — 원문 조항 그대로 비교</div></div>
+<div class="cols">
+  <div class="col them"><h3>사업주체는 바꿀 수 있다</h3>
+    <div class="item">"<b>동등 이상 자재로 변경 가능</b>" — 마감재·사양 (원문 2회)</div>
+    <div class="item">"설계변경 시 <b>개별 동의를 받지 아니함</b>" — 조경·레벨·경계 계획 일체</div>
+    <div class="item">"감리회사 및 금액은 변경될 수 있습니다 (<b>이 경우 별도 정산하지 않습니다</b>)"</div>
+    <div class="item">창호 사양은 "풍동실험 및 입면 계획에 따라 <b>추후 변경될 수 있음</b>"</div></div>
+  <div class="col us"><h3>계약자는 바꿀 수 없다</h3>
+    <div class="item">"마감재 선택사항 및 추가옵션계약은 <b>변경이 불가</b>"</div>
+    <div class="item">"공사 착수·발주 이후에는 <b>해제가 불가</b>" — 그 시점은 계약자가 알 수 없음</div>
+    <div class="item">"계약자의 변심, 귀책사유 등으로 해제되는 경우 <b>위약금을 배상</b>"</div>
+    <div class="item">미숙지로 인한 불이익 — "<b>어떠한 이의도 제기할 수 없습니다</b>"</div></div>
+</div>
+<div class="fix"><div class="flb">JL 개선방향</div><div class="ftx">① 사업주체측 변경 시 협의회 사전 서면통지 의무 요구 &nbsp;② 옵션 발주 예정시점 공개 및 발주 전 해제기준(공제율) 명시 요구 &nbsp;③ "동등 이상" 변경 시 변경 전·후 자재 비교표 공개 요구 — 비대칭을 대칭으로 만드는 것이 협상의 목표입니다</div></div>
+<div class="brand"><div class="l">법무법인 <span>JL</span> &nbsp;|&nbsp; 분양공고문 분석팀</div><div class="r">번영로 롯데캐슬 센트럴스카이 · 근거는 모두 입주자모집공고(2024.11.01.) 원문 기재 기준</div></div></body></html>
