@@ -1,0 +1,56 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><style>
+@font-face { font-family:"NanumSquare"; src:url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareR.ttf"); font-weight:400; }
+@font-face { font-family:"NanumSquare"; src:url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareB.ttf"); font-weight:700; }
+@font-face { font-family:"NanumSquare"; src:url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareEB.ttf"); font-weight:800; }
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1332px;height:750px;overflow:hidden}
+body{font-family:"S-Core Dream","NanumSquare",sans-serif;position:relative;background:linear-gradient(180deg,#F4F8FC 0%,#FFF 40%)}
+.head{position:absolute;left:0;right:0;top:44px;text-align:center;z-index:5}
+.head .q{font-size:44px;font-weight:800;color:#0F2548;letter-spacing:-1px}
+.head .q em{font-style:normal;color:#3E6CB5}
+.head .q em.r{color:#C0392B}
+.head .sub{font-size:16.5px;color:#5b6673;margin-top:10px;font-weight:700}
+.brand{position:absolute;left:0;right:0;bottom:0;height:56px;background:#0F2548;display:flex;align-items:center;justify-content:space-between;padding:0 44px;z-index:5}
+.brand .l{color:#fff;font-size:16px;font-weight:800}
+.brand .l span{color:#3E6CB5}
+.brand .r{color:#8FA3C0;font-size:12px}
+
+.big{position:absolute;left:96px;top:210px;width:430px;bottom:96px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.duo{display:flex;gap:0;border:2px solid #0F2548;border-radius:12px;overflow:hidden}
+.half{flex:1;padding:22px 18px;text-align:center}
+.half.apt{background:#0F2548;color:#fff}
+.half.of{background:#fff;color:#0F2548}
+.half b{display:block;font-size:21px;font-weight:800;margin-bottom:6px}
+.half span{font-size:13px;line-height:1.5;opacity:.85}
+.vs{position:relative}
+.vs::after{content:"한 건물";position:absolute;left:50%;top:-14px;transform:translateX(-50%);background:#C0392B;color:#fff;font-size:12px;font-weight:800;padding:4px 14px;border-radius:99px}
+.note{font-size:13px;color:#5b6673;line-height:1.55;background:#F7F9FC;border:1px solid #E1E7EE;border-radius:10px;padding:14px 16px}
+.checks{position:absolute;left:590px;right:96px;top:206px;bottom:96px;display:flex;flex-direction:column;justify-content:space-between}
+.chk{display:flex;align-items:center;gap:18px;background:#fff;border:1.5px solid #E1E7EE;border-radius:14px;padding:16px 22px;box-shadow:0 3px 14px rgba(15,37,72,.07)}
+.chk .ic{width:50px;height:50px;border-radius:50%;background:#C0392B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;flex:none}
+.chk.ok .ic{background:#0F2548}
+.chk .t b{display:block;font-size:17.5px;font-weight:800;color:#C0392B;margin-bottom:3px}
+.chk.ok .t b{color:#0F2548}
+.chk .t span{font-size:13.5px;color:#5b6673;line-height:1.45}
+
+</style></head><body>
+
+<div class="head">
+  <div class="q">103동에는 <em>이웃이 두 종류</em>입니다</div>
+  <div class="sub">아파트와 오피스텔이 한 건물 — 공고문이 예고한 구조를 입주 전에 정리해야 합니다</div>
+</div>
+<div class="big">
+  <div class="duo vs">
+    <div class="half apt"><b>아파트</b><span>엘리베이터 4대<br>주민공동시설 사용</span></div>
+    <div class="half of"><b>오피스텔</b><span>엘리베이터 2대<br>2층 비즈니스라운지(오피스텔용)</span></div>
+  </div>
+  <div class="note">공고문은 엘리베이터·라운지를 용도별로 나눠놨지만, <b>관리비 배분·커뮤니티 이용권·주차 배분의 세부 기준은 어디에도 없습니다.</b> 이 공백은 입주 후 분쟁이 됩니다.</div>
+</div>
+<div class="checks">
+  <div class="chk"><div class="ic">1</div><div class="t"><b>관리비는 누가 얼마나?</b><span>공용설비(로비·주차장·조경) 비용 배분 기준 미정 — 입주 후 첫 관리비 고지서에서 분쟁 시작</span></div></div>
+  <div class="chk"><div class="ic">2</div><div class="t"><b>주차장은 함께 씁니다</b><span>지하주차장 공유 — 세대당 주차대수 산정과 오피스텔 방문객 주차 규칙이 관건</span></div></div>
+  <div class="chk ok"><div class="ic">✓</div><div class="t"><b>JL의 대응</b><span>용도별 비용배분·시설이용 기준을 관리규약(안)에 선반영 — 입주예정자협의회가 지금 준비해야 하는 정확한 이유</span></div></div>
+</div>
+
+<div class="brand"><div class="l">법무법인 <span>JL</span> &nbsp;|&nbsp; 분양공고문 분석팀</div><div class="r">번영로 롯데캐슬 센트럴스카이 입주예정자협의회 대상 제안 · 근거는 모두 입주자모집공고(2024.11.01.) 원문 기재 기준</div></div>
+</body></html>

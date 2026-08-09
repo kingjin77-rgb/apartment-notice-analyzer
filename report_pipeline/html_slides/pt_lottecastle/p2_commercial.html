@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><style>
+@font-face { font-family:"NanumSquare"; src:url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareR.ttf"); font-weight:400; }
+@font-face { font-family:"NanumSquare"; src:url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareB.ttf"); font-weight:700; }
+@font-face { font-family:"NanumSquare"; src:url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareEB.ttf"); font-weight:800; }
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1332px;height:750px;overflow:hidden}
+body{font-family:"S-Core Dream","NanumSquare",sans-serif;position:relative;background:linear-gradient(180deg,#F4F8FC 0%,#FFF 40%)}
+.head{position:absolute;left:0;right:0;top:44px;text-align:center;z-index:5}
+.head .q{font-size:44px;font-weight:800;color:#0F2548;letter-spacing:-1px}
+.head .q em{font-style:normal;color:#3E6CB5}
+.head .q em.r{color:#C0392B}
+.head .sub{font-size:16.5px;color:#5b6673;margin-top:10px;font-weight:700}
+.brand{position:absolute;left:0;right:0;bottom:0;height:56px;background:#0F2548;display:flex;align-items:center;justify-content:space-between;padding:0 44px;z-index:5}
+.brand .l{color:#fff;font-size:16px;font-weight:800}
+.brand .l span{color:#3E6CB5}
+.brand .r{color:#8FA3C0;font-size:12px}
+
+.map{position:absolute;left:96px;top:196px;bottom:88px;width:520px}
+svg text{font-family:"S-Core Dream","NanumSquare",sans-serif}
+.checks{position:absolute;left:680px;right:96px;top:206px;bottom:96px;display:flex;flex-direction:column;justify-content:space-between}
+.chk{display:flex;align-items:center;gap:18px;background:#fff;border:1.5px solid #E1E7EE;border-radius:14px;padding:16px 22px;box-shadow:0 3px 14px rgba(15,37,72,.07)}
+.chk .ic{width:50px;height:50px;border-radius:50%;background:#C0392B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex:none}
+.chk.ok .ic{background:#0F2548}
+.chk .t b{display:block;font-size:17.5px;font-weight:800;color:#C0392B;margin-bottom:3px}
+.chk.ok .t b{color:#0F2548}
+.chk .t span{font-size:13.5px;color:#5b6673;line-height:1.45}
+
+</style></head><body>
+
+<div class="head">
+  <div class="q">단지 3면이 <em class="r">상업지역</em>입니다</div>
+  <div class="sub">"남서측, 북측, 북동측엔 상업시설... 소음 등의 환경권 침해" — 공고문 원문 직접 고지</div>
+</div>
+<div class="map">
+<svg width="520" height="450" viewBox="0 0 520 450">
+  <rect x="10" y="10" width="500" height="430" rx="14" fill="#F7F9FC" stroke="#C6D2E4" stroke-width="1.5"/>
+  <rect x="30" y="30" width="460" height="90" rx="8" fill="#FBEAEA" stroke="#E3B7B0" stroke-dasharray="6 4"/>
+  <text x="260" y="82" text-anchor="middle" font-size="16" font-weight="800" fill="#C0392B">북측 · 북동측 상업시설</text>
+  <rect x="30" y="140" width="120" height="200" rx="8" fill="#FBEAEA" stroke="#E3B7B0" stroke-dasharray="6 4"/>
+  <text x="90" y="235" text-anchor="middle" font-size="15" font-weight="800" fill="#C0392B">남서측</text>
+  <text x="90" y="257" text-anchor="middle" font-size="15" font-weight="800" fill="#C0392B">상업시설</text>
+  <rect x="180" y="150" width="290" height="180" rx="10" fill="#0F2548"/>
+  <text x="325" y="225" text-anchor="middle" font-size="19" font-weight="800" fill="#fff">번영로 롯데캐슬</text>
+  <text x="325" y="252" text-anchor="middle" font-size="19" font-weight="800" fill="#fff">센트럴스카이 (3개동)</text>
+  <rect x="30" y="360" width="460" height="52" rx="6" fill="#E8EDF5" stroke="#C6D2E4"/>
+  <text x="260" y="392" text-anchor="middle" font-size="15" font-weight="800" fill="#0F2548">남동측 — 광로 번영로 (대로)</text>
+  <text x="500" y="440" text-anchor="end" font-size="10.5" fill="#9aa3ad">※ 방위 배치 모식도 — 원문 기재 기준</text>
+</svg>
+</div>
+<div class="checks">
+  <div class="chk"><div class="ic">1</div><div class="t"><b>상업지 소음 · 야간 영업 영향</b><span>원도심 상권 인접 — 소음·빛공해·유동인구를 원문이 고지. 어떤 업종이 들어서는지는 아무도 통제하지 않고 있습니다</span></div></div>
+  <div class="chk"><div class="ic">2</div><div class="t"><b>번영로 대로변 저층 세대</b><span>"일부 저층 세대의 소음, 빛공해 등의 환경권 및 사생활 침해" — 원문 명시</span></div></div>
+  <div class="chk"><div class="ic">3</div><div class="t"><b>단지 하부 근린생활시설(상가)</b><span>포디움 하부 1층 상가 업종은 미정 — 관리규약으로 업종 제한을 준비할 수 있는 시기는 입주 전, 지금뿐입니다</span></div></div>
+  <div class="chk ok"><div class="ic">✓</div><div class="t"><b>JL의 대응</b><span>상업지 인접 세대 목록화 → 방음·차폐 확인 요구 → 상가 업종제한 관리규약(안) 준비</span></div></div>
+</div>
+
+<div class="brand"><div class="l">법무법인 <span>JL</span> &nbsp;|&nbsp; 분양공고문 분석팀</div><div class="r">번영로 롯데캐슬 센트럴스카이 입주예정자협의회 대상 제안 · 근거는 모두 입주자모집공고(2024.11.01.) 원문 기재 기준</div></div>
+</body></html>

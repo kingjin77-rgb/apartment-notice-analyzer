@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareR.ttf"); font-weight: 400; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareB.ttf"); font-weight: 700; }
+  @font-face { font-family: "NanumSquare"; src: url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareEB.ttf"); font-weight: 800; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1332px; height:750px; overflow:hidden; }
+  body { font-family:"S-Core Dream","NanumSquare",sans-serif; position:relative;
+    background: linear-gradient(180deg, #F4F8FC 0%, #FFFFFF 40%); }
+  /* 상단 헤드라인 */
+  .head { position:absolute; left:0; right:0; top:44px; text-align:center; }
+  .head .q { font-size:46px; font-weight:800; color:#0F2548; letter-spacing:-1px; }
+  .head .q em { font-style:normal; color:#3E6CB5; }
+  .head .sub { font-size:17px; color:#5b6673; margin-top:10px; font-weight:700; }
+  /* 좌측: 103동 단면 스택 */
+  .tower { position:absolute; left:96px; top:196px; bottom:88px; width:300px; display:flex; flex-direction:column; }
+  .tw-label { text-align:center; font-size:15px; font-weight:800; color:#0F2548; margin-bottom:8px; }
+  .stack { flex:1; display:flex; flex-direction:column; border:2px solid #0F2548; border-radius:8px; overflow:hidden; }
+  .fl { flex:1; display:flex; align-items:center; justify-content:space-between; padding:0 14px;
+    font-size:13px; font-weight:700; color:#5b6673; background:#fff; border-bottom:1px solid #E5EAF0; }
+  .fl.risk { background:#FBEAEA; color:#C0392B; font-weight:800; }
+  .fl.mech { background:#EDF2F9; color:#0F2548; font-weight:800; }
+  .fl .tag { font-size:11px; background:#C0392B; color:#fff; border-radius:4px; padding:2px 8px; }
+  .fl.mech .tag { background:#0F2548; }
+  /* 우측: 체크리스트 카드 */
+  .checks { position:absolute; left:480px; right:96px; top:206px; bottom:96px;
+    display:flex; flex-direction:column; justify-content:space-between; }
+  .chk { display:flex; align-items:center; gap:18px; background:#fff; border:1.5px solid #E1E7EE;
+    border-radius:14px; padding:18px 24px; box-shadow:0 3px 14px rgba(31,56,100,.07); }
+  .chk .ic { width:52px; height:52px; border-radius:50%; background:#0F2548; color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:800; flex:none; }
+  .chk.warn .ic { background:#C0392B; }
+  .chk .t b { display:block; font-size:18.5px; font-weight:800; color:#0F2548; margin-bottom:3px; }
+  .chk.warn .t b { color:#C0392B; }
+  .chk .t span { font-size:14px; color:#5b6673; line-height:1.45; }
+  /* 하단 브랜드 바 */
+  .brand { position:absolute; left:0; right:0; bottom:0; height:56px; background:#0F2548;
+    display:flex; align-items:center; justify-content:space-between; padding:0 44px; }
+  .brand .l { color:#fff; font-size:16px; font-weight:800; }
+  .brand .l span { color:#3E6CB5; }
+  .brand .r { color:#8FA3C0; font-size:12px; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <div class="q">우리 집 위아래, <em>무엇이 있는지</em> 확인하셨나요?</div>
+    <div class="sub">공고문은 이미 알고 있습니다 — 번영로 롯데캐슬 센트럴스카이 103동 단면 (49층, 원문 기재 기준)</div>
+  </div>
+
+  <div class="tower">
+    <div class="tw-label">103동 단면 모식도</div>
+    <div class="stack">
+      <div class="fl mech"><span>옥탑</span><span>소화수조·기계실</span><span class="tag">진동원</span></div>
+      <div class="fl risk"><span>최상층 세대</span><span>옥탑 소음·진동 영향</span><span class="tag">유의</span></div>
+      <div class="fl"><span>23~48층</span><span>일반 세대</span></div>
+      <div class="fl mech"><span>22층</span><span>제연휀룸</span><span class="tag">진동원</span></div>
+      <div class="fl mech"><span>21층</span><span>소화수조</span><span class="tag">진동원</span></div>
+      <div class="fl mech"><span>20층</span><span>피난안전구역·제연휀룸</span><span class="tag">진동원</span></div>
+      <div class="fl risk"><span>19·23층 등 인접</span><span>소음·진동 영향</span><span class="tag">유의</span></div>
+      <div class="fl"><span>4~18층</span><span>일반 세대</span></div>
+      <div class="fl risk"><span>3층(저층)</span><span>부대시설 상부 소음</span><span class="tag">유의</span></div>
+      <div class="fl mech"><span>2층</span><span>도서관·독서실·오피스텔라운지</span><span class="tag">시설</span></div>
+      <div class="fl mech"><span>1층·지하</span><span>근생·제연DA·주차 급배기</span><span class="tag">시설</span></div>
+    </div>
+  </div>
+
+  <div class="checks">
+    <div class="chk warn"><div class="ic">20</div><div class="t"><b>20·21·22층 — 설비층 인접 세대</b><span>"피난안전구역·소화수조·제연휀룸... 아래 위 주변 층 세대의 소음, 진동" — 공고문 원문 직접 고지</span></div></div>
+    <div class="chk warn"><div class="ic">2</div><div class="t"><b>저층부 — 부대시설·상업지 이중 영향</b><span>2층 시설 소음 + 3면 상업시설·번영로 대로 소음/빛공해 — 원문이 두 갈래로 고지</span></div></div>
+    <div class="chk warn"><div class="ic">49</div><div class="t"><b>최상층 — 옥탑 설비 진동</b><span>옥탑 소화수조·의장 구조물 인접 — "최상층 및 주변 층 소음·진동" 고지</span></div></div>
+    <div class="chk"><div class="ic">✓</div><div class="t"><b>법무법인 제이엘은 634세대 전 호수를 이렇게 검토합니다</b><span>공고문 69면 전수 대조 → 호수별 유의사항 지도 → 사전점검·하자 대응까지 연결</span></div></div>
+  </div>
+
+  <div class="brand">
+    <div class="l">법무법인 <span>JL</span> &nbsp;|&nbsp; 분양공고문 분석팀</div>
+    <div class="r">※ 단면은 이해를 돕기 위한 모식도이며 층 구성은 입주자모집공고 원문 기재 기준</div>
+  </div>
+</body>
+</html>
