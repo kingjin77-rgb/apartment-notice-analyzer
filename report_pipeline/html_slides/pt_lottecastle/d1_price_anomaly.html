@@ -1,0 +1,61 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><style>
+@font-face{font-family:"NanumSquare";src:url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareR.ttf");font-weight:400}
+@font-face{font-family:"NanumSquare";src:url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareB.ttf");font-weight:700}
+@font-face{font-family:"NanumSquare";src:url("file:///root/repos/apartment-notice-analyzer/report_pipeline/template/brand/fonts/NanumSquareEB.ttf");font-weight:800}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1332px;height:750px;overflow:hidden}
+body{font-family:"S-Core Dream","NanumSquare",sans-serif;position:relative;background:linear-gradient(180deg,#F4F8FC 0%,#FFF 40%)}
+.head{position:absolute;left:0;right:0;top:32px;text-align:center;z-index:5}
+.head .tag{display:inline-block;background:#C0392B;color:#fff;font-size:12.5px;font-weight:800;padding:5px 16px;border-radius:99px;margin-bottom:10px;letter-spacing:1px}
+.head .q{font-size:38px;font-weight:800;color:#0F2548;letter-spacing:-1px}
+.head .q em{font-style:normal;color:#C0392B}
+.head .sub{font-size:14.5px;color:#5b6673;margin-top:7px;font-weight:700}
+.wrap{position:absolute;left:56px;right:56px;top:150px;bottom:120px;display:flex;gap:16px}
+.lft{width:530px;display:flex;flex-direction:column;gap:8px}
+.ttl{font-size:13px;font-weight:800;color:#0F2548;margin-bottom:2px}
+table{border-collapse:collapse;width:100%}
+th{background:#0F2548;color:#fff;font-size:12px;font-weight:800;padding:7px 8px}
+td{border:1px solid #E1E7EE;font-size:12.5px;padding:7px 9px;text-align:right;background:#fff;color:#3d4854}
+td.f{text-align:left;font-weight:800;color:#0F2548}
+tr.hot td{background:#FBEAEA;color:#C0392B;font-weight:800}
+tr.gap td{background:#0F2548;color:#fff;font-weight:800;font-size:12px;text-align:center;padding:5px}
+.rgt{flex:1;display:flex;flex-direction:column;gap:10px}
+.find{background:#fff;border:1.5px solid #E1E7EE;border-left:5px solid #C0392B;border-radius:0 12px 12px 0;padding:13px 18px;flex:1;display:flex;flex-direction:column;justify-content:center}
+.find b{display:block;font-size:16.5px;font-weight:800;color:#C0392B;margin-bottom:5px}
+.find span{font-size:13.5px;color:#3d4854;line-height:1.55}
+.find span u{text-decoration:none;background:#FBEAEA;font-weight:800}
+.fix{position:absolute;left:56px;right:56px;bottom:70px;background:#0F2548;border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:14px}
+.fix .flb{flex:none;background:#3E6CB5;color:#fff;font-size:12.5px;font-weight:800;padding:7px 13px;border-radius:8px}
+.fix .ftx{font-size:13.5px;font-weight:700;color:#fff;line-height:1.5}
+.brand{position:absolute;left:0;right:0;bottom:0;height:52px;background:#0F2548;display:flex;align-items:center;justify-content:space-between;padding:0 44px}
+.brand .l{color:#fff;font-size:15px;font-weight:800}.brand .l span{color:#3E6CB5}
+.brand .r{color:#8FA3C0;font-size:11px}
+</style></head><body>
+<div class="head"><div class="tag">진단형 분석 · 원문 수치 재계산</div>
+<div class="q">21층은 <em>소화수조와 같은 층</em>인데, 30층과 <em>같은 값</em>입니다</div>
+<div class="sub">공고문 7면 층별 공급금액표 × 51면 설비층 고지 — 두 표를 겹치자 드러난 가격 왜곡</div></div>
+<div class="wrap">
+ <div class="lft">
+  <div class="ttl">84A타입 층별 공급금액 (원문 7면 실측) — 설비층 겹침 표시</div>
+  <table>
+   <tr><th style="text-align:left">층 구간</th><th>세대수</th><th>공급금액</th><th>3층 대비</th></tr>
+   <tr><td class="f">3층</td><td>2</td><td>671,000,000</td><td>기준</td></tr>
+   <tr><td class="f">4~5층</td><td>4</td><td>678,000,000</td><td>+700만</td></tr>
+   <tr><td class="f">6~10층</td><td>10</td><td>693,000,000</td><td>+2,200만</td></tr>
+   <tr><td class="f">11~19층</td><td>18</td><td>707,000,000</td><td>+3,600만</td></tr>
+   <tr class="gap"><td colspan="4">20층 — 피난안전구역·제연휀룸 (주거세대 없음, 가격표에서 사라진 층)</td></tr>
+   <tr class="hot"><td class="f">21~30층</td><td>20</td><td>722,000,000</td><td>+5,100만</td></tr>
+   <tr><td class="f">31~40층</td><td>20</td><td>732,000,000</td><td>+6,100만</td></tr>
+   <tr><td class="f">41층 이상</td><td>18</td><td>743,000,000</td><td>+7,200만</td></tr>
+  </table>
+  <div style="font-size:11.5px;color:#8a93a0;line-height:1.45;margin-top:2px">※ 21~30층은 <b style="color:#C0392B">단일 가격</b> — 21층(소화수조 동일층)·22층(제연휀룸 동일층)과 30층(설비 없음)이 모두 722,000,000원</div>
+ </div>
+ <div class="rgt">
+  <div class="find"><b>발견 1 — 리스크가 가격에 반영되지 않음</b><span>원문 51면: "103동 <u>21층에 소화수조가, 22층에 제연휀룸</u> 계획되어 있어서 <u>21층, 22층 공동주택 세대</u> 및 아래 위 주변 층 세대의 소음, 진동" — 설비와 <u>같은 층에 사는 세대</u>가 존재함을 원문이 인정</span></div>
+  <div class="find"><b>발견 2 — 오히려 1,500만원을 더 냅니다</b><span>21층 세대는 11~19층(707,000,000원)보다 <u>+1,500만원</u>을 더 내면서, 소음·진동 리스크는 단지 최고 수준. 층이 높다는 이유만으로 가격이 오르고 설비 인접은 할인 요소로 반영되지 않음</span></div>
+  <div class="find"><b>발견 3 — 같은 84㎡인데 라인별 1,700만원 차이</b><span>동일 3층 기준 84A·84B <u>671,000,000</u> vs 84C <u>654,000,000</u> — 같은 전용면적에 1,700만원 격차가 있으나 <u>차이의 근거(향·조망·소음)는 공고문 어디에도 설명 없음</u></span></div>
+ </div>
+</div>
+<div class="fix"><div class="flb">JL 개선방향</div><div class="ftx">① 설비 동일층·직상하층(21·22·23층 및 19층) 세대 목록을 공개하고, 해당 세대에 차음·방진 보강 사양을 서면 확약할 것 &nbsp;② 층별·라인별 가격 산정 근거(향·조망·소음 반영 여부)를 공개할 것 — 리스크를 고지했다면 가격에도 반영돼야 합니다</div></div>
+<div class="brand"><div class="l">법무법인 <span>JL</span> &nbsp;|&nbsp; 분양공고문 분석팀</div><div class="r">번영로 롯데캐슬 센트럴스카이 · 공고문 7면·51면 원문 수치 직접 계산</div></div>
+</body></html>
