@@ -92,6 +92,12 @@ section{padding:40px 0 8px}
 .c-ask{border:1.5px dashed #BFD0E6;border-radius:9px;padding:10px 12px;font-size:12.5px;color:var(--navy2);
   line-height:1.55;font-weight:600;margin-top:auto}
 .c-ask strong{display:block;font-size:11px;color:var(--blue);font-weight:800;margin-bottom:3px;letter-spacing:.4px}
+.c-ask.lock{position:relative;border-color:#D9E2EE;background:#FAFCFE;overflow:hidden;min-height:74px}
+.c-ask.lock .blur{filter:blur(4.5px);opacity:.5;user-select:none;pointer-events:none}
+.c-ask.lock .veil{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;background:linear-gradient(180deg,rgba(250,252,254,.55),rgba(250,252,254,.92))}
+.c-ask.lock .veil b{font-size:12.5px;font-weight:800;color:var(--navy)}
+.c-ask.lock .veil span{font-size:11px;font-weight:700;color:var(--sub)}
 
 /* ── 필터 ── */
 .filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
@@ -422,7 +428,7 @@ footer .r{font-size:12px;color:#8FA3C0;text-align:right}
 
 <section id="ask">
   <div class="s-head"><span class="s-num">05</span><h2 class="s-title">입주예정자협의회 개선요구서(초안)</h2>
-    <p class="s-desc">사업주체에 그대로 제출할 수 있는 문장으로 정리했습니다.</p></div>
+    <p class="s-desc">31건 전부를 사업주체에 그대로 제출할 수 있는 문장으로 작성해 두었습니다. 아래는 목록이며, 문안 2건을 샘플로 공개합니다.</p></div>
   <p class="scrollhint">← 표를 옆으로 밀어 보실 수 있습니다</p>
   <div class="scrollx">
     <table class="tbl"><thead><tr><th style="width:52px">No</th><th style="width:78px">근거 면</th><th>요구사항</th></tr></thead>
@@ -480,6 +486,9 @@ footer .r{font-size:12px;color:#8FA3C0;text-align:right}
 const DATA = __DATA__;
 const MATRIX = __MATRIX__;
 const ALL = DATA.categories.flatMap(c => c.findings.map(f => ({...f, cat:c.title, catKey:c.key, color:c.color})));
+// 개선요구 문안은 샘플 2건만 공개 (나머지는 자문 계약 시 제공)
+const SAMPLE_OPEN = ['U1','S1'];
+ALL.forEach(f => { f.open = SAMPLE_OPEN.includes(f.id); });
 
 // 커버리지 셀
 const cov = document.getElementById('covcells');
@@ -509,7 +518,10 @@ function render(key){
      <div class="c-quote">"${esc(f.quote)}"</div>
      <div class="c-body">${esc(f.problem)}</div>
      <div class="c-quant">${esc(f.quant)}</div>
-     <div class="c-ask"><strong>개선요구</strong>${esc(f.ask)}</div>
+     ${f.open
+       ? `<div class="c-ask"><strong>개선요구</strong>${esc(f.ask)}</div>`
+       : `<div class="c-ask lock"><strong>개선요구</strong><div class="blur">${esc(f.ask)}</div>
+          <div class="veil"><b>🔒 개선요구 문안 · 자문 계약 시 제공</b><span>사업주체에 그대로 제출 가능한 형태로 31건 전부 작성되어 있습니다</span></div></div>`}
    </div>`).join('');
 }
 render('all');
@@ -540,8 +552,11 @@ document.getElementById('fw').innerHTML =
   '</div>';
 
 // 개선요구서 표
-document.getElementById('asks').innerHTML = ALL.map((f,i)=>
-  `<tr><td class="n">${i+1}</td><td class="n">${f.pages.join('·')}면</td><td><b>${esc(f.title)}</b><br><span style="color:#5B6673">${esc(f.ask)}</span></td></tr>`).join('');
+const ordA={'치명':0,'높음':1,'중간':2};
+document.getElementById('asks').innerHTML = [...ALL].sort((a,b)=>ordA[a.grade]-ordA[b.grade]).map((f,i)=>
+  `<tr><td class="n">${i+1}</td><td class="n">${f.pages.join('·')}면</td><td><b>${esc(f.title)}</b><br>` +
+  (f.open ? `<span style="color:#5B6673">${esc(f.ask)}</span>`
+          : `<span style="color:#98A4B3">🔒 요구 문안 — 자문 계약 시 제공</span>`) + `</td></tr>`).join('');
 
 // 다운로드 — 배포용은 PPT / PDF / Excel 만 노출
 function save(name, content, type){
