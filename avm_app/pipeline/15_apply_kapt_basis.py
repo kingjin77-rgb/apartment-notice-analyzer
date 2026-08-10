@@ -76,7 +76,9 @@ for c in data:
         c["maxfl"] = b["topFloor"]
     for src, dst in (("hallType", "hallType"), ("parkingPerHh", "parkingPerHh"),
                      ("builder", "builder"), ("heatType", "heatType"),
-                     ("subwayStation", "subwayStation"), ("eduFacility", "eduFacility")):
+                     ("subwayStation", "subwayStation"), ("eduFacility", "eduFacility"),
+                     ("area60", "area60"), ("area85", "area85"),
+                     ("area135", "area135"), ("area136", "area136")):
         if b.get(src):
             c[dst] = b[src]
     # B. 공부상 임대구분으로 lh 교체
@@ -94,6 +96,36 @@ for c in data:
         c["lh"] = new_lh
 P(f"기본정보 적용 {n_basis}건 / 임대구분 교정 {n_lh_fix}건")
 P(f"  임대(공부상) 총 {sum(1 for c in data if c.get('lh'))}건")
+
+# ---------- A-2. 물리적으로 불가능한 평형 삭제 ----------
+# 12번은 인근 3개 단지의 면적을 그대로 대상 단지 areas로 복사했다. 감사 결과
+# 대조가능 9,630곳에서 면적 엔트리의 26.1%가 K-APT가 '세대수 0'이라 명시한
+# 구간에 배정돼 있었다(나인원한남은 전 세대 135㎡ 초과인데 84.89㎡가 배정됨).
+# 감정가 = 단가 x 면적이므로 이건 오차가 아니라 다른 단지 물건을 대상물건으로
+# 표시하는 것이다. K-APT는 버킷별 세대수만 주고 정확한 전용면적은 주지 않으므로,
+# 여기서 할 수 있는 것은 '틀린 평형 삭제'이지 '맞는 평형 채우기'가 아니다.
+def bucket(a):
+    if a <= 60: return "area60"
+    if a <= 85: return "area85"
+    if a <= 135: return "area135"
+    return "area136"
+
+n_chk = n_drop = n_empty = 0
+for c in data:
+    b = basis.get(c.get("kaptCode") or "")
+    if not b or not c.get("areas"):
+        continue
+    buckets = {k: b.get(k, 0) for k in ("area60", "area85", "area135", "area136")}
+    if not sum(buckets.values()):
+        continue          # 면적구성 자체가 없으면 판정 불가 — 손대지 않는다
+    n_chk += 1
+    keep = [a for a in c["areas"] if buckets.get(bucket(a["a"]), 0) > 0]
+    n_drop += len(c["areas"]) - len(keep)
+    c["areas"] = keep
+    c["areaOk"] = 1 if keep else 0
+    if not keep:
+        n_empty += 1
+P(f"\n평형 검증: 대조 {n_chk}건 / 불가능 평형 삭제 {n_drop}개 / 전부 탈락 {n_empty}건")
 
 # ---------- 노후도 회귀 (시/도별) ----------
 def fit(pts):
@@ -124,6 +156,14 @@ for c in anchors:
 MIN_R2 = 0.15          # 이 밑이면 연식이 단가를 설명 못 한다고 보고 폴백
 MIN_LOCAL_N = 8        # 국지회귀 최소 표본
 CAP = 0.30             # 보정배율 상한 ±30% (외삽 폭주 차단)
+
+# 사례 '선정'에 연식 유사도를 쓰는 것과, 선정된 사례 단가에 exp(coef*연식차)를
+# 곱해 '보정'하는 것은 다른 문제다. 선정 개선은 물적 유사성을 높이는 것이라
+# 근거가 분명하지만, 보정을 켜면 12,700개 단지의 감정가가 한꺼번에 움직이고
+# 그 결과를 오늘 검증할 방법이 없다. 검증 안 된 보정을 켜는 것은 보정을
+# 미적용하고 그 사실을 명시하는 것보다 나쁘다 — 선정만 켜고 보정은 끈다.
+# 켤 때는 반드시 대표 단지 표본으로 보정 전/후를 대조 검증한 뒤 켤 것.
+APPLY_AGE = False
 
 nat = fit([p for v in by_sido.values() for p in v])
 NAT_COEF = nat[0] if nat and nat[2] >= MIN_R2 else 0.0
@@ -201,7 +241,7 @@ for c in targets:
     adj = []
     for d, a in top:
         u = a["unit"]
-        if ty is not None and coef and str(a.get("yr", "")).isdigit():
+        if APPLY_AGE and ty is not None and coef and str(a.get("yr", "")).isdigit():
             f_age = math.exp(coef * (ty - int(a["yr"])))
             f_age = max(1 - CAP, min(1 + CAP, f_age))   # 외삽 폭주 차단
             u = u * f_age
@@ -213,6 +253,7 @@ for c in targets:
                   for (d, a), u in zip(top, adj)]
     c["ageCoef"] = round(coef, 5)
     c["ageSrc"] = csrc
+    c["ageApplied"] = 1 if APPLY_AGE else 0
 
     fs = [[a["fadj"][i] for _, a in top if a.get("fadj") and a["fadj"][i] is not None] for i in range(4)]
     c["fadj"] = [round(statistics.median(f), 3) if f else None for f in fs]

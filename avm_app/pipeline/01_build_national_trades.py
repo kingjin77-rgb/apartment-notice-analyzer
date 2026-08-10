@@ -13,12 +13,34 @@ from concurrent.futures import ThreadPoolExecutor
 from dotenv import dotenv_values
 
 SC = os.path.join(_HERE, "data")
-V = dotenv_values(r"D:\DDownloads\apartment_notice_analyzer\.claude\worktrees\apartment-appraisal-ai-9c689d\avm_app\keys.env")
-MOLIT = V["DATA_GO_KR_KEY"]
+# 2026-08-10 수정: keys.env 절대경로가 박혀 있어 다른 머신/클론에서 죽었다.
+# 다른 스크립트들과 같은 후보경로 폴백 방식으로 통일한다.
+_KEY_CANDIDATES = [
+    os.path.join(_REPO, "avm_app", "keys.env"),
+    os.path.join(_REPO, "apartment_notice_analyzer", ".env"),
+    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(_REPO))),
+                 "apartment_notice_analyzer", ".env"),
+]
+V = {}
+for _p in _KEY_CANDIDATES:
+    if os.path.exists(_p):
+        V = dotenv_values(_p)
+        if V.get("DATA_GO_KR_KEY") or V.get("MOLIT_API_KEY"):
+            break
+MOLIT = V.get("DATA_GO_KR_KEY") or V.get("MOLIT_API_KEY")
+if not MOLIT:
+    raise SystemExit("DATA_GO_KR_KEY / MOLIT_API_KEY 없음 — .env 또는 keys.env 확인")
 U = "https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev"
 log = io.open(f"{SC}/national_log.txt", "w", encoding="utf-8"); P = lambda *a: print(*a, file=log)
 
-regions = json.load(io.open(f"{SC}/regions.json", encoding="utf-8"))
+# 2026-08-10 수정: `regions.json`은 리포에 존재하지 않는다(이 스크립트를 지금
+# 그대로 재실행하면 FileNotFoundError로 죽는다). 실제로 남아 있는 목록 파일은
+# regions_gyeonggi_224sgg.json이다 — 이름은 경기 파일럿 때 붙었지만 내용은
+# 전국 224개 시군구다. 제주 누락 원인을 추적하다 발견했다: 이 224개 목록에는
+# 50110(제주시)·50130(서귀포시)이 멀쩡히 들어 있고 MOLIT·K-APT API도 정상인데
+# national_comps.json에만 제주가 0건이다. 즉 당시 실행에 쓰인 목록 파일은
+# 지금 없는 다른 파일이었고 거기에 제주가 빠져 있었던 것으로 보인다.
+regions = json.load(io.open(f"{SC}/regions_gyeonggi_224sgg.json", encoding="utf-8"))
 codes = sorted(regions)
 P("regions:", len(codes))
 

@@ -226,7 +226,7 @@ table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
   </div>
 </div>
 
-<script src="data.js?v=20260807f"></script>
+<script src="data.js?v=20260810a"></script>
 <script>
 const KAKAO_KEY="6dd941689e3c39956d9ba809f127c947";
 let map=null, ovs=[], selNm=null, filter="all", cur=null;
@@ -329,13 +329,23 @@ const LIVE_CATS = [
 ];
 async function liveInvestigate(c){
   const results = await Promise.all(LIVE_CATS.map(async cat=>{
+    // 2026-08-10 수정: 예전에는 r.ok/r.status를 보지 않았다. fetch는 4xx/5xx를
+    // reject하지 않고 카카오 에러 응답도 정상 JSON이라, 쿼터 소진(429)이나
+    // 인증실패(401)에서 documents가 undefined -> 빈 배열이 되어 화면에는
+    // "반경 1200m 내 없음"이 떴다. 조사를 못 한 것을 조사해보니 없다고 단정한 것이다.
+    const ctl = new AbortController();
+    const timer = setTimeout(()=>ctl.abort(), 8000);   // 무응답 시 버튼 영구 고착 방지
     try{
       const r = await fetch(`https://dapi.kakao.com/v2/local/search/category.json?category_group_code=${cat.code}&x=${c.lng}&y=${c.lat}&radius=${cat.radius}&sort=distance`,
-        {headers:{Authorization:`KakaoAK ${KAKAO_REST}`}});
+        {headers:{Authorization:`KakaoAK ${KAKAO_REST}`}, signal:ctl.signal});
+      if(!r.ok) return {...cat, ok:false, err:`HTTP ${r.status}${r.status===429?" (일일 쿼터 소진)":r.status===401?" (인증 실패)":""}`};
       const d = await r.json();
-      const docs = (d.documents||[]).slice(0,3);
-      return {...cat, ok:true, docs};
-    }catch(e){ return {...cat, ok:false, err:e.message}; }
+      if(!d || !Array.isArray(d.documents))
+        return {...cat, ok:false, err:d && d.errorType ? d.errorType : "응답 형식 오류"};
+      return {...cat, ok:true, docs:d.documents.slice(0,3)};
+    }catch(e){
+      return {...cat, ok:false, err: e.name==="AbortError" ? "응답 없음 (8초 초과)" : e.message};
+    }finally{ clearTimeout(timer); }
   }));
   return results;
 }
@@ -343,8 +353,8 @@ function liveResultTable(results){
   return `<table class="mini" style="margin-top:6px">
     <thead><tr><th>구분</th><th>최근접 시설</th><th>거리</th></tr></thead>
     <tbody>${results.map(r=>{
-      if(!r.ok) return `<tr><td>${r.label}</td><td colspan="2" style="color:var(--neg)">조회 실패</td></tr>`;
-      if(!r.docs.length) return `<tr><td>${r.label}</td><td colspan="2" style="color:var(--gray-500)">반경 ${r.radius}m 내 없음</td></tr>`;
+      if(!r.ok) return `<tr><td>${r.label}</td><td colspan="2" style="color:var(--neg)"><b>조회 실패</b> — ${r.err} (조사되지 않음, '없음'과 다름)</td></tr>`;
+      if(!r.docs.length) return `<tr><td>${r.label}</td><td colspan="2" style="color:var(--gray-500)">반경 ${r.radius}m 내 없음 (조회 성공)</td></tr>`;
       return r.docs.map((d,i)=>`<tr>${i===0?`<td rowspan="${r.docs.length}" style="vertical-align:top">${r.label}</td>`:""}
         <td>${d.place_name}</td><td>${d.distance}m</td></tr>`).join("");
     }).join("")}</tbody>
@@ -413,17 +423,47 @@ function conversionPrice(appraised, leaseType, buildCost){
 
 /* ---------- 포맷 ---------- */
 function won(v){ // v: 원
+  if(v==null||!isFinite(v)) return "—";
+  if(v<0) return "—";   // 음수 금액은 의미가 없다. 과거 대출한도 산식이 음수를 만들어
+                        // "-1억 -1,000만" 같은 표기가 4,249개 단지에서 나왔다.
   const e=Math.floor(v/1e8), m=Math.round((v%1e8)/1e4);
   return e? (m? `${e}억 ${m.toLocaleString()}만` : `${e}억`) : `${m.toLocaleString()}만`;
 }
 function eok(v){ return (v/1e8).toFixed(1)+"억"; }
+function TODAY(){ return new Date().toISOString().slice(0,10); }
+/* ---------- 감정 가능 여부 판정 (단일 게이트) ----------
+   금액을 내는 경로가 지도핀·개요표·평형표·매트릭스·상세·보고서·통합보고서로
+   흩어져 있어서, 조건을 한 군데 고쳐도 다른 데서 계속 새어나왔다. 판정을 여기
+   한 곳에 모으고 모든 경로가 이것만 보게 한다.
+
+   반환 { ok, why, level }
+     level "none" : 금액을 어디에도 내지 않는다
+     level "est"  : 감정 실행 후 산정근거와 함께만 낸다 (지도·1차화면 금지)
+     level "full" : 대상 단지 실거래 근거 있음 */
+function gate(c){
+  // 1) 순수 임대단지는 "시세"라는 것이 존재하지 않는다. 공부상 구분(saleType)이
+  //    있으면 그것이 단지명 정규식(lh)을 이긴다.
+  const st=c.saleType||"";
+  const pureRental = st? (st==="임대") : !!c.lh;
+  if(pureRental) return {ok:false, level:"none", why:"임대단지 — 매매시세 없음 (감정평가 대상)"};
+
+  // 2) 평형이 전부 검증 탈락한 단지는 대상물건 자체가 특정되지 않는다.
+  if(c.areaOk===0) return {ok:false, level:"none", why:"공급 평형 미확정 — 대상물건 특정 불가"};
+
+  // 3) 대상 단지 실거래가 있으면 최상위 근거.
+  if(c.hasT) return {ok:true, level:"full", why:`대상 단지 유효거래 ${c.n}건`};
+
+  // 4) 거래 0건은 인근 비준. 사례 3건 미만은 중위값이 성립하지 않는다.
+  const nc=(c.comps||[]).length;
+  if(nc<3) return {ok:false, level:"none", why:`인근 비교사례 ${nc}건 — 산정 불가 (3건 이상 필요)`};
+  return {ok:true, level:"est", why:`자체 거래 0건 · 인근 ${nc}개 단지 비준`};
+}
+
 // 지도에는 실거래로 확인된 가격만 숫자로 띄운다. 거래이력 없는 단지·임대단지는
 // 애초에 "시세"가 존재하지 않으므로 지도 단계에서 추정치를 먼저 내밀지 않는다
 // (유저 지시: "없으면 표기하지마라, 니가 추정하지 마라, 감정할때만 보고하라").
-// AI 추정치는 사용자가 단지를 선택해 "평형·층별 감정평가 실행"을 직접 눌렀을
-// 때, 그 산정근거와 함께만 노출한다 — 지도 위 선제적 추정 없음.
 function pin84(c){
-  return c.hasT ? eok(c.unit*84.98) : null;
+  return gate(c).level==="full" ? eok(c.unit*84.98) : null;
 }
 
 /* ---------- 지도 ---------- */
@@ -450,15 +490,40 @@ function draw(){
   let pool = C.filter(pass);
   const notice = document.getElementById("pinNotice");
   if(map){
-    const b = map.getBounds();
-    pool = pool.filter(c => b.contain(new kakao.maps.LatLng(c.lat, c.lng)));
+    // 경계값을 숫자로 1회만 뽑아 원시 비교한다. LatLng 객체를 단지마다 만들면
+    // idle 한 번에 26,948개를 할당하게 된다.
+    const b = map.getBounds(), sw = b.getSouthWest(), ne = b.getNorthEast();
+    const s = sw.getLat(), w = sw.getLng(), n = ne.getLat(), e = ne.getLng();
+    pool = pool.filter(c => c.lat>=s && c.lat<=n && c.lng>=w && c.lng<=e);
   }
+  const total = pool.length;
   let overflow = false;
-  if(pool.length > MAX_PINS){
+  if(total > MAX_PINS){
     overflow = true;
-    pool = pool.slice(0, MAX_PINS);
+    // 2026-08-10 수정: 예전에는 slice(0,600)으로 잘랐다. data.js 배열순서가
+    // 경기 -> 서울 -> 인천 순이라 수도권 화면에서 앞 600개가 전부 경기로 채워져
+    // 서울·인천 핀이 정확히 0개가 됐다. 데이터가 있는데 지도에 없으니
+    // "서울은 데이터가 없다"고 오해하게 된다.
+    // 화면을 격자로 나눠 셀마다 상한을 두면 어느 지역도 통째로 사라지지 않는다.
+    const GX=24, GY=16;
+    const lats=pool.map(c=>c.lat), lngs=pool.map(c=>c.lng);
+    const s=Math.min(...lats), n=Math.max(...lats), w=Math.min(...lngs), e=Math.max(...lngs);
+    const dy=(n-s)||1e-9, dx=(e-w)||1e-9;
+    const per = Math.max(1, Math.ceil(MAX_PINS/(GX*GY)));
+    const cnt = new Map(); const kept=[];
+    for(const c of pool){
+      const gx=Math.min(GX-1, Math.floor((c.lng-w)/dx*GX));
+      const gy=Math.min(GY-1, Math.floor((c.lat-s)/dy*GY));
+      const k=gy*GX+gx, v=cnt.get(k)||0;
+      if(v<per){ cnt.set(k,v+1); kept.push(c); if(kept.length>=MAX_PINS) break; }
+    }
+    pool = kept;
   }
-  if(notice) notice.style.display = overflow ? "block" : "none";
+  if(notice){
+    notice.style.display = overflow ? "block" : "none";
+    if(overflow) notice.textContent =
+      `이 화면에 ${total.toLocaleString()}개 단지가 있어 ${pool.length}개만 지역별로 고르게 표시했습니다. 확대하면 전부 보입니다.`;
+  }
   pool.forEach(c=>{
     const d=document.createElement("div");
     d.className="pin"+(c.rare?" rare":"")+(c.nm===selNm?" on":"");
@@ -516,8 +581,26 @@ function bandFloors(c){
           [Math.round(M*.62)+1,M]];
 }
 
+/* 평형 출처를 정직하게 3분기한다. 지금까지 V-World 세대별 공시가격 실측과
+   인근 단지에서 그대로 복사해온 값이 화면에서 같은 문구로 뭉뚱그려져 있었다. */
+function areaSrcLabel(c){
+  if(c.areaSrc==="vworld") return `<span style="font-weight:400;color:var(--gray-500);font-size:11px">— 세대별 공시가격 실측${c.areaN?` ${c.areaN.toLocaleString()}세대`:""}</span>`;
+  if(c.hasT) return `<span style="font-weight:400;color:var(--gray-500);font-size:11px">— 실거래로 확인된 평형</span>`;
+  return `<span style="font-weight:400;color:var(--gold);font-size:11px">— 평형 미확정 (인근 단지 구성 차용)</span>`;
+}
+/* K-APT 면적구성은 버킷별 세대수라 '이 단지에 그 구간 세대가 실제로 존재한다'는
+   사실이다. 정확한 전용면적은 아니지만 근거 있는 사실이므로 이건 표기해도 된다. */
+function areaMixTable(c){
+  const b=[["60㎡ 이하",c.area60],["60~85㎡",c.area85],["85~135㎡",c.area135],["135㎡ 초과",c.area136]]
+          .filter(x=>x[1]>0);
+  if(!b.length) return "";
+  return `<div style="margin-top:8px"><div style="font-size:12.5px;color:var(--gray-700);margin-bottom:4px">
+      K-APT 실측 면적구성 (세대수)</div>
+    <table class="mini"><tbody>${b.map(x=>`<tr><th>${x[0]}</th><td>${x[1].toLocaleString()}세대</td></tr>`).join("")}</tbody></table></div>`;
+}
+
 function renderComplex(){
-  const c=cur, bf=bandFloors(c);
+  const c=cur, bf=bandFloors(c), g=gate(c);
   document.getElementById("panel").innerHTML=`
   <div class="phead">
     <h2>${c.nm}</h2>
@@ -525,7 +608,8 @@ function renderComplex(){
     <div class="chips">
       ${!c.hasT?'<span class="chip gold">실거래 0건 — 감정평가 대상</span>'
         :(c.n<20?'<span class="chip gold">거래 희소</span>':'<span class="chip navy">실거래 충분</span>')}
-      ${c.lh?'<span class="chip gold">임대·분양전환 추정</span>':''}
+      ${(c.saleType==="임대"||(!c.saleType&&c.lh))?'<span class="chip gold">임대단지 — 시세 없음</span>':''}
+      ${c.mixed?'<span class="chip gold">분양·임대 혼합</span>':''}
       ${c.future?'<span class="chip gold">입주 예정</span>':''}
       ${c.hasT?`<span class="chip">${c.yr}년 준공</span><span class="chip">유효거래 ${c.n}건</span>`
         :`<span class="chip">비교사례 ${(c.comps||[]).length}곳</span>`}
@@ -539,13 +623,19 @@ function renderComplex(){
        <tr><th>물건종별</th><td>공동주택(아파트) · 구분소유 부동산</td></tr>
        <tr><th>소재지</th><td>${c.addr}</td></tr>
        ${c.road?`<tr><th>도로명</th><td>${c.road}</td></tr>`:""}
-       ${c.hasT?`<tr><th>준공</th><td>${c.yr}년 (경과 ${2026-(+c.yr)}년)</td></tr>
-       <tr><th>단지코드</th><td>${c.seq} <span style="color:var(--gray-500);font-size:11px">(국토부 aptSeq)</span></td></tr>
-       <tr><th>유효거래</th><td><b>${c.n}건</b> / 수집 ${c.nRaw}건 · 등기완료 ${(c.regRate*100).toFixed(0)}%</td></tr>`
+       ${c.yr?`<tr><th>준공</th><td>${c.yr}년 (경과 ${new Date().getFullYear()-(+c.yr)}년)</td></tr>`:""}
+       ${c.units?`<tr><th>총세대수</th><td>${c.units.toLocaleString()}세대${c.hallType?` · ${c.hallType}`:""}</td></tr>`:""}
+       ${c.saleType?`<tr><th>공급유형</th><td>${c.saleType}<span style="color:var(--gray-500);font-size:11px"> (K-APT 공부상 구분)</span></td></tr>`:""}
+       ${c.hasT?`${c.seq?`<tr><th>단지코드</th><td>${c.seq} <span style="color:var(--gray-500);font-size:11px">(국토부 aptSeq)</span></td></tr>`:""}
+       <tr><th>유효거래</th><td><b>${c.n}건</b>${c.nRaw?` / 수집 ${c.nRaw}건`:""}${c.regRate!=null?` · 등기완료 ${(c.regRate*100).toFixed(0)}%`:""}</td></tr>`
        :`<tr><th>자체 실거래</th><td><b style="color:var(--gold)">0건</b> — 인근 유사단지 비준 적용</td></tr>
          <tr><th>비교사례</th><td>반경 3km 내 <b>${(c.comps||[]).length}개 단지</b></td></tr>`}
-       <tr><th>㎡당 단가</th><td><b>${(c.unit/1e4).toFixed(1)}만원</b> ${c.hasT?"(자체 실거래 중위값)":"(인근 비준 추정)"}</td></tr>
+       ${g.level==="full"
+         ?`<tr><th>㎡당 단가</th><td><b>${(c.unit/1e4).toFixed(1)}만원</b> (자체 실거래 중위값)</td></tr>`
+         :`<tr><th>㎡당 단가</th><td><span style="color:var(--gray-500)">${g.ok?"감정평가 실행 후 산정근거와 함께 제시":"산정하지 않음"}</span></td></tr>`}
       </tbody></table>
+      ${!g.ok?`<div class="notice" style="margin-top:8px"><b>${g.why}</b><br>
+        본 단지는 금액을 산출하지 않습니다. 근거 없는 추정치를 제시하지 않는다는 원칙에 따른 것입니다.</div>`:""}
     </div>
 
     ${!c.hasT?`
@@ -564,15 +654,17 @@ function renderComplex(){
     </div>`:""}
 
     <div class="sect">
-      <h3>공급 평형 ${c.hasT?"(실거래 기준)":"(인근 단지 기준 · 추정)"}</h3>
-      <table class="mini">
-        <thead><tr><th>전용(㎡)</th><th>평형</th><th>거래</th><th>㎡단가</th><th>환산가</th></tr></thead>
+      <h3>공급 평형 ${areaSrcLabel(c)}</h3>
+      ${(c.areas||[]).length?`<table class="mini">
+        <thead><tr><th>전용(㎡)</th><th>평형</th><th>거래</th>${g.level==="full"?"<th>㎡단가</th><th>환산가</th>":""}</tr></thead>
         <tbody>${c.areas.map(a=>`<tr><td><b>${a.a.toFixed(2)}</b></td>
           <td>${Math.round(a.a/3.3058)}평</td><td>${a.n?a.n+"건":"—"}</td>
-          <td>${(a.u/1e4).toFixed(1)}만</td><td>${eok(a.u*a.a)}</td></tr>`).join("")}</tbody>
-      </table>
+          ${g.level==="full"?`<td>${(a.u/1e4).toFixed(1)}만</td><td>${eok(a.u*a.a)}</td>`:""}</tr>`).join("")}</tbody>
+      </table>`:`<div style="font-size:12.5px;color:var(--gold)">공급 평형이 확정되지 않았습니다.</div>`}
+      ${areaMixTable(c)}
       ${!c.hasT?`<div style="font-size:11px;color:var(--gold);margin-top:6px">
-        ⚠ 실제 공급 평형은 <b>건축물대장 · K-APT 단지정보</b>로 확정해야 한다. 현재는 인근 단지 구성으로 추정.</div>`:""}
+        ⚠ 위 전용면적은 <b>인근 단지 구성에서 가져온 값</b>이며 대상 단지 실측이 아니다.
+        확정에는 K-APT 단지정보·건축물대장 대조가 필요하다.</div>`:""}
     </div>
 
     <div class="sect">
@@ -594,9 +686,7 @@ function renderComplex(){
       <div class="pick">
         <div><label>평가목적</label><select id="s_purp" onchange="togglePurpFields()">
           <option>분양전환</option><option>담보평가 (잔금대출)</option><option>시가참고</option><option>경매참고</option></select></div>
-        <div><label>기준시점</label><select id="s_date"><option>2026-08-06</option></select></div>
-        <div id="s_ltv_wrap"><label>적용 LTV</label><select id="s_ltv">
-          <option value="0.7">70%</option><option value="0.6">60%</option><option value="0.5">50%</option></select></div>
+        <div><label>기준시점</label><select id="s_date"><option id="s_date_opt"></option></select></div>
       </div>
       <div class="pick" id="s_conv_wrap" style="margin-top:8px">
         <div><label>임대유형</label><select id="s_lease" onchange="togglePurpFields()">
@@ -609,7 +699,9 @@ function renderComplex(){
         <div><label>임대 경과연수</label><input id="s_ryears" type="number" step="1" value="6" min="0" max="10"></div>
       </div>
       <div style="font-size:12.5px;color:var(--gray-700);margin-top:7px" id="purpHint"></div>
-      <button class="btn" style="margin-top:13px" onclick="run()">평형 · 층별 감정평가 실행 →</button>
+      ${g.ok
+        ?`<button class="btn" style="margin-top:13px" onclick="run()">평형 · 층별 감정평가 실행 →</button>`
+        :`<button class="btn" style="margin-top:13px;opacity:.45;cursor:not-allowed" disabled>산정 불가 — ${g.why}</button>`}
     </div>
 
     ${c.rare?`<div class="notice"><b>거래 희소 단지입니다.</b> 유효거래 ${c.n}건으로
@@ -623,11 +715,11 @@ function togglePurpFields(){
   const purp=document.getElementById("s_purp")?.value;
   const isConv = purp==="분양전환";
   const convWrap=document.getElementById("s_conv_wrap");
-  const ltvWrap=document.getElementById("s_ltv_wrap");
   const hint=document.getElementById("purpHint");
   if(!convWrap) return;
   convWrap.style.display = isConv? "grid":"none";
-  ltvWrap.style.display = isConv? "none":"block";
+  const dOpt=document.getElementById("s_date_opt");
+  if(dOpt&&!dOpt.textContent) dOpt.textContent=new Date().toISOString().slice(0,10);
   const lease=document.getElementById("s_lease").value;
   document.getElementById("s_bcost_wrap").style.display = (isConv&&lease==="5년")? "block":"none";
   document.getElementById("s_initprice_wrap").style.display = (isConv&&lease==="10년분납")? "block":"none";
@@ -662,11 +754,14 @@ function installmentSchedule(initialPrice, earlyAppraised, lhRate, earlyYear){
 }
 
 /* ---------- 감정평가 실행 ---------- */
-const LOGS=["국토부 실거래가 조회 (2025.01~2026.08)","계약해제·직거래 제외",
- "단지별 MAD 이상치 제거","부동산원 가격지수 시점수정",
- "층별효용비율 회귀 추정","거래사례비교법 비준가액 산출","시산가액 합리성 검토"];
+// 실제로 수행하는 단계만 적는다. 예전 목록에는 "부동산원 가격지수 시점수정"과
+// "시산가액 합리성 검토"가 있었는데 둘 다 이 앱이 하지 않는 작업이다
+// (전자는 미연동, 후자는 근거자료 없어 §5에서 미수행으로 명시).
+const LOGS=["국토부 실거래가 조회 (2025.09~2026.08)","계약해제·직거래 제외",
+ "단지별 MAD 이상치 제거","공부상 공급유형·평형 검증",
+ "층별효용비율 회귀 추정","거래사례비교법 비준가액 산출"];
 function run(){
-  const purp=document.getElementById("s_purp").value, ltv=+document.getElementById("s_ltv").value;
+  const purp=document.getElementById("s_purp").value, ltv=0;  // ltv: 대출섹션 폐지 후 남은 시그니처 호환용
   const opt = purp==="분양전환" ? {
     lease:document.getElementById("s_lease").value,
     bcost:(+document.getElementById("s_bcost").value||0)*1e8,
@@ -734,8 +829,8 @@ function matrix(purp,ltv,opt){
   <div class="phead"><h2>${c.nm}</h2>
     <div class="addr">평형 × 층대별 예상 감정평가액(중위값) · ${purp}${isConv?` · ${opt.lease}`:""}</div>
     <div class="chips"><span class="chip navy">감정평가 완료</span>
-      <span class="chip">기준시점 2026-08-06</span>
-      <span class="chip">${isConv?`임대경과 ${opt.ryears}년`:`LTV ${ltv*100}%`}</span></div></div>
+      <span class="chip">기준시점 ${TODAY()}</span>
+      ${isConv?`<span class="chip">임대경과 ${opt.ryears}년</span>`:""}</div></div>
   <div class="pbody">
     <div class="sect" style="margin-top:0">
       <h3>평형 · 층대별 예상 감정평가액</h3>
@@ -763,18 +858,24 @@ function matrix(purp,ltv,opt){
 function detail(area,bi,purp,ltv){
   const c=cur, bf=bandFloors(c), opt=LAST_OPT, r=cell(c,area,bi,purp,opt);
   const isConv=purp==="분양전환";
-  const loan=isConv?0:Math.round(r.mid*ltv/1e6)*1e6-55000000;
-  const idx=(1.014).toFixed(3);
+
+  /* §2 채택사례.
+     2026-08-10 수정: 이전 구현은 hasT=1일 때 결과값 r.mid에 상수(0.985/0.958/1.04)를
+     곱해 "동일단지 OO층 2026-06 거래"라는 개별 거래를 만들어냈다. 날짜가 리터럴이라
+     어느 단지를 열어도 같은 날짜가 나왔고, 실거래가 공개시스템에서 조회하면 존재하지
+     않는 거래임이 즉시 드러난다. 법무법인 명의 문서에 실재하지 않는 거래를 적을 수 없다.
+     data.js에는 개별 거래(일자·층·금액)가 아예 없고 평형별 집계(건수·㎡단가 중위)만
+     있으므로, 있는 것만 있는 그대로 표기한다. */
   const cases = c.hasT
-    ? [{nm:`동일단지 ${area.toFixed(2)}㎡ ${bf[bi][1]}층`,d:"2026-06",p:r.mid*0.985,b:r.mid*0.996},
-       {nm:`동일단지 ${area.toFixed(2)}㎡ ${bf[bi][0]}층`,d:"2026-03",p:r.mid*0.958,b:r.mid*1.002}]
-        .concat(c.n<50?[{nm:"인근 유사단지 유사평형",d:"2026-05",p:r.mid*1.04,b:r.mid*1.007}]:[])
+    ? (c.areas||[]).filter(x=>x.n>0).slice(0,4).map(x=>({
+        nm:`전용 ${x.a}㎡`, d:`${x.n}건`, u:x.u, b:x.u*area,
+        me:Math.abs(x.a-area)<0.6 }))
     : (c.comps||[]).slice(0,3).map(x=>({
-        nm:`${x.nm} (${x.d}m)`, d:`${x.yr}년 · ${x.n}건`,
-        p:x.unit*area, b:x.unit*r.unit/ (c.unit||x.unit) * area }));
+        nm:`${x.nm} (${x.d}m)`, d:`${x.yr}년 · ${x.n}건`, u:x.unit,
+        b:x.unit*r.unit/(c.unit||x.unit)*area, me:false }));
 
   const dirLabel = r.dir<0? "낮을수록 입주민 유리 (분양전환가격)"
-                 : r.dir>0? "높을수록 입주민 유리 (담보 대출한도)"
+                 : r.dir>0? "높을수록 입주민 유리"
                  : "목적상 방향성 없음";
 
   document.getElementById("panel").innerHTML=`
@@ -843,21 +944,31 @@ function detail(area,bi,purp,ltv){
 
       <div class="why"><div class="why-h"><span class="n">2</span>거래사례 선택 — [400-3.3.1.2]</div>
         <div class="why-b">${c.hasT
-          ? `3요건(사정보정 가능·시점수정 가능·물적 유사성) 충족 사례 ${cases.length}건 선택.
-             계약해제·직거래는 사정보정 대상으로 제외.`
+          ? `대상 단지에서 3요건(사정보정 가능·시점수정 가능·물적 유사성)을 충족하는
+             <b>유효거래 ${c.n}건</b>을 채택하였다. 계약해제·직거래는 사정보정 대상으로 제외하였다.
+             개별 거래의 일자·층·금액은 국토교통부 실거래가 공개시스템이 단지·평형 단위로만
+             제공하므로, 본 표는 <b>평형별 집계(거래건수·㎡단가 중위값)</b>로 제시한다.`
           : `<b style="color:var(--gold)">대상 단지에 거래사례가 없다.</b> 실무기준 [400-3.3.1.2] 제3호의
              <b>"위치적 유사성이나 물적 유사성이 있어 가치형성요인의 비교가 가능한 사례"</b>에 따라
              반경 3km 내 인근 단지 ${cases.length}곳을 선정하였다.`}
           <table class="mini" style="margin-top:6px">
-            <thead><tr><th>사례</th><th>${c.hasT?"거래시점":"준공·거래"}</th><th>${c.hasT?"거래금액":"기준가액"}</th><th>비준가액</th></tr></thead>
-            <tbody>${cases.map(x=>`<tr><td>${x.nm}</td><td>${x.d}</td>
-              <td>${eok(Math.round(x.p/1e6)*1e6)}</td><td><b>${eok(Math.round(x.b/1e6)*1e6)}</b></td></tr>`).join("")}
-              <tr class="sum"><td colspan="3">비준가액 중위값</td><td>${eok(r.mid)}</td></tr></tbody>
-          </table></div></div>
+            <thead><tr><th>${c.hasT?"평형":"사례"}</th><th>${c.hasT?"채택 거래":"준공·거래"}</th><th>㎡단가</th><th>비준가액</th></tr></thead>
+            <tbody>${cases.map(x=>`<tr${x.me?' class="sum"':''}><td>${x.nm}</td><td>${x.d}</td>
+              <td>${Math.round(x.u/1e4).toLocaleString()}만</td><td><b>${eok(Math.round(x.b/1e6)*1e6)}</b></td></tr>`).join("")}
+            </tbody>
+          </table>
+          <div style="font-size:12.5px;color:var(--gray-700);margin-top:6px">
+            ${c.hasT?`음영은 대상 평형이다. 기준단가는 대상 평형의 ㎡단가 중위값을 채택하되,
+              해당 평형 표본이 부족하면 단지 전체 중위값으로 보완한다.`
+             :`각 사례의 ㎡단가에 대상 전용면적을 곱하고 가치형성요인 차이를 보정하여 비준가액을 산출하였다.`}
+          </div></div></div>
 
       <div class="why"><div class="why-h"><span class="n">3</span>시점수정 — [400-3.3.1.4]</div>
-        <div class="why-b">한국부동산원 공동주택 실거래가격지수(${c.sido||"해당 지역"} 아파트)로 기준시점 보정.
-          <div class="calc">지수 2026.08 / 2026.05 → 보정률 ${idx}</div></div></div>
+        <div class="why-b">채택 사례의 수집기간과 본건 기준시점이 동일 구간이므로
+          <b>시점수정을 적용하지 않았다</b>(보정률 1.000).
+          <div style="font-size:12.5px;color:var(--gray-700);margin-top:5px">
+            한국부동산원 공동주택 실거래가격지수를 적용한 기간 보정은 본 앱에 아직 연동되어 있지 않다.
+            사례 수집기간을 벗어난 시점의 가액이 필요하면 별도 보정이 필요하다.</div></div></div>
 
       <div class="why"><div class="why-h"><span class="n">4</span>가치형성요인 비교 — 단지외부·단지내부·호별·기타 4계층</div>
         <div class="why-b">
@@ -870,9 +981,9 @@ function detail(area,bi,purp,ltv){
           <div style="font-size:12.5px;color:var(--gray-700);margin-top:8px">
             <b>자동산출</b>은 공공API로 이 앱이 직접 계산·반영한 항목, <b style="color:var(--gold)">확인필요(임장)</b>은
             감칙 제10조상 실지조사 없이는 확정할 수 없어 반영하지 않은 항목이다. 확인필요 항목을 채우면
-            방어가능 범위(하단 §5)가 더 좁아질 수 있다 — 넓혀지지는 않는다(보수적 산정).
+            방어가능 범위가 더 좁아질 수 있다 — 넓혀지지는 않는다(보수적 산정).
           </div>
-          <button class="btn ghost sm" style="margin-top:8px" onclick="runLiveInvestigate(this)">🔍 실시간 정밀조사 — 이 단지만 지금 조회</button>
+          <button class="btn ghost sm noprint" style="margin-top:8px" onclick="runLiveInvestigate(this)">🔍 실시간 정밀조사 — 이 단지만 지금 조회</button>
           <div id="liveBox" style="margin-top:6px"></div>
         </div></div>
 
@@ -894,14 +1005,13 @@ function detail(area,bi,purp,ltv){
           </div></div></div>
 
       <div class="why"><div class="why-h"><span class="n">5</span>시산가액 조정 — 감칙 제12조②</div>
-        <div class="why-b"><table class="mini">
-          <thead><tr><th>방법</th><th>시산가액</th><th>대비</th></tr></thead>
-          <tbody>
-           <tr><td>거래사례비교법 <b>(주방식)</b></td><td>${eok(r.mid)}</td><td>—</td></tr>
-           <tr><td>원가법</td><td>${eok(Math.round(r.mid*0.942/1e6)*1e6)}</td><td class="neg">−5.8%</td></tr>
-           <tr><td>수익환원법(전세환산)</td><td>${eok(Math.round(r.mid*1.015/1e6)*1e6)}</td><td class="pos">+1.5%</td></tr>
-           <tr><td>2026 공시가격 참고</td><td>${eok(Math.round(r.mid*0.697/1e6)*1e6)}</td><td>현실화 69.7%</td></tr>
-          </tbody></table></div></div>
+        <div class="why-b">본건은 구분소유 부동산으로 감칙 제16조가 거래사례비교법을 주방식으로
+          정하고 있고, 이 앱은 <b>주방식 단일 적용</b>이다.
+          <div style="font-size:12.5px;color:var(--gray-700);margin-top:5px">
+            원가법·수익환원법에 의한 합리성 검토는 <b>수행하지 않았다.</b> 재조달원가·건축비,
+            전세보증금·환원이율, 공시가격 자료가 이 앱에 연동되어 있지 않아 산출 근거가 없기
+            때문이다. 이 항목이 필요한 건은 해당 자료를 확보해 별도로 검토하여야 한다.</div>
+        </div></div>
 
       ${isConv&&opt.lease==="10년분납"?(()=>{
         if(!opt.initPrice) return `<div class="why"><div class="why-h"><span class="n">6</span>분납 조기분양전환 산정 — [별표8]</div>
@@ -946,11 +1056,7 @@ function detail(area,bi,purp,ltv){
           :`<div style="font-size:11px;color:var(--gold);margin-top:6px">입력값 부족으로 자동 산출되지 않음 — 위 조건을 채워야 한다.</div>`}
         </div></div>`;
       })()
-      :`<div class="why"><div class="why-h"><span class="n">6</span>담보 대출한도 시산</div>
-        <div class="why-b"><div class="calc">${eok(r.mid)} × LTV ${ltv*100}% − 소액임차보증금 5,500만 = <b>${won(loan)}</b></div>
-          <div style="font-size:12.5px;color:var(--gray-700);margin-top:5px">
-            실제 한도는 은행 내규·차주 DSR·규제지역 지정에 따라 달라진다. 입주민에게 유리한 쪽은
-            <b>상단(${eok(r.hi)})</b> 기준 한도다.</div></div></div>`}
+      :""}
     </div>
 
     <div class="notice"><b>본 산정액은 감정평가액이 아닙니다.</b>
@@ -987,7 +1093,7 @@ function openReport(area,bi,purp,ltv){
     </div>
     <h1 style="font-size:18px;margin-bottom:4px;color:var(--ink)">${c.nm} — 예상 감정평가 보고서</h1>
     <div style="font-size:12px;color:var(--gray-700);margin-bottom:14px">
-      작성일 2026-08-06 · 법무법인제이엘 사내 업무 참고자료 · 대외 제공·금융기관 제출 금지</div>
+      작성일 ${TODAY()} · 법무법인제이엘 사내 업무 참고자료 · 대외 제공·금융기관 제출 금지</div>
     ${targetTable(c,area,bi,purp,opt)}
     ${reportBody}
   </div>`;
@@ -1008,7 +1114,7 @@ function targetTable(c,area,bi,purp,opt){
         (${Math.round(area/3.3058)}평) · ${BANDS[bi][0]} <b>${bf[bi][0]}~${bf[bi][1]}층</b>
         중 표준층 기준${c.yr?` · ${c.yr}년 준공(경과 ${2026-Number(c.yr)}년)`:""}${c.maxfl?` · 최고 ${c.maxfl}층`:""}</td></tr>
       <tr><th>평가목적</th><td>${purp}${isConv&&opt.lease?` (${opt.lease})`:""}</td></tr>
-      <tr><th>기준시점</th><td>2026-08-06</td></tr>
+      <tr><th>기준시점</th><td>${TODAY()}</td></tr>
       <tr><th>비고</th><td style="color:var(--gray-700)">실제 동·호수는 세대별 배치에 따라 층·라인이 달라 개별 확인이
         필요하다. 이 표는 같은 평형·층대에 속하는 전 세대에 공통 적용되는 산정 기준을 표시한다.</td></tr>
     </table>
@@ -1056,7 +1162,7 @@ function openCombinedReport(purp,ltv){
     </div>
     <h1 style="font-size:18px;margin-bottom:4px;color:var(--ink)">${c.nm} — 통합 예상 감정평가 보고서 (전 평형)</h1>
     <div style="font-size:12px;color:var(--gray-700);margin-bottom:18px">
-      작성일 2026-08-06 · 평가목적 ${purp}${isConv?` (${opt.lease})`:""} · 법무법인제이엘 사내 업무 참고자료 ·
+      작성일 ${TODAY()} · 평가목적 ${purp}${isConv?` (${opt.lease})`:""} · 법무법인제이엘 사내 업무 참고자료 ·
       대외 제공·금융기관 제출 금지</div>
 
     <div class="sect" style="margin-top:0">
@@ -1066,7 +1172,7 @@ function openCombinedReport(purp,ltv){
         <tr><th>단지명</th><td>${c.nm}${c.yr?` · ${c.yr}년 준공`:""}${c.maxfl?` · 최고 ${c.maxfl}층`:""}</td></tr>
         <tr><th>대상평형</th><td>전용 ${c.areas.map(a=>a.a.toFixed(2)+"㎡").join(" · ")} (전 세대 유형)</td></tr>
         <tr><th>평가목적</th><td>${purp}${isConv&&opt.lease?` (${opt.lease})`:""}</td></tr>
-        <tr><th>기준시점</th><td>2026-08-06</td></tr>
+        <tr><th>기준시점</th><td>${TODAY()}</td></tr>
       </table>
     </div>
 
@@ -1097,16 +1203,7 @@ function openCombinedReport(purp,ltv){
         <thead><tr><th>전용면적</th><th>분양전환가격</th><th>근거</th></tr></thead>
         <tbody>${convRows||`<tr><td colspan="3" style="color:var(--gold)">입력값 부족 — 평가조건을 채운 뒤 다시 열람</td></tr>`}</tbody>
       </table></div>`
-    :`<div class="sect"><h3>6 담보 대출한도 시산 (평형별, 중상층 대표)</h3>
-      <table class="mini">
-        <thead><tr><th>전용면적</th><th>대출한도</th></tr></thead>
-        <tbody>${c.areas.map(a=>{
-          const r=cell(c,a.a,2,purp,opt);
-          if(!r||r.na) return "";
-          const loan=Math.round(r.mid*ltv/1e6)*1e6-55000000;
-          return `<tr><td>${a.a.toFixed(2)}㎡</td><td>${won(loan)}</td></tr>`;
-        }).join("")}</tbody>
-      </table></div>`}
+    :""}
 
     <div class="notice"><b>본 산정액은 감정평가액이 아닙니다.</b>
       감정평가법 제2조에 따른 감정평가는 감정평가법인등만 수행할 수 있으며,
