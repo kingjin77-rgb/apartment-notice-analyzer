@@ -11,21 +11,21 @@ const p=(text,o={})=>new Paragraph({alignment:o.align,spacing:{before:o.before??
   indent:o.indent, border:o.border,
   children:[new TextRun({text,bold:o.b,size:o.size??20,color:o.color??'1A1A1A',font:F})]});
 
-const cellW=[560,700,900,7280];
+const cellW=[600,760,1000,7546];
 const TW=cellW.reduce((a,b)=>a+b,0);
 const th=t=>new TableCell({width:{size:cellW[0],type:WidthType.DXA},shading:{type:ShadingType.CLEAR,fill:NAVY},
   margins:{top:60,bottom:60,left:90,right:90},
   children:[new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:0},children:[new TextRun({text:t,bold:true,size:18,color:'FFFFFF',font:F})]})]});
 const tc=(children,w)=>new TableCell({width:{size:w,type:WidthType.DXA},margins:{top:70,bottom:70,left:100,right:100},children});
 
-const rows=[new TableRow({tableHeader:true,children:[
+const rows=[new TableRow({tableHeader:true,cantSplit:true,children:[
   ['연번',cellW[0]],['등급',cellW[1]],['근거 면',cellW[2]],['요구사항',cellW[3]]].map(([t,w])=>
   new TableCell({width:{size:w,type:WidthType.DXA},shading:{type:ShadingType.CLEAR,fill:NAVY},margins:{top:70,bottom:70,left:100,right:100},
     children:[new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:0},children:[new TextRun({text:t,bold:true,size:18,color:'FFFFFF',font:F})]})]}))
 })];
 
 ALL.forEach((f,i)=>{
-  rows.push(new TableRow({children:[
+  rows.push(new TableRow({cantSplit:true,children:[
     tc([new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:0},children:[new TextRun({text:String(i+1),bold:true,size:18,font:F})]})],cellW[0]),
     tc([new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:0},children:[new TextRun({text:f.grade,bold:true,size:18,color:f.grade==='치명'?RED:(f.grade==='높음'?'B7791F':NAVY),font:F})]})],cellW[1]),
     tc([new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:0},children:[new TextRun({text:f.pages.join('·')+'면',size:18,font:F})]})],cellW[2]),
@@ -41,7 +41,7 @@ ALL.forEach((f,i)=>{
 
 const doc=new Document({
   creator:'법무법인 제이엘',title:'번영로 롯데캐슬 센트럴스카이 개선요구서',
-  sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1100,bottom:1100,left:900,right:900}}},children:[
+  sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1080,bottom:1080,left:1000,right:1000}}},children:[
     new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:60},children:[new TextRun({text:'번영로 롯데캐슬 센트럴스카이 입주예정자협의회',bold:true,size:22,color:NAVY,font:F})]}),
     new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:300},border:{bottom:{style:BorderStyle.SINGLE,size:12,color:GOLD,space:6}},children:[new TextRun({text:'자문 : 법무법인 제이엘 분양공고문 분석팀',size:18,color:'666666',font:F})]}),
     new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:200,after:320},children:[new TextRun({text:'입주자모집공고 관련 개선요구 및 질의',bold:true,size:34,color:NAVY,font:F})]}),

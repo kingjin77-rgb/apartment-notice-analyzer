@@ -286,11 +286,6 @@ AUTO = [
   '=IF(AND($B$7=3,OR(AND($B$5="103동",$B$8="84F"),AND($B$5<>"103동",$B$8="84E"))),"포디움 상부 2층 필로티 바로 위 세대입니다","-")',
   "101·102동은 5호라인, 103동은 4호라인에 2층 필로티가 있습니다. 바닥 단열·소음을 확인하십시오.",
   "중간", "51면"),
- ("가스배관 방범",
-  '=IF($B$7<=3,"카바 있음","카바 없음")',
-  '=IF($B$7<=3,"3층까지만 방범용 배관카바가 설치됩니다","4층 이상은 방범용 배관카바가 없습니다")',
-  "포디움 상부(2층)에서 접근 가능한 높이인지 함께 확인하십시오.",
-  "중간", "59면"),
  ("공급금액",
   '=IF(ISNA(MATCH($B$8,\'④ 타입정보\'!$A$5:$A$11,0)),"타입 선택","확인")',
   '=IF(ISNA(MATCH($B$8,\'④ 타입정보\'!$A$5:$A$11,0)),"-",IF($B$7<=3,INDEX(\'④ 타입정보\'!$E$5:$E$11,MATCH($B$8,\'④ 타입정보\'!$A$5:$A$11,0)),IF($B$7<=19,INDEX(\'④ 타입정보\'!$F$5:$F$11,MATCH($B$8,\'④ 타입정보\'!$A$5:$A$11,0)),IF($B$7<=30,INDEX(\'④ 타입정보\'!$G$5:$G$11,MATCH($B$8,\'④ 타입정보\'!$A$5:$A$11,0)),IF($B$7<=40,INDEX(\'④ 타입정보\'!$H$5:$H$11,MATCH($B$8,\'④ 타입정보\'!$A$5:$A$11,0)),INDEX(\'④ 타입정보\'!$I$5:$I$11,MATCH($B$8,\'④ 타입정보\'!$A$5:$A$11,0)))))))',
@@ -401,6 +396,22 @@ cell(wf, r + 1, 6, f'=_xlfn.CONCAT("치명 ",COUNTIF(B5:B{r-1},"치명")," / 높
 wb.move_sheet("① 세대 점검표", offset=-1)
 for s in wb.worksheets:
     s.sheet_view.showGridLines = False
+
+# ── A4 인쇄 정밀 설정 (전 시트)
+from openpyxl.worksheet.properties import PageSetupProperties
+for ws_ in wb.worksheets:
+    ws_.page_setup.paperSize = 9          # A4
+    ws_.page_setup.orientation = 'landscape' if ws_.title in ('② 동별 유의사항','③ 세대내부 점검','⑤ 검토 발견목록') else 'portrait'
+    ws_.page_setup.fitToWidth = 1
+    ws_.page_setup.fitToHeight = 0        # 폭만 맞추고 세로는 흐름대로
+    ws_.sheet_properties.pageSetUpPr = PageSetupProperties(fitToPage=True)
+    ws_.page_margins.left = ws_.page_margins.right = 0.35
+    ws_.page_margins.top = 0.5; ws_.page_margins.bottom = 0.45
+    ws_.print_options.horizontalCentered = True
+# 반복 머리글
+wb['② 동별 유의사항'].print_title_rows = '1:4'
+wb['③ 세대내부 점검'].print_title_rows = '1:4'
+wb['⑤ 검토 발견목록'].print_title_rows = '1:4'
 
 wb.save('/tmp/lc/번영로롯데캐슬_사전점검_체크리스트.xlsx')
 print("saved", [s.title for s in wb.worksheets])

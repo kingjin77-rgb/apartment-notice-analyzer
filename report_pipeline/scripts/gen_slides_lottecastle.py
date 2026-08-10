@@ -80,12 +80,12 @@ body:before{content:"";position:absolute;inset:auto -6% -30% 52%;height:520px;
   <h1>공고문 69면,<br><em>한 면도 빼지 않고</em> 읽었습니다</h1>
   <div class="rule"></div>
   <p>번영로 롯데캐슬 센트럴스카이 · 634세대 · 울산 중구 학산동 167-4 일원<br>
-  키워드 검색이 아니라 전면 통독 — 서로 다른 면의 표를 겹쳐 <b style="color:#fff">31건</b>을 찾았고, 수치는 모두 원문과 재대조했습니다.</p>
+  키워드 검색이 아니라 전면 통독 — 서로 다른 면의 표를 이 단지에만 있는 문제 <b style="color:#fff">13건</b>을 찾았습니다. 여러 아파트 공통의 상투 항목은 처음부터 뺐고, 수치는 모두 원문과 재대조했습니다.</p>
   <div class="kpi">
     <div class="k"><b>69 / 69면</b><small>통독 커버리지 · 미통독 0면</small></div>
-    <div class="k"><b>31건</b><small>발견 항목 · 즉시 시정 7건</small></div>
+    <div class="k"><b>13건</b><small>단지 고유 발견 · 치명 3건</small></div>
     <div class="k"><b>396세대</b><small>21층 이상 · 진입창 없는 구간</small></div>
-    <div class="k"><b>231.9억</b><small>보증 밖 발코니 확장금액</small></div>
+    <div class="k"><b>1억 1,400만</b><small>103동 21·22층 8세대 초과부담</small></div>
   </div>
 </div>
 """)
@@ -114,8 +114,8 @@ page("s02", f"""
     <div class="seg"><b>57 – 69면</b><small>세대별 유의사항 · 신탁 · 보증약관</small></div>
   </div>
   <div class="two" style="margin-top:auto">
-    <div class="panel"><h3>① 서로 다른 면의 표를 겹칩니다</h3><p>7면 층별가격표 × 52면 설비층 고지 · 53면 택배차량 통로높이 × 64면 · 40면 확장금액 × 66면 보증제외. 한 면만 보면 정상으로 보이는 것이 여기서 갈립니다.</p></div>
-    <div class="panel"><h3>② 비율은 원(₩), 기간은 달력 일수로</h3><p>"중도금 60%"가 아니라 "세대당 5억 3,820만원", "소명기간 7일"이 아니라 "계약 전까지 달력 5일"로 바꿔 놓아야 판단할 수 있습니다.</p></div>
+    <div class="panel"><h3>① 서로 다른 면의 표를 겹칩니다</h3><p>7면 층별가격표 × 52면 설비층 고지 · 6면 면적표 × 7면 가격표 · 9면 배정표 × 11면 추천기관. 한 면만 보면 정상으로 보이는 것이 여기서 갈립니다.</p></div>
+    <div class="panel"><h3>② 상투 항목은 처음부터 뺍니다</h3><p>주차 층고, 내진 법정등급, 표준약관 문구처럼 어느 아파트에나 똑같이 있는 것은 문제로 취급하지 않습니다. 남는 것이 이 단지의 진짜 문제입니다.</p></div>
     <div class="panel dark"><h3>③ 적혀 있지 않은 것을 찾습니다</h3><p>총 주차대수 · 신탁재산 잔액 · 실외기 영향 호수 — 이 세 가지는 69면 어디에도 없습니다. 없는 것이 있는 것보다 중요할 때가 있습니다.</p></div>
   </div>
 </div>
@@ -125,24 +125,22 @@ page("s02", f"""
 page("s03", """
 <div class="pad">
   <div class="eyebrow">DIAGNOSIS</div>
-  <h1>찾은 것은 <em>31건</em>, 그중 즉시 시정을 요구할 항목이 <em>7건</em></h1>
+  <h1>상투를 걷어내고 남은 <em>이 단지만의 문제 13건</em></h1>
   <div class="mrow">
     <div class="m hot"><b style="font-size:31px">1억 1,400만</b><small>103동 21·22층 8세대가<br>11~19층보다 더 내는 금액</small></div>
     <div class="m hot"><b>396세대</b><small>21층 이상 62.5% —<br>소방관 진입창 없는 구간</small></div>
-    <div class="m hot"><b>231.9억</b><small>발코니 확장금액 전액이<br>HUG 보증 대상 밖</small></div>
-    <div class="m hot"><b>0.4m</b><small>택배차량 운행층 높이<br>53면 2.7m ↔ 64면 2.3m</small></div>
-    <div class="m hot"><b>7일?</b><small>"7일 이상"이라면서<br>상한은 "계약 체결 이전"</small></div>
+    <div class="m hot"><b>4대</b><small>103동만 승강기 1대 적음<br>오피스텔 2대는 사용 불가</small></div>
+    <div class="m hot"><b>0세대</b><small>장애인·철거주택 소유자<br>자격만 있고 배정 없음</small></div>
+    <div class="m hot"><b>70일</b><small>층간소음 사후확인제<br>시행 직전 승인으로 배제</small></div>
   </div>
   <table class="t">
-    <tr><th style="width:210px">분류</th><th>공고문이 말한 것</th><th>두 면을 겹쳐 보면</th><th style="width:150px">근거 면</th></tr>
+    <tr><th style="width:150px">분류</th><th>공고문이 말한 것</th><th>두 면을 겹쳐 보면</th><th style="width:120px">근거 면</th></tr>
     <tr><td class="n">동별·세대별</td><td>103동 21층 소화수조 · 22층 제연휀룸 (52면)</td><td>가격표는 21~30층을 한 밴드로 묶음 — 8세대 1억 1,400만원</td><td class="n red">7 ↔ 52</td></tr>
-    <tr><td class="n">비용·보증</td><td>발코니 확장금액을 별도 계좌로 수납 (40면)</td><td>그 231억 9,276만원이 보증 대상에서 제외 (66면)</td><td class="n red">40 ↔ 66</td></tr>
-    <tr><td class="n">책임구조</td><td>매도인 책임 = 신탁재산(현금) 한도</td><td>그 잔액은 69면 어디에도 없음</td><td class="n red">68</td></tr>
-    <tr><td class="n">마감·옵션</td><td>홍보물 우선(57면)</td><td>68·69면이 이를 두 번 뒤집음</td><td class="n red">57 ↔ 68 ↔ 69</td></tr>
-    <tr><td class="n">절차·자격</td><td>"통보받은 날부터 7일 이상" (4면)</td><td>상한이 "계약 체결 이전" — 통보가 늦으면 7일이 없음</td><td class="n red">4 ↔ 25</td></tr>
-    <tr><td class="n">승강기</td><td>101·102동 5대 / 103동 아파트 4대 (53면)</td><td>103동 오피스텔 2대는 코어 분리로 사용 불가 (50면)</td><td class="n red">50 ↔ 53</td></tr>
-    <tr><td class="n">피난</td><td>소방관 진입창 위치가 타입마다 다름 (50면)</td><td>84A는 침실3, 84E·105는 안방발코니 — 가구 놓이는 자리</td><td class="n red">50</td></tr>
-    <tr><td class="n">공백</td><td>총 주차대수 · 신탁 잔액 · 실외기 호수</td><td>세 가지 모두 69면 어디에도 없음</td><td class="n red">전면</td></tr>
+    <tr><td class="n">피난</td><td>"각동 20층이하는 … 소방관진입창" (50면)</td><td>21층 이상 396세대는 그 문장에 없음 · 타입별 위치도 상이</td><td class="n red">50 · 52</td></tr>
+    <tr><td class="n">가격 형평</td><td>84B 계약면적 174.73㎡ (6면)</td><td>가장 작은데 가장 넓은 84D보다 1,300만원 비쌈</td><td class="n red">6 ↔ 7</td></tr>
+    <tr><td class="n">승강기</td><td>101·102동 5대 / 103동 아파트 4대 (53면)</td><td>오피스텔 2대는 코어 분리로 사용 불가 (50면)</td><td class="n red">50 ↔ 53</td></tr>
+    <tr><td class="n">절차·자격</td><td>장애인 추천기관 3곳 지정 (11면)</td><td>기관추천 54세대를 다른 7개 항목이 전부 소진 — 배정 0</td><td class="n red">9 ↔ 11</td></tr>
+    <tr><td class="n">공백</td><td>총 주차대수</td><td>69면 어디에도 없음 — 세대당 주차대수 산출 불가</td><td class="n red">전면</td></tr>
   </table>
 </div>
 """, "03")
@@ -285,37 +283,50 @@ page("s06", """
 </div>
 """, "06")
 
-# ── 07 돈
+# ── 07 가격역전·자격
 page("s07", """
 <style>
-.wf{margin-top:22px;flex:1;display:flex;flex-direction:column;justify-content:center;background:#fff;border:1.5px solid #E1E7EE;border-radius:14px;padding:24px 26px}
-.row{display:flex;align-items:center;gap:16px;margin-bottom:14px}
-.row .nm{width:250px;font-size:15px;font-weight:800;color:#0F2548}
-.row .tr{flex:1;height:34px;background:#F1F4F8;border-radius:7px;overflow:hidden}
-.row .fi{height:100%;display:flex;align-items:center;padding-left:14px;color:#fff;font-size:15px;font-weight:800;border-radius:7px}
-.note{font-size:14px;color:#5B6673;font-weight:700;margin-top:6px}
+.three{display:flex;gap:16px;margin-top:22px;flex:1}
+.bx{flex:1;background:#fff;border:1.5px solid #E1E7EE;border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;justify-content:center}
+.bx h3{font-size:19px;font-weight:800;color:#0F2548;letter-spacing:-.5px;margin-bottom:10px}
+.bx .big{font-size:36px;font-weight:800;color:#C0392B;letter-spacing:-1.5px;line-height:1;margin-bottom:8px}
+.bx p{font-size:14px;color:#5B6673;font-weight:700;line-height:1.55}
+.cmp{display:flex;gap:8px;margin:10px 0}
+.cmp .cc{flex:1;border:1.5px solid #E1E7EE;border-radius:10px;padding:10px 12px;text-align:center}
+.cmp .cc b{display:block;font-size:15px;font-weight:800;color:#0F2548}
+.cmp .cc small{font-size:11.5px;color:#5B6673;font-weight:700}
+.cmp .cc.r{border-color:#F0C6C0;background:#FDF6F5}.cmp .cc.r b{color:#C0392B}
 </style>
 <div class="pad">
-  <div class="eyebrow">FINDING 04 · 비용 · 보증</div>
-  <h1>발코니 확장금액 <em>231억 9,276만원</em>,<br>돈은 따로 걷고 <u>보증에서는 빠집니다</u></h1>
-  <div class="wf">
-    <div class="row"><div class="nm">HUG 분양보증 (65면)</div>
-      <div class="tr"><div class="fi" style="width:100%;background:#3E6CB5">3,014억 5,570만원 — 기본 분양대금만</div></div></div>
-    <div class="row"><div class="nm" style="color:#C0392B">보증 제외 (66면)</div>
-      <div class="tr"><div class="fi" style="width:33%;background:#C0392B">231억 9,276만원 — 발코니 확장금액(40면) + 유상옵션 별도</div></div></div>
-    <div class="row"><div class="nm" style="color:#C0392B">보증사고 시 이자 (37·38면)</div>
-      <div class="tr"><div class="fi" style="width:27%;background:#B7791F">대납하던 중도금 이자 → 계약자 부담</div></div></div>
-    <div class="note">40면 확장금액 × 세대수: 84A 3,525만×92 · 84B 3,495만×44 · 84C 3,550만×134 · 84D 3,591만×136 · 84E 3,526만×92 · 84F 3,523만×44 · 105형 4,323만×92 = <b style="color:#C0392B">23,192,760,000원</b><br>66면 제외 문구: "홈오토, 발코니샤시, 마이너스옵션 부위, <b style="color:#C0392B">그 밖의 마감재공사</b>" — 마지막 한 마디로 배제 범위가 사실상 무한히 열립니다.</div>
-  </div>
-  <div class="two" style="margin-top:18px">
-    <div class="panel red" style="flex:1.2"><h3>매도인 책임은 "신탁재산(현금) 한도" (68면)</h3>
-      <p>법적 매도인(무궁화신탁)은 <b>현존하는 신탁 현금 범위</b>에서만 책임지고, 하자 책임은 시행위탁자·시공사로 넘어갑니다. 그런데 그 <b>잔액이 얼마인지는 69면 어디에도 없습니다.</b> 계약 전 검증이 불가능한 한도입니다.</p></div>
-    <div class="ask" style="flex:1"><span class="tag">개선요구</span>① "사양선택 품목"을 <b>한정 열거</b>로 축소하거나 옵션 총액에 대한 <b>별도 이행보증</b> 확보 · 금액 병기 ② <b>신탁재산 현금 잔액과 기준일 서면 고지</b> ③ 하자담보책임에 대한 <b>시공사 연대보증 확약서</b>를 계약서에 첨부.</div>
+  <div class="eyebrow">FINDING 04 · 가격 형평 · 자격</div>
+  <h1>작은 집이 더 비싸고, <u>자격은 있는데 자리가 없습니다</u></h1>
+  <div class="three">
+    <div class="bx">
+      <h3>84B — 가장 작은데 가장 비쌉니다 (6↔7면)</h3>
+      <div class="cmp">
+        <div class="cc r"><b>84B · 174.73㎡</b><small>3층 671,000,000원</small></div>
+        <div class="cc"><b>84D · 177.97㎡</b><small>3층 658,000,000원</small></div>
+      </div>
+      <p>계약면적이 3.24㎡ 작은 84B가 오히려 1,300만원 비쌉니다. ㎡당 3,840,000원 vs 3,697,000원 — 3.9% 차이인데, 향·조망 등 차등 근거는 공고문 어디에도 없습니다.</p>
+      <div class="quote" style="margin-top:12px">산정 근거 서면 공개를 요구할 수 있는 지점입니다.</div>
+    </div>
+    <div class="bx">
+      <h3>9인 이상 가구 각주 누락 (14·18면)</h3>
+      <div class="big">월 472,926원</div>
+      <p>8인 초과 가구는 1인마다 배율을 더하는 각주가 있어야 하는데 표에서 빠졌습니다. 다자녀 가구가 <b>자기 소득기준을 낮게 계산해 자격을 스스로 포기</b>할 수 있는 크기입니다.</p>
+      <div class="quote" style="margin-top:12px">정정공고와 재산정 기회 부여를 요구합니다.</div>
+    </div>
+    <div class="bx">
+      <h3>장애인·철거주택 소유자 (9·11면)</h3>
+      <div class="big">배정 0세대</div>
+      <p>추천기관 3곳(울산·부산·경남 장애인복지과)까지 지정해 두었지만, 기관추천 54세대는 다른 7개 항목이 <b>정확히 전부 소진</b>합니다. 10+7+6+10+10+7+4 = 54. 신청 창구만 열려 있습니다.</p>
+      <div class="quote" style="margin-top:12px">실제 배정 세대수와 산정 근거 공개를 요구합니다.</div>
+    </div>
   </div>
 </div>
 """, "07")
 
-# ── 08 마감·옵션
+# ── 08 옵션 봉쇄·모순
 page("s08", """
 <style>
 .chain{display:flex;align-items:stretch;gap:12px;margin-top:22px}
@@ -324,16 +335,16 @@ page("s08", """
 .node small{font-size:13.5px;color:#5B6673;font-weight:700;line-height:1.45}
 .node.end{background:#C0392B;border-color:#C0392B}
 .node.end b,.node.end small{color:#fff}
-.arw{font-size:24px;color:#B9C4D2;font-weight:800;align-self:center}
-.tri{display:flex;gap:14px;margin-top:18px;flex:1}
-.tri .p{flex:1;background:#F6F9FC;border:1.5px solid #E1E7EE;border-radius:14px;padding:16px 18px}
-.tri .p b{display:block;font-size:15.5px;font-weight:800;color:#0F2548;margin-bottom:5px}
-.tri .p small{font-size:13.5px;color:#5B6673;font-weight:700;line-height:1.5}
-.tri .p.x{background:#FDF3F2;border-color:#F0C6C0}.tri .p.x b{color:#C0392B}
+.arw{font-size:22px;color:#B9C4D2;font-weight:800;align-self:center}
+.duo{display:flex;gap:16px;margin-top:18px;flex:1}
+.p2{flex:1;background:#FDF3F2;border:1.5px solid #F0C6C0;border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;justify-content:center}
+.p2 h3{font-size:18px;font-weight:800;color:#C0392B;margin-bottom:8px}
+.p2 p{font-size:14px;color:#43525F;font-weight:700;line-height:1.6}
+.p2.g{background:#F6F9FC;border-color:#E1E7EE}.p2.g h3{color:#0F2548}
 </style>
 <div class="pad">
-  <div class="eyebrow">FINDING 05 · 마감재 · 옵션</div>
-  <h1>에어컨은 <em>고르든 안 고르든</em> 한쪽이 막힙니다</h1>
+  <div class="eyebrow">FINDING 05 · 옵션 · 문서 효력</div>
+  <h1>에어컨은 <em>고르든 안 고르든</em> 한쪽이 막히고,<br>문서 효력은 <u>세 번 뒤집힙니다</u></h1>
   <div class="chain">
     <div class="node"><b>추가선택 품목의 전제</b><small>"발코니 확장옵션을 선택한<br>세대에 한하여" (42·43·46면)</small></div>
     <div class="arw">→</div>
@@ -341,55 +352,47 @@ page("s08", """
     <div class="arw">또는</div>
     <div class="node end"><b>시스템에어컨 선택</b><small>"기본제공 냉매매립배관 제외 …<br>스탠드형·벽걸이형 추가 설치 불가"</small></div>
   </div>
-  <div class="tri">
-    <div class="p x"><b>엔지니어드스톤 "하자와 무관" (56면)</b><small>이음부 노출 · 스크래치 · 컬러·패턴 상이 — 세 가지를 미리 하자에서 뺐습니다. 44면 마감재표와 61면 유상 스타일업 옵션에 모두 쓰이는 자재입니다.</small></div>
-    <div class="p x"><b>홍보물 우선? 계약서 우선? (57↔68↔69면)</b><small>같은 공고문에서 우선순위가 세 번 뒤집힙니다. 카탈로그를 믿고 계약해도 분쟁 시 청구 근거가 사라질 수 있습니다.</small></div>
-    <div class="p"><b>돈 더 내면 거실이 좁아집니다 (61면)</b><small>유상 아트월을 고르면 실사용 내폭이 줄어드는데, 줄어드는 두께(mm)는 알려주지 않습니다.</small></div>
-    <div class="p"><b>옵션 가전은 B2B 전용모델 (61면)</b><small>비스포크·오브제 이름은 같아도 내부 스펙이 다를 수 있다고만 하고, 무엇이 다른지는 밝히지 않습니다.</small></div>
+  <div class="duo">
+    <div class="p2"><h3>홍보물 우선? 계약서 우선? (57 ↔ 68 ↔ 69면)</h3>
+      <p>57면은 "분양 홍보물을 우선기준으로 함", 68면은 "별도의 확약 등을 근거로 권리를 주장할 수 없음", 69면은 "분양계약서를 우선합니다". 같은 공고문 안에서 우선순위가 세 번 뒤집힙니다. 카탈로그를 믿고 계약해도 분쟁 시 청구 근거가 사라질 수 있는 구조 — <b>우선순위 단일화 재고지를 요구합니다.</b></p></div>
+    <div class="p2 g"><h3>총 주차대수 — 69면 어디에도 없음</h3>
+      <p>634세대 + 오피스텔 + 근생 복합 단지인데 총 주차대수가 전 69면에 없습니다. '주차대수'라는 단어는 53면 기둥 간섭 안내에 한 번 나올 뿐입니다. 세대당 주차대수를 계산할 수 없으니, <b>주거·오피스텔·근생 구분 주차대수를 공고 정정으로 요구합니다.</b></p></div>
   </div>
-  <div class="ask" style="margin-top:18px"><span class="tag">개선요구</span>추가선택 품목의 <b>발코니 확장 종속 조건 해제</b>, 시스템에어컨 선택 여부와 무관한 <b>전 실 냉매 매립배관 기본 시공</b>, 엔지니어드스톤 <b>포괄 면책문구 삭제 또는 허용오차 수치 특정</b>, 홍보물·계약서 <b>우선순위 단일화 재고지</b>, 옵션 <b>산출내역서 교부</b>.</div>
 </div>
 """, "08")
 
-# ── 09 절차·자격
+# ── 09 승강기·오피스텔
 page("s09", """
 <style>
-.cal{display:flex;gap:6px;margin-top:8px}
-.d{flex:1;text-align:center;border:1.5px solid #E1E7EE;border-radius:9px;padding:9px 0;font-size:13px;font-weight:800;color:#5B6673;background:#fff}
-.d.x{background:#EEF2F7;color:#B9C4D2}
-.d.o{background:#C0392B;color:#fff;border-color:#C0392B}
-.three{display:flex;gap:16px;margin-top:22px;flex:1}
-.bx{flex:1;background:#fff;border:1.5px solid #E1E7EE;border-radius:14px;padding:24px 22px;display:flex;flex-direction:column;justify-content:center}
-.bx h3{font-size:19px;font-weight:800;color:#0F2548;letter-spacing:-.5px;margin-bottom:10px}
-.bx .big{font-size:38px;font-weight:800;color:#C0392B;letter-spacing:-1.5px;line-height:1;margin-bottom:8px}
-.bx p{font-size:14px;color:#5B6673;font-weight:700;line-height:1.55}
+.duo{display:flex;gap:20px;margin-top:22px;flex:1}
+.half{flex:1;background:#fff;border:1.5px solid #E1E7EE;border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;justify-content:center}
+.half h3{font-size:20px;font-weight:800;color:#0F2548;letter-spacing:-.5px;margin-bottom:12px}
+.ev{display:flex;gap:10px;margin-bottom:14px}
+.ev .e{flex:1;border:1.5px solid #E1E7EE;border-radius:11px;padding:14px;text-align:center}
+.ev .e b{display:block;font-size:30px;font-weight:800;color:#0F2548;letter-spacing:-1px}
+.ev .e small{font-size:12px;color:#5B6673;font-weight:700}
+.ev .e.r{border-color:#F0C6C0;background:#FDF6F5}.ev .e.r b{color:#C0392B}
+.half p{font-size:14.5px;color:#43525F;font-weight:700;line-height:1.6}
 </style>
 <div class="pad">
-  <div class="eyebrow">FINDING 06 · 절차 · 자격</div>
-  <h1>"7일 이상"이라 적고, <u>상한은 "계약 체결 이전"</u>으로 잘랐습니다</h1>
-  <div class="three">
-    <div class="bx">
-      <h3>부적격 소명기간 (4면 ↔ 25면)</h3>
-      <div class="cal">
-        <div class="d o">11.21</div><div class="d x">발표</div><div class="d o">↓</div><div class="d o">12.3</div><div class="d o">12.4</div><div class="d o">12.5</div><div class="d x">종료</div>
+  <div class="eyebrow">FINDING 06 · 103동 구조</div>
+  <h1>103동은 <em>승강기가 1대 적고</em>,<br>옆의 2대는 <u>쓸 수 없습니다</u></h1>
+  <div class="duo">
+    <div class="half">
+      <h3>승강기 대수 (50 ↔ 53면)</h3>
+      <div class="ev">
+        <div class="e"><b>5대</b><small>101동 · 102동<br>(비상용·피난용 포함)</small></div>
+        <div class="e r"><b>4대</b><small>103동 아파트<br>(비상용·피난용 포함)</small></div>
+        <div class="e r"><b>+2대</b><small>오피스텔 전용<br>— 아파트는 사용 불가</small></div>
       </div>
-      <p style="margin-top:12px">4면은 "통보를 받은 날부터 7일 이상"이라 하고, 25면은 그 상한을 <b style="color:#C0392B">"계약 체결 이전"</b>으로 자릅니다. 통보가 며칠만 늦으면 7일은 물리적으로 남지 않습니다.</p>
-      <div class="quote" style="margin-top:18px">기간의 길이를 사업주체의 통보 시점이 결정합니다.</div>
+      <p>50면: "103동 오피스텔은 공동주택과 코어가 분리되어 있어서 지하를 포함한 모든 층에서 EV홀이나 로비를 따로 쓰게" — 눈앞의 2대를 쓸 수 없다고 공고문이 직접 적었습니다. 그런데 103동은 21·22층 설비 동거 세대까지 있는 동입니다. <b>세대수 대비 승강기 산정 근거(주택건설기준 제15조) 서면 제시를 요구합니다.</b></p>
     </div>
-    <div class="bx">
-      <h3>9인 이상 가구 소득기준 (14 · 18면)</h3>
-      <div class="big">월 472,926원</div>
-      <p>8인 초과 가구는 1인마다 배율을 더하는 각주가 있어야 하는데 표에서 빠졌습니다. 다자녀 가구가 <b>자기 소득기준을 낮게 계산해 자격을 스스로 포기</b>할 수 있는 크기입니다.</p>
-      <div class="quote" style="margin-top:18px">누락된 각주 한 줄이 한 가구의 청약 기회를 지웁니다.</div>
-    </div>
-    <div class="bx">
-      <h3>장애인 · 철거주택 소유자 (9 · 11면)</h3>
-      <div class="big">배정 0세대</div>
-      <p>추천기관(3개 시·도 장애인복지과)까지 지정해 두었지만, 기관추천 54세대는 다른 7개 항목이 <b>정확히 전부 소진</b>합니다. 신청 창구만 열려 있고 당첨 가능성은 처음부터 0입니다.</p>
-      <div class="quote" style="margin-top:18px">10+7+6+10+10+7+4 = 54세대. 남는 자리가 없습니다.</div>
+    <div class="half">
+      <h3>오피스텔 혼합의 비대칭 (50 · 52면)</h3>
+      <p style="margin-bottom:12px">오피스텔은 커뮤니티 중 <b>비지니스라운지 하나만</b> 쓰는데, 그 라운지가 103동 2층에 있어 <b>103동 아파트 저층세대가 소음을 받습니다.</b> 이용은 못 하고 영향만 받는 구조입니다.</p>
+      <p>여기에 주거·오피스텔·근생 간 <b>공용부 관리비 배분과 입주자대표회의 의결권 구조</b>는 69면 어디에도 없습니다. 입주 후 분쟁 1순위 항목이 비어 있습니다 — <b>관리규약 초안 사전 공개를 요구합니다.</b></p>
     </div>
   </div>
-  <div class="ask" style="margin-top:20px"><span class="tag">개선요구</span>소명기간 하한을 <b>"통보일로부터 영업일 7일 이상"</b>으로 명확히 하고 그 기간 확보를 위해 개별 계약일을 연기할 수 있음을 공고에 명시, 9인 이상 가구 산정 각주 <b>정정공고 및 재산정 기회 부여</b>, 장애인·철거주택 소유자 <b>실제 배정 세대수와 산정 근거 서면 공개</b>.</div>
 </div>
 """, "09")
 
@@ -411,7 +414,7 @@ page("s10", """
   <div class="eyebrow">WHAT WE DO NEXT</div>
   <h1>검토는 시작입니다. <u>입주까지 같은 자료로 이어갑니다</u></h1>
   <div class="rm">
-    <div class="st now"><div class="no">01</div><b>공고문 전수 통독</b><small>69면 5개 구간 병렬 통독<br>발견 31건 · 즉시 시정 7건<br><b style="color:#FFD479">완료</b></small></div>
+    <div class="st now"><div class="no">01</div><b>공고문 전수 통독</b><small>69면 5개 구간 병렬 통독<br>단지 고유 발견 13건 · 치명 3건<br><b style="color:#FFD479">완료</b></small></div>
     <div class="st"><div class="no">02</div><b>개선요구서 제출</b><small>협의회 명의 공문 작성<br>사업주체·시공사·감리 동시 발송</small></div>
     <div class="st"><div class="no">03</div><b>회신 관리 · 협의</b><small>항목별 회신 대장 운영<br>미회신·형식회신 재요구</small></div>
     <div class="st"><div class="no">04</div><b>사전점검 체크리스트</b><small>발견 항목을 세대별 점검표로<br>21~22층 · 저층부 별도 항목</small></div>
@@ -419,7 +422,7 @@ page("s10", """
   </div>
   <div class="close">
     <b>"공고문에 다 적혀 있었다"는 말을, 입주 후가 아니라 지금 듣게 해드립니다.</b>
-    <p>이번 검토에서 나온 31건은 모두 <b>공고문 원문에 근거</b>합니다. 새로 만들어낸 문제가 아니라, 한 면만 보아서는 보이지 않던 것을 서로 겹쳐 꺼낸 것입니다.
+    <p>이번 검토의 13건은 모두 <b>공고문 원문에 근거</b>하며, 어느 아파트에나 있는 상투 항목은 처음부터 뺐습니다. 남은 것은 이 단지에서만 나오는 문제들입니다.
     법무법인 제이엘은 634세대 전 호수를 같은 방식으로 검토하고, 그 결과를 사전점검과 하자 대응까지 하나의 자료로 연결합니다.</p>
   </div>
 </div>

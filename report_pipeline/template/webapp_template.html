@@ -13,9 +13,9 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
 body{overflow-x:hidden}
-p,h1,h2,h3,h4,td,th,div{overflow-wrap:anywhere;word-break:keep-all}
+p,h1,h2,h3,h4,td,th,div,li,span{word-break:keep-all;overflow-wrap:break-word;line-break:strict}
 body{font-family:"S-Core Dream","NanumSquare","Pretendard","Malgun Gothic","Apple SD Gothic Neo",sans-serif;
-  color:var(--ink);background:var(--bg);line-height:1.55;font-size:15px;-webkit-text-size-adjust:100%}
+  color:var(--ink);background:var(--bg);line-height:1.65;font-size:15px;letter-spacing:-.01em;-webkit-text-size-adjust:100%}
 a{color:inherit;text-decoration:none}
 .wrap{max-width:1240px;margin:0 auto;padding:0 20px}
 
@@ -84,8 +84,8 @@ section{padding:40px 0 8px}
 .pill.pg{background:#F1F4F8;color:var(--sub)}
 .c-title{font-size:17px;font-weight:800;color:var(--navy);letter-spacing:-.5px;line-height:1.35;margin-bottom:9px}
 .c-quote{font-size:12.5px;color:var(--sub);background:#F7F9FC;border-left:3px solid var(--line);
-  padding:8px 11px;border-radius:0 7px 7px 0;margin-bottom:10px;font-weight:600}
-.c-body{font-size:13.5px;color:#31404F;line-height:1.62;margin-bottom:11px}
+  padding:8px 11px;border-radius:0 7px 7px 0;margin-bottom:10px;font-weight:600;line-height:1.6}
+.c-body{font-size:13.5px;color:#31404F;line-height:1.7;margin-bottom:11px}
 .c-quant{background:#0F2548;color:#fff;border-radius:9px;padding:10px 12px;font-size:12.5px;
   font-weight:700;line-height:1.5;margin-bottom:11px}
 .c-quant b{color:#FFD479}
@@ -192,10 +192,32 @@ footer .r{font-size:12px;color:#8FA3C0;text-align:right}
   .card{padding:15px}
 }
 @media print{
-  .topbar,.tb-dl,.filters,#dlsec{display:none!important}
-  body{background:#fff}
-  .card,.vbox{break-inside:avoid;box-shadow:none}
-  .hero{background:#0F2548!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{size:A4 portrait;margin:11mm 10mm}
+  html,body{width:auto}
+  .topbar,.tb-dl,.filters,#dlsec,.scrollhint{display:none!important}
+  body{background:#fff;font-size:10.5pt;line-height:1.6}
+  .wrap{max-width:100%;padding:0}
+  section{padding:14pt 0 4pt;break-inside:auto}
+  .s-head{margin-bottom:8pt}
+  .hero{background:#0F2548!important;padding:16pt 12pt 0;border-radius:6pt}
+  .hero .wrap{padding:0 8pt}
+  .h-title{font-size:20pt}
+  .h-stats{grid-template-columns:repeat(5,1fr);gap:5pt;padding-bottom:12pt}
+  .h-stat{padding:6pt 7pt}
+  .h-stat b{font-size:13pt}
+  .h-stat span{font-size:6.5pt}
+  .cov{border-radius:0 0 6pt 6pt;padding:8pt 12pt 10pt;margin-bottom:6pt}
+  .grid{grid-template-columns:1fr 1fr;gap:8pt}
+  .viz{grid-template-columns:1fr;gap:8pt}
+  .bldgs{grid-template-columns:1fr;gap:8pt}
+  .card,.vbox,.bldg,.common,.fw,.tbl,.dl{break-inside:avoid;box-shadow:none;page-break-inside:avoid}
+  .card{padding:9pt 10pt}
+  .c-title{font-size:11pt}
+  .c-body,.c-quote,.c-quant,.c-ask{font-size:8.5pt}
+  .tbl{min-width:0;font-size:8.5pt}
+  .tbl th,.tbl td{padding:4pt 5pt}
+  .scrollx{overflow:visible}
+  footer{border-radius:6pt;margin-top:14pt;padding:12pt}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style>
@@ -217,13 +239,13 @@ footer .r{font-size:12px;color:#8FA3C0;text-align:right}
   <div class="wrap">
     <span class="h-tag">입주자모집공고 69면 전수 통독 · 병렬 5개 구간</span>
     <h1 class="h-title">번영로 롯데캐슬 센트럴스카이<br><em>공고문이 이미 말하고 있는</em> 것들</h1>
-    <p class="h-sub">634세대 · 울산 중구 학산동 167-4 일원 · 관리형 토지신탁 구조. 공고문 69면을 처음부터 끝까지 읽고, 서로 다른 면의 표를 겹쳐 확인한 결과입니다.</p>
+    <p class="h-sub">634세대 · 울산 중구 학산동 167-4 일원 · 관리형 토지신탁 구조. 공고문 69면을 처음부터 끝까지 읽고, 여러 아파트 공통의 상투 항목을 걷어낸 뒤 이 단지에만 있는 문제를 모은 결과입니다.</p>
     <div class="h-stats">
       <div class="h-stat"><b>69<small style="font-size:.5em">면</small></b><span>전수 통독 완료</span></div>
       <div class="h-stat"><b class="r">__NF__<small style="font-size:.5em">건</small></b><span>발견 항목</span></div>
       <div class="h-stat"><b class="r">__NCRIT__<small style="font-size:.5em">건</small></b><span>치명 등급</span></div>
       <div class="h-stat"><b class="y">396<small style="font-size:.5em">세대</small></b><span>21층↑ 진입창 없음 (62.5%)</span></div>
-      <div class="h-stat"><b class="y">231.9<small style="font-size:.5em">억</small></b><span>보증 밖 발코니 확장금액</span></div>
+      <div class="h-stat"><b class="y">4<small style="font-size:.5em">대</small></b><span>103동 승강기 — 1대 적음</span></div>
     </div>
   </div>
 </div>
@@ -247,11 +269,11 @@ footer .r{font-size:12px;color:#8FA3C0;text-align:right}
     <thead><tr><th>쟁점</th><th>근거 면</th><th>공고문이 말한 것</th><th>겹쳐 보면</th><th>정량</th></tr></thead>
     <tbody>
       <tr><td><b>설비층 동거인데 감액 없음</b></td><td class="n">7 ↔ 52</td><td>103동 21층 소화수조·22층 제연휀룸</td><td>가격표가 21~30층을 한 밴드로 묶음</td><td class="n red">8세대 1억 1,400만</td></tr>
-      <tr><td><b>택배차량 통로높이 충돌</b></td><td class="n">53 ↔ 64</td><td>택배차량 운행층 2.7m / 2.3m</td><td>일반 통로 2.3m는 동일 — 택배층만 다름</td><td class="n red">0.4m</td></tr>
-      <tr><td><b>보증 밖 확장금액</b></td><td class="n">40 ↔ 66</td><td>확장금액을 별도 계좌로 수납</td><td>그 전액이 HUG 보증 대상에서 제외</td><td class="n red">231억 9,276만</td></tr>
-      <tr><td><b>매도인 책임 한도</b></td><td class="n">68</td><td>신탁재산(현금) 한도</td><td>그 잔액은 69면 어디에도 없음</td><td class="n">검증 불가</td></tr>
       <tr><td><b>고층부 피난</b></td><td class="n">50 · 52</td><td>"각동 20층이하는 … 소방관진입창"</td><td>21층 이상 396세대는 그 문장에 없음</td><td class="n red">396세대·62.5%</td></tr>
-      <tr><td><b>소명기간</b></td><td class="n">4 ↔ 25</td><td>"통보받은 날부터 7일 이상"</td><td>상한이 "계약 체결 이전" — 통보 늦으면 소멸</td><td class="n red">하한 없음</td></tr>
+      <tr><td><b>가격 역전</b></td><td class="n">6 ↔ 7</td><td>84B 계약면적 174.73㎡ — 최소</td><td>가장 넓은 84D보다 비쌈, 근거 미제시</td><td class="n red">+1,300만</td></tr>
+      <tr><td><b>승강기</b></td><td class="n">50 ↔ 53</td><td>101·102동 5대 / 103동 아파트 4대</td><td>오피스텔 2대는 코어 분리로 사용 불가</td><td class="n red">1대 부족</td></tr>
+      <tr><td><b>자격·배정</b></td><td class="n">9 ↔ 11</td><td>장애인 추천기관 3곳 지정</td><td>기관추천 54세대 전부 소진 — 배정 없음</td><td class="n red">0세대</td></tr>
+      <tr><td><b>공백</b></td><td class="n">전면</td><td>총 주차대수</td><td>69면 어디에도 없음 — 세대당 산출 불가</td><td class="n red">미기재</td></tr>
     </tbody>
   </table>
   </div>
@@ -351,26 +373,29 @@ footer .r{font-size:12px;color:#8FA3C0;text-align:right}
     </div>
 
     <div class="vbox">
-      <h4>돈은 받되 보증은 없는 구간</h4>
-      <p class="sub">공고문 40면(확장금액 별도 수납) ↔ 66면(HUG 보증 제외) 대조</p>
-      <svg viewBox="0 0 460 250" role="img" aria-label="보증 범위 비교">
+      <h4>승강기 — 103동만 다릅니다</h4>
+      <p class="sub">공고문 50면(코어 분리) ↔ 53면(대수) 대조</p>
+      <svg viewBox="0 0 460 250" role="img" aria-label="승강기 비교">
         <rect x="0" y="0" width="460" height="250" fill="#fff"/>
-        <text x="24" y="30" font-size="11.5" font-weight="800" fill="#0F2548">HUG 분양보증 (65면)</text>
-        <rect x="24" y="40" width="330" height="34" fill="#3E6CB5" rx="5"/>
-        <text x="189" y="62" text-anchor="middle" fill="#fff" font-size="12.5" font-weight="800">3,014억 5,570만원 — 기본 분양대금</text>
-        <text x="24" y="108" font-size="11.5" font-weight="800" fill="#C0392B">보증 대상에서 빠지는 금액 (66면)</text>
-        <rect x="24" y="118" width="112" height="34" fill="#C0392B" rx="5"/>
-        <text x="80" y="140" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="800">231.9억</text>
-        <text x="146" y="133" font-size="11" font-weight="700" fill="#5B6673">발코니 확장금액 23,192,760,000원 (40면)</text>
-        <text x="146" y="147" font-size="10.5" font-weight="700" fill="#C0392B">+ "그 밖의 마감재공사" (범위 무한 확장)</text>
-        <line x1="24" y1="172" x2="436" y2="172" stroke="#E1E7EE"/>
-        <text x="24" y="196" font-size="11.5" font-weight="800" fill="#0F2548">여기에 더해</text>
-        <rect x="24" y="206" width="196" height="30" fill="#0F2548" rx="5"/>
-        <text x="122" y="225" text-anchor="middle" fill="#fff" font-size="11" font-weight="800">매도인 책임 = 신탁 현금 한도(68면)</text>
-        <rect x="228" y="206" width="208" height="30" fill="#B7791F" rx="5"/>
-        <text x="332" y="225" text-anchor="middle" fill="#fff" font-size="11" font-weight="800">그 잔액은 69면 어디에도 없음</text>
+        <g font-weight="800" text-anchor="middle">
+          <rect x="24" y="34" width="126" height="130" rx="10" fill="#EDF2F9" stroke="#C9D6E8" stroke-width="1.5"/>
+          <text x="87" y="60" font-size="13" fill="#0F2548">101동</text>
+          <text x="87" y="112" font-size="40" fill="#0F2548">5대</text>
+          <text x="87" y="140" font-size="10.5" fill="#5B6673">비상용·피난용 포함</text>
+          <rect x="166" y="34" width="126" height="130" rx="10" fill="#EDF2F9" stroke="#C9D6E8" stroke-width="1.5"/>
+          <text x="229" y="60" font-size="13" fill="#0F2548">102동</text>
+          <text x="229" y="112" font-size="40" fill="#0F2548">5대</text>
+          <text x="229" y="140" font-size="10.5" fill="#5B6673">비상용·피난용 포함</text>
+          <rect x="308" y="34" width="126" height="130" rx="10" fill="#FDF2F1" stroke="#E8B4AE" stroke-width="2"/>
+          <text x="371" y="60" font-size="13" fill="#C0392B">103동 아파트</text>
+          <text x="371" y="112" font-size="40" fill="#C0392B">4대</text>
+          <text x="371" y="140" font-size="10.5" fill="#C0392B">+오피스텔 2대는 사용 불가</text>
+        </g>
+        <rect x="24" y="182" width="410" height="46" rx="8" fill="#0F2548"/>
+        <text x="229" y="202" font-size="11" font-weight="800" fill="#FFD479" text-anchor="middle">"모든 층에서 EV홀이나 로비를 따로 쓰게 되어있으며" — 50면</text>
+        <text x="229" y="219" font-size="10.5" font-weight="700" fill="#B9C8DE" text-anchor="middle">103동은 21·22층 설비 동거 세대까지 있는 동입니다</text>
       </svg>
-      <div class="legend"><span><i style="background:#3E6CB5"></i>보증 대상</span><span><i style="background:#C0392B"></i>보증 제외</span><span><i style="background:#0F2548"></i>책임 제한</span></div>
+      <div class="legend"><span><i style="background:#3E6CB5"></i>101·102동</span><span><i style="background:#C0392B"></i>103동 아파트</span></div>
     </div>
 
     <div class="vbox">
@@ -438,17 +463,17 @@ footer .r{font-size:12px;color:#8FA3C0;text-align:right}
 
 <section id="method">
   <div class="s-head"><span class="s-num">06</span><h2 class="s-title">이렇게 검토했습니다</h2>
-    <p class="s-desc">키워드 검색이 아니라 전면 통독입니다. 못 읽은 면은 못 읽었다고 적습니다.</p></div>
+    <p class="s-desc">상투 항목은 처음부터 배제, 전면 통독입니다. 못 읽은 면은 못 읽었다고 적습니다.</p></div>
   <div class="grid">
     <div class="card"><div class="c-top"><span class="pill lv">01</span></div>
       <div class="c-title">69면을 5개 구간으로 나눠 동시 통독</div>
       <div class="c-body">1-14 / 15-28 / 29-42 / 43-56 / 57-69면을 각각 별도 검토자가 처음부터 끝까지 읽습니다. 키워드로 훑고 "전수 검토"라고 쓰지 않습니다.</div></div>
     <div class="card"><div class="c-top"><span class="pill lv">02</span></div>
       <div class="c-title">서로 다른 면의 표를 겹칩니다</div>
-      <div class="c-body">7면 층별가격표 × 52면 설비층 고지, 53면 택배차량 통로높이 × 64면, 40면 확장금액 × 66면 보증제외 — 한 면만 보면 보이지 않는 것이 여기서 나옵니다.</div></div>
+      <div class="c-body">7면 층별가격표 × 52면 설비층 고지, 6면 면적표 × 7면 가격표, 9면 배정표 × 11면 추천기관 — 한 면만 보면 보이지 않는 것이 여기서 나옵니다.</div></div>
     <div class="card"><div class="c-top"><span class="pill lv">03</span></div>
-      <div class="c-title">비율은 원(₩)으로, 기간은 달력 일수로 환산</div>
-      <div class="c-body">"중도금 60%"가 아니라 "세대당 5억 3,820만원", "발코니 확장 유상"이 아니라 "전 세대 합계 231억 9,276만원"으로 바꿔 제시합니다.</div></div>
+      <div class="c-title">상투 항목은 처음부터 배제합니다</div>
+      <div class="c-body">주차 층고·내진 법정등급·표준약관 문구처럼 어느 아파트에나 똑같이 있는 것은 문제로 취급하지 않고 처음부터 뺍니다. 남는 것이 이 단지의 진짜 문제입니다.</div></div>
     <div class="card"><div class="c-top"><span class="pill lv">04</span></div>
       <div class="c-title">있어야 할 정보의 공백을 지적합니다</div>
       <div class="c-body">총 주차대수, 신탁재산 잔액, 실외기 영향 호수 — 이 셋은 69면 어디에도 없습니다. 적혀 있지 않은 것이 적혀 있는 것보다 중요할 때가 있습니다.</div></div>
@@ -487,7 +512,7 @@ const DATA = __DATA__;
 const MATRIX = __MATRIX__;
 const ALL = DATA.categories.flatMap(c => c.findings.map(f => ({...f, cat:c.title, catKey:c.key, color:c.color})));
 // 개선요구 문안은 샘플 2건만 공개 (나머지는 자문 계약 시 제공)
-const SAMPLE_OPEN = ['U1','S1'];
+const SAMPLE_OPEN = ['U1','U2'];
 ALL.forEach(f => { f.open = SAMPLE_OPEN.includes(f.id); });
 
 // 커버리지 셀
