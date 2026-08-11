@@ -226,9 +226,11 @@ table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
   </div>
 </div>
 
-<script src="data.js?v=20260811c"></script>
+<script src="keys.js"></script>
+<script src="data.js?v=20260811e"></script>
 <script>
-const KAKAO_KEY="6dd941689e3c39956d9ba809f127c947";
+const _K = window.AVM_KEYS || {};
+const KAKAO_KEY = _K.KAKAO_JS || "6dd941689e3c39956d9ba809f127c947";
 let map=null, ovs=[], selNm=null, filter="all", cur=null;
 // hasT=1 : 자체 실거래 보유 / hasT=0 : 거래 0건 -> 인근 유사단지 비준
 const C=COMPLEX_DATA.map((c,i)=>({...c, id:"x"+i, rare:!c.hasT||c.n<20}));
@@ -318,17 +320,11 @@ function statusBadge(x){
 }
 // 실시간 정밀조사 — 유저 제안(2026-08-06): 4,860개 전체를 배치로 미리 돌리는 대신,
 // 사용자가 특정 단지를 "클릭하는 순간" 카카오 로컬 API로 그 단지만 실시간 조사한다.
-// ⚠️ 2026-08-11 정정: 아래 주석의 전제가 틀렸었다.
-//   기존 주석: "사내 전용(외부 미배포)이라 클라이언트에 노출해도 되는 수준 —
-//   keys.public.txt에 이미 커밋된 공개데이터 키와 동일한 원칙"
-//   실제로는 이 리포가 public이고 해당 커밋이 origin에 푸시돼 있어 키 값을
-//   그대로 되받을 수 있는 상태였다. REST 키는 JS 키와 달리 도메인 화이트리스트
-//   대상이 아니고 브라우저에서는 IP 제한도 못 걸어서 아무 제한을 둘 수 없다.
-//   조치: keys.public.txt 추적 해제 + .gitignore 추가.
-//   ⚠️ 남은 조치(사용자): 이 키를 카카오 개발자콘솔에서 재발급할 것.
-//      git 이력에 남아 있으므로 파일을 지워도 과거 커밋에서 복구된다.
-//      재발급 후 아래 상수를 지우고 서버 프록시나 빌드시 주입으로 바꿀 것.
-const KAKAO_REST = "05e389f436950940951c2df266c6ec1d";
+// 키는 keys.js(gitignore 대상)에서 읽는다. 예전에는 여기에 직접 박혀 있었고
+// 리포가 public이라 그대로 노출됐다. 아래 상수는 keys.js가 없을 때의 폴백이며,
+// ⚠️ 이 키들은 이미 노출됐으므로 재발급이 필요하다(카카오 개발자콘솔·data.go.kr).
+const KAKAO_REST = _K.KAKAO_REST || "05e389f436950940951c2df266c6ec1d";
+const DATA_GO_KR = _K.DATA_GO_KR || "";
 const LIVE_CATS = [
   {code:"SW8", label:"지하철역", radius:1200},
   {code:"SC4", label:"학교", radius:1000},
@@ -573,26 +569,176 @@ qi.oninput=()=>{
 document.addEventListener("click",e=>{ if(!sg.contains(e.target)&&e.target!==qi) sg.classList.remove("on"); });
 function doSearch(){ const v=qi.value.trim(); const h=C.find(c=>c.nm.includes(v)); if(h)pick(h.id); }
 
+/* ---------- 클릭 시점 실측 감정 (live appraisal) ----------
+   유저 지시: "아파트 클릭 후 그때부터 감정툴 적용".
+
+   배치로 27,000개를 미리 다 조사하는 대신, 사용자가 실제로 보는 단지 하나만
+   그 자리에서 공부(公簿)로 확인한다. 배치는 쿼터·시간이 들고 그 사이 데이터가
+   낡지만, 클릭 단위 조회는 항상 최신이고 필요한 만큼만 쓴다.
+
+   여기서 바로잡는 것은 이 앱 오차의 가장 큰 원인인 전용면적이다. 거래0건 단지의
+   areas는 인근 단지에서 복사해온 값이라 "다른 단지 물건을 대상물건으로 표시"하는
+   상태다. 건축물대장 전유공용면적은 대상 단지 자체의 공부상 면적이다.
+
+   ⚠️ 과거 기록 정정: README에 "건축HUB는 대형단지에서 12건만 반환(필지분할 추정)"
+   이라 적혀 있었으나, 실제로는 numOfRows를 크게 줘도 1페이지만 오는 페이징 문제였다.
+   pageNo를 돌리면 totalCount 3,519건·8,046건이 전부 정상 반환되는 것을 확인했다. */
+const LIVE = {};   // 단지키 -> 실측 결과 캐시 (같은 단지 재클릭 시 재조회 안 함)
+const liveKey = c => `${c.nm}|${c.umd}|${c.addr}`;
+
+async function kakaoBcode(addr){
+  const r = await fetch("https://dapi.kakao.com/v2/local/search/address.json?query="+encodeURIComponent(addr),
+    {headers:{Authorization:`KakaoAK ${KAKAO_REST}`}});
+  if(!r.ok) throw new Error("주소조회 HTTP "+r.status);
+  const d = await r.json();
+  const doc = (d.documents||[])[0];
+  if(!doc || !doc.address) throw new Error("법정동코드를 찾지 못함");
+  return doc.address.b_code;
+}
+
+/* 건축물대장 전유공용면적 — 페이징으로 전부 받는다. */
+async function fetchExpos(bcode, addr, onProg){
+  const m = /(\d+)(?:-(\d+))?\s*$/.exec((addr||"").trim());
+  if(!m) throw new Error("주소에서 지번을 읽지 못함");
+  const bun = m[1].padStart(4,"0"), ji = (m[2]||"0").padStart(4,"0");
+  const base = "https://apis.data.go.kr/1613000/BldRgstHubService/getBrExposPubuseAreaInfo"
+             + `?serviceKey=${encodeURIComponent(DATA_GO_KR)}&sigunguCd=${bcode.slice(0,5)}`
+             + `&bjdongCd=${bcode.slice(5)}&bun=${bun}&ji=${ji}&_type=json&numOfRows=100`;
+  let all=[], total=null;
+  for(let page=1; page<=60; page++){
+    const r = await fetch(base+"&pageNo="+page);
+    if(!r.ok) throw new Error("건축물대장 HTTP "+r.status);
+    const b = (await r.json())?.response?.body;
+    if(!b) throw new Error("건축물대장 응답 형식 오류");
+    if(total===null){ total = +(b.totalCount||0); if(!total) throw new Error("대장에 해당 지번 자료 없음"); }
+    let it = b.items?.item || [];
+    if(!Array.isArray(it)) it=[it];
+    all = all.concat(it);
+    if(onProg) onProg(all.length, total);
+    if(!it.length || all.length>=total) break;
+  }
+  return all;
+}
+
+/* ±0.6㎡ 안은 같은 타입으로 묶는다 — 안 묶으면 84.97과 84.98이 다른 평형이 된다. */
+function clusterAreas(vals, tol=0.6){
+  vals = vals.slice().sort((a,b)=>a-b);
+  const cl=[];
+  for(const v of vals){
+    if(cl.length && v-cl[cl.length-1][cl[cl.length-1].length-1] <= tol) cl[cl.length-1].push(v);
+    else cl.push([v]);
+  }
+  return cl.map(g=>({a:+(g.reduce((s,x)=>s+x,0)/g.length).toFixed(2), n:g.length}))
+           .sort((x,y)=>y.n-x.n);
+}
+
+/* 같은 지번에 아파트·오피스텔·근린생활시설이 섞여 있는 주상복합이 많다.
+   용도를 안 걸러내면 상가 12.7㎡가 아파트 평형으로 잡힌다(경희궁의아침4단지에서
+   전유 425건 중 아파트는 120건뿐이고 나머지가 오피스텔 238·근생 37이었다).
+   mainPurpsCdNm이 공부상 용도를 정확히 준다. */
+const HOUSING = /^(아파트|공동주택|연립주택|다세대주택|도시형생활주택)/;
+
+async function liveAppraise(c, onProg){
+  const key = liveKey(c);
+  if(LIVE[key]) return LIVE[key];
+  const say = s => onProg && onProg(s);
+  say("법정동코드 조회 중…");
+  const bcode = await kakaoBcode(c.addr);
+  say("건축물대장 전유면적 조회 중…");
+  const rows = await fetchExpos(bcode, c.addr, (got,tot)=>say(`건축물대장 ${got}/${tot}건 수신…`));
+
+  const expos = rows.filter(x=>String(x.exposPubuseGbCdNm||"").indexOf("전유")>=0);
+  let housing = expos.filter(x=>HOUSING.test(String(x.mainPurpsCdNm||"").trim()));
+  const mix = {};
+  expos.forEach(x=>{const p=String(x.mainPurpsCdNm||"(미상)").trim(); mix[p]=(mix[p]||0)+1;});
+  if(!housing.length) throw new Error("이 지번의 대장에 주거용 전유부가 없음 (용도: "
+      + Object.keys(mix).slice(0,3).join(", ") + ")");
+
+  const areas = housing.map(x=>+x.area).filter(a=>a>0);
+  if(areas.length < 5) throw new Error(`주거용 전유가 ${areas.length}건뿐이라 채택하지 않음`);
+
+  /* K-APT 총세대수와 대조한다. 두 출처가 독립인데 일치하면 이 지번이 대상 단지가
+     맞다는 강한 근거가 되고, 크게 어긋나면 같은 지번의 다른 동을 잡았거나
+     단지가 여러 지번에 걸쳐 있다는 뜻이라 채택하면 안 된다. */
+  let verify = null;
+  if(c.units){
+    const diff = Math.abs(areas.length - c.units) / c.units;
+    verify = {kapt:c.units, ledger:areas.length, diff:+(diff*100).toFixed(1),
+              ok: diff <= 0.05};
+    if(!verify.ok && diff > 0.5)
+      throw new Error(`대장 주거 전유 ${areas.length}세대가 K-APT ${c.units}세대와 크게 어긋남 — 채택 보류`);
+  }
+  const res = {bcode, areas:clusterAreas(areas).slice(0,6), units:areas.length,
+               dongs:new Set(housing.map(x=>x.dongNm).filter(Boolean)).size,
+               mix, verify};
+  LIVE[key] = res;
+  return res;
+}
+
+async function runLiveAppraise(btn){
+  const c = cur, box = document.getElementById("liveAppBox");
+  btn.disabled = true;
+  const prog = s => { box.innerHTML = `<div style="font-size:12.5px;color:var(--gray-700)">${s}</div>`; };
+  try{
+    const r = await liveAppraise(c, prog);
+    // 실측으로 교체한다. 인근 단지에서 빌려온 면적보다 항상 우선한다.
+    c.areas = r.areas.map(a=>({a:a.a, n:0, u:c.unit||0}));
+    c.areaSrc = "bldrgst_live";
+    c.areaN = r.units;
+    c.areaOk = 1;
+    const v = r.verify;
+    box.innerHTML = `<div style="font-size:12.5px;color:var(--pos)">
+      ✓ 건축물대장 실측 반영 — 주거용 전유 ${r.units.toLocaleString()}세대${r.dongs?` · ${r.dongs}개 동`:""},
+      평형 ${r.areas.length}종
+      ${v?`<span style="display:block;color:${v.ok?"var(--pos)":"var(--gold)"}">
+        K-APT 총세대수 ${v.kapt.toLocaleString()}세대와 대조: ${v.ok?"일치":`${v.diff}% 차이 — 단지가 여러 지번에 걸쳐 있을 수 있음`}</span>`:""}
+      ${Object.keys(r.mix).length>1?`<span style="display:block;color:var(--gray-700)">
+        같은 지번 내 다른 용도 제외: ${Object.entries(r.mix).filter(([k])=>!/^(아파트|공동주택|연립주택|다세대주택|도시형생활주택)/.test(k)).map(([k,n])=>`${k} ${n}`).join(" · ")}</span>`:""}
+      </div>`;
+    renderComplex();
+    setTimeout(()=>{const b=document.getElementById("liveAppBox"); if(b)
+      b.innerHTML=`<div style="font-size:12.5px;color:var(--pos)">✓ 이 단지는 건축물대장 실측 평형이 적용된 상태입니다.</div>`;},50);
+  }catch(e){
+    box.innerHTML = `<div style="font-size:12.5px;color:var(--neg)">
+      조회 실패 — ${e.message}<br>
+      <span style="color:var(--gray-700)">실측이 안 되면 인근 단지 차용 평형이 그대로 유지됩니다. 임의로 채우지 않습니다.</span></div>`;
+    btn.disabled = false;
+  }
+}
+
 /* ---------- 단지 선택 ---------- */
 function pick(id){
   cur=C.find(c=>c.id===id); selNm=cur.nm; sg.classList.remove("on");
   if(map){ draw(); map.panTo(new kakao.maps.LatLng(cur.lat,cur.lng)); }
   renderComplex(); document.querySelector(".panel").scrollTop=0;
+  // 거래0건 단지는 평형이 인근 차용이라 오차의 주원인이다. 클릭하는 순간
+  // 자동으로 공부 조회를 걸어 실측으로 바꾼다(실패해도 화면은 그대로 유지).
+  if(!cur.hasT && cur.areaSrc!=="vworld" && cur.areaSrc!=="bldrgst_live" && DATA_GO_KR){
+    const btn=document.getElementById("liveAppBtn");
+    if(btn) runLiveAppraise(btn);
+  }
 }
 
 const BANDS=[["저층","1층 ~ 하위18%"],["중층","18~35%"],["중상층","35~62%"],["고층","62% 이상"]];
+/* 4구간으로 나누므로 최고층이 낮으면 구간이 겹치거나 뒤집힌다. 예전에는 그대로
+   출력해서 "2~0층"·"2~1층" 같은 표기가 445개 단지에서 나왔다. 하한>상한이면
+   그 층대는 존재하지 않는 것이므로 null을 돌려 화면에서 빼버린다. */
 function bandFloors(c){
-  const M=c.maxfl;
-  return [[1,Math.max(1,Math.round(M*.18))],
-          [Math.max(2,Math.round(M*.18)+1),Math.round(M*.35)],
-          [Math.round(M*.35)+1,Math.round(M*.62)],
-          [Math.round(M*.62)+1,M]];
+  const M=+c.maxfl||0;
+  if(M<1) return [null,null,null,null];
+  const raw=[[1,Math.max(1,Math.round(M*.18))],
+             [Math.max(2,Math.round(M*.18)+1),Math.round(M*.35)],
+             [Math.round(M*.35)+1,Math.round(M*.62)],
+             [Math.round(M*.62)+1,M]];
+  return raw.map(b=> (b[0]>b[1]||b[0]<1||b[1]>M) ? null : b);
 }
+const bandLabel = b => b ? `${b[0]}~${b[1]}층` : "해당 없음";
 
 /* 평형 출처를 정직하게 3분기한다. 지금까지 V-World 세대별 공시가격 실측과
    인근 단지에서 그대로 복사해온 값이 화면에서 같은 문구로 뭉뚱그려져 있었다. */
 function areaSrcLabel(c){
-  if(c.areaSrc==="vworld") return `<span style="font-weight:400;color:var(--gray-500);font-size:11px">— 세대별 공시가격 실측${c.areaN?` ${c.areaN.toLocaleString()}세대`:""}</span>`;
+  if(c.areaSrc==="bldrgst_live") return `<span style="font-weight:400;color:var(--pos);font-size:11px">— 건축물대장 실측${c.areaN?` ${c.areaN.toLocaleString()}세대`:""}</span>`;
+  if(c.areaSrc==="vworld") return `<span style="font-weight:400;color:var(--pos);font-size:11px">— 세대별 공시가격 실측${c.areaN?` ${c.areaN.toLocaleString()}세대`:""}</span>`;
   if(c.hasT) return `<span style="font-weight:400;color:var(--gray-500);font-size:11px">— 실거래로 확인된 평형</span>`;
   return `<span style="font-weight:400;color:var(--gold);font-size:11px">— 평형 미확정 (인근 단지 구성 차용)</span>`;
 }
@@ -691,9 +837,14 @@ function renderComplex(){
           ${g.level==="full"?`<td>${(a.u/1e4).toFixed(1)}만</td><td>${eok(a.u*a.a)}</td>`:""}</tr>`).join("")}</tbody>
       </table>`:`<div style="font-size:12.5px;color:var(--gold)">공급 평형이 확정되지 않았습니다.</div>`}
       ${areaMixTable(c)}
-      ${!c.hasT?`<div style="font-size:11px;color:var(--gold);margin-top:6px">
-        ⚠ 위 전용면적은 <b>인근 단지 구성에서 가져온 값</b>이며 대상 단지 실측이 아니다.
-        확정에는 K-APT 단지정보·건축물대장 대조가 필요하다.</div>`:""}
+      ${!c.hasT&&c.areaSrc!=="vworld"&&c.areaSrc!=="bldrgst_live"?`
+        <div style="font-size:11px;color:var(--gold);margin-top:6px">
+          ⚠ 위 전용면적은 <b>인근 단지 구성에서 가져온 값</b>이며 대상 단지 실측이 아니다.</div>
+        <button id="liveAppBtn" class="btn ghost sm noprint" style="margin-top:6px"
+          onclick="runLiveAppraise(this)">🏢 건축물대장으로 실제 평형 조회</button>
+        <div id="liveAppBox" style="margin-top:5px"></div>`:""}
+      ${c.areaSrc==="bldrgst_live"?`<div style="font-size:11px;color:var(--pos);margin-top:6px">
+        ✓ 건축물대장 전유공용면적 <b>실측</b> — 전유 ${(c.areaN||0).toLocaleString()}세대 기준</div>`:""}
     </div>
 
     <div class="sect">
@@ -701,7 +852,7 @@ function renderComplex(){
       <table class="mini">
         <thead><tr><th>층대</th><th>해당 층</th><th>효용비율</th></tr></thead>
         <tbody>${c.fadj.map((f,i)=>`<tr><td>${BANDS[i][0]}</td>
-          <td>${bf[i][0]}~${bf[i][1]}층</td>
+          <td>${bandLabel(bf[i])}</td>
           <td class="${f==null?'':(f>=1?'pos':'neg')}">${f==null?'—':f.toFixed(3)}</td></tr>`).join("")}</tbody>
       </table>
       <div style="font-size:12.5px;color:var(--gray-700);margin-top:6px">
@@ -865,7 +1016,7 @@ function matrix(purp,ltv,opt){
       <h3>평형 · 층대별 예상 감정평가액</h3>
       <table class="mini mx">
         <thead><tr><th>전용면적</th>${BANDS.map((b,i)=>
-          `<th>${b[0]}<span class="sm">${bf[i][0]}~${bf[i][1]}층</span></th>`).join("")}</tr></thead>
+          `<th>${b[0]}<span class="sm">${bandLabel(bf[i])}</span></th>`).join("")}</tr></thead>
         <tbody>${rows}</tbody>
       </table>
       <div class="tipbox">👉 <b>표의 금액을 클릭</b>하면 산정근거·입주민 관점 참고치와 감정평가 보고서로 이동합니다.
@@ -909,7 +1060,7 @@ function detail(area,bi,purp,ltv){
 
   document.getElementById("panel").innerHTML=`
   <div class="phead"><h2>${c.nm}</h2>
-    <div class="addr">전용 ${area.toFixed(2)}㎡ · ${BANDS[bi][0]}(${bf[bi][0]}~${bf[bi][1]}층) · ${purp}${isConv?` · ${opt.lease}`:""}</div></div>
+    <div class="addr">전용 ${area.toFixed(2)}㎡ · ${BANDS[bi][0]}(${bandLabel(bf[bi])}) · ${purp}${isConv?` · ${opt.lease}`:""}</div></div>
   <div class="pbody">
     <div class="resv resv2">
       <div class="rc"><div class="l">일 반 (중위) 추 정</div>
@@ -1028,7 +1179,7 @@ function detail(area,bi,purp,ltv){
           <div class="calc">㎡단가 ${Math.round(r.unit/1e4).toLocaleString()}만 × ${area.toFixed(2)}㎡ = ${won(r.mid)}</div>
           <table class="mini" style="margin-top:6px">
             <thead><tr><th>층대</th><th>효용비율</th></tr></thead>
-            <tbody>${c.fadj.map((f,i)=>`<tr${i===bi?' class="sum"':''}><td>${BANDS[i][0]} (${bf[i][0]}~${bf[i][1]}층)</td>
+            <tbody>${c.fadj.map((f,i)=>`<tr${i===bi?' class="sum"':''}><td>${BANDS[i][0]} (${bandLabel(bf[i])})</td>
               <td class="${f==null?'':(f>=1?'pos':'neg')}">${f==null?'—':f.toFixed(3)}</td></tr>`).join("")}</tbody>
           </table>
           <div style="font-size:12.5px;color:var(--gray-700);margin-top:8px">
@@ -1169,7 +1320,7 @@ function targetTable(c,area,bi,purp,opt){
       <tr><th>소재지</th><td>${c.addr||""}${c.road?` (도로명: ${c.road})`:""}</td></tr>
       <tr><th>단지명</th><td>${c.nm}</td></tr>
       <tr><th>전유부분</th><td>공동주택(아파트) · 전용면적 <b>${area.toFixed(2)}㎡</b>
-        (${Math.round(area/3.3058)}평) · ${BANDS[bi][0]} <b>${bf[bi][0]}~${bf[bi][1]}층</b>
+        (${Math.round(area/3.3058)}평) · ${BANDS[bi][0]} <b>${bandLabel(bf[bi])}</b>
         중 표준층 기준${c.yr?` · ${c.yr}년 준공(경과 ${2026-Number(c.yr)}년)`:""}${c.maxfl?` · 최고 ${c.maxfl}층`:""}</td></tr>
       <tr><th>평가목적</th><td>${purp}${isConv&&opt.lease?` (${opt.lease})`:""}</td></tr>
       <tr><th>기준시점</th><td>${TODAY()}</td></tr>
@@ -1250,7 +1401,7 @@ function openCombinedReport(purp,ltv){
       <h3>평형 · 층대별 예상 감정평가액 — 일반(중위) / ${c.rare||!c.hasT?"참고":"입주민유리"}</h3>
       <table class="mini mx">
         <thead><tr><th>전용면적</th>${BANDS.map((b,i)=>
-          `<th>${b[0]}<span class="sm">${bf[i][0]}~${bf[i][1]}층</span></th>`).join("")}</tr></thead>
+          `<th>${b[0]}<span class="sm">${bandLabel(bf[i])}</span></th>`).join("")}</tr></thead>
         <tbody>${rows}</tbody>
       </table>
       <div style="font-size:12.5px;color:var(--gray-700);margin-top:8px">
