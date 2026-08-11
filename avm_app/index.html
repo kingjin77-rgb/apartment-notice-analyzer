@@ -6,12 +6,16 @@
 <title>법무법인제이엘 AI감정평가사</title>
 <style>
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&display=swap");
 :root{
   --navy:#0d2162; --navy-deep:#081541; --navy-soft:#eff2fb;
   --ink:#111418; --gray-700:#3a3f47; --gray-500:#5b616b; --gray-300:#b6bbc2;
   --line:#e3e5e9; --paper:#fff; --paper-alt:#f4f5f8; --gold:#b08d4f;
   --pos:#1c6b52; --neg:#a8332b;
   --ff:"Pretendard Variable",Pretendard,-apple-system,"Malgun Gothic",system-ui,sans-serif;
+  /* 보고서(.doc) 전용 — 실제 감정평가서·계약서류가 흔히 쓰는 명조 계열.
+     화면 UI는 계속 고딕(Pretendard)을 쓰고, 인쇄/저장되는 문서에서만 이 폰트를 쓴다. */
+  --ff-doc:"Noto Serif KR","Batang",serif;
   --ease:cubic-bezier(.22,.61,.36,1);
 }
 *,*::before,*::after{box-sizing:border-box}
@@ -70,6 +74,21 @@ header{background:var(--paper);border-bottom:1px solid var(--line);height:60px;d
 .pin.rare .bx{border-color:var(--gold)} .pin.rare .pr{color:var(--gold)} .pin.rare .tail{border-top-color:var(--gold)}
 .pin.on .bx{background:var(--navy);border-color:var(--navy)}
 .pin.on .nm{color:rgba(255,255,255,.82)} .pin.on .pr{color:#fff}
+/* 겹친 핀(같은 좌표에 단지 여러 곳) — 눌러 목록에서 고른다 */
+.pin .bx.stack{border-color:var(--ink);border-style:dashed}
+.pin .bx.stack .nm{max-width:170px;color:var(--ink)}
+.pin .bx.stack .pr{font-size:10.5px;font-weight:600;color:var(--gray-500);white-space:normal;max-width:170px}
+.stackpick{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:200;
+  background:var(--paper);border:1px solid var(--line);border-radius:6px;box-shadow:0 8px 30px rgba(0,0,0,.22);
+  width:min(360px,88vw);max-height:70vh;overflow:auto;padding:4px 0}
+.sp-h{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;font-size:12.5px;
+  font-weight:700;color:var(--gray-700);border-bottom:1px solid var(--line)}
+.sp-x{background:none;border:0;font-size:14px;color:var(--gray-500);cursor:pointer;padding:2px 6px}
+.sp-item{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;
+  background:none;border:0;border-bottom:1px solid var(--line);padding:9px 14px;cursor:pointer}
+.sp-item:hover{background:var(--paper-alt)}
+.sp-nm{font-size:13px;font-weight:700;color:var(--ink)}
+.sp-tag{font-size:11px;color:var(--gray-500)}
 
 .panel{width:440px;flex-shrink:0;background:var(--paper);border-left:1px solid var(--line);overflow-y:auto}
 @media(max-width:900px){.panel{width:100%;border-left:0;border-top:1px solid var(--line);overflow:visible}}
@@ -158,6 +177,81 @@ table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
 .steps-log div.dn{color:var(--pos)}
 .src{font-size:11.5px;color:var(--gray-700);margin-top:12px;line-height:1.75;
      border-top:1px solid var(--line);padding-top:10px}
+
+/* ============================================================
+   보고서 전용 스킨 (.doc)
+   기존 openReport()/openCombinedReport()는 화면 패널(.pbody)의 DOM을
+   그대로 복사해서 보고서로 썼다. 그래서 저장·인쇄해도 파란 카드·둥근
+   배지·강조박스가 그대로 남아 "캡처화면 같다"는 지적을 받았다.
+   로직(어떤 사례를 썼는지, 계산식)은 그대로 두고 같은 클래스 이름을
+   .doc 스코프 안에서 흑백 문서 톤으로 다시 정의한다 — 계산을 건드리지
+   않고 화면만 문서로 바꾼다. */
+.doc{font-family:var(--ff-doc);color:#1c1c1c;background:#fff;font-size:12.5px;line-height:1.8}
+.doc h1,.doc h2,.doc h3{font-family:var(--ff-doc);color:#1c1c1c}
+
+.doc-cover{text-align:center;padding:18px 10px 22px;border-bottom:3px double #1c1c1c;margin-bottom:22px}
+.doc-cover .brand{font-size:11.5px;letter-spacing:.32em;color:#555;font-weight:600}
+.doc-cover .doctype{font-size:11px;letter-spacing:.2em;color:#555;margin-top:14px}
+.doc-cover h1{font-size:23px;font-weight:800;margin:8px 0 4px;letter-spacing:-.01em}
+.doc-cover .sub{font-size:12.5px;color:#444;margin-bottom:14px}
+.doc-cover .docno{font-size:10.5px;color:#777;letter-spacing:.03em}
+.doc-cover table{width:100%;margin-top:16px;border-collapse:collapse;font-size:12px}
+.doc-cover table th{width:96px;background:#f4f3ef;color:#333;font-weight:600;text-align:left;
+   padding:7px 10px;border:1px solid #999}
+.doc-cover table td{padding:7px 10px;border:1px solid #999;color:#1c1c1c}
+.doc-cover .result{margin-top:16px;border:1.5px solid #1c1c1c;padding:12px 14px;display:flex;
+   justify-content:center;gap:26px;flex-wrap:wrap}
+.doc-cover .result .u{text-align:center}
+.doc-cover .result .u .l{font-size:10px;letter-spacing:.1em;color:#666}
+.doc-cover .result .u .v{font-size:19px;font-weight:800;margin-top:2px}
+.doc-cover .result .u.fav .v{color:var(--neg)}
+
+/* 이하 화면(.pbody) 요소를 문서 톤으로 재정의. 셀렉터 이름은 그대로 두고
+   색만 흑백 계열로 바꾼다 — 생성 로직(어떤 값이 들어가는지)은 무관하다. */
+.doc .phead{display:none}                    /* 표지에 이미 표시했으니 패널 헤더는 숨김 */
+.doc .sect{margin-top:22px;page-break-inside:avoid}
+.doc .sect>h3{font-size:14px;font-weight:800;color:#1c1c1c;border-bottom:1.5px solid #1c1c1c;
+   padding-bottom:6px;margin-bottom:10px;letter-spacing:-.01em}
+.doc .kv th{background:#f4f3ef;color:#333;border:1px solid #999}
+.doc .kv td{border:1px solid #999;color:#1c1c1c}
+.doc .mini th{background:#f4f3ef;color:#333;border:1px solid #999}
+.doc .mini td{border:1px solid #999;color:#1c1c1c}
+.doc .mini tr.sum td{background:#e9e7df;color:#1c1c1c;font-weight:800}
+.doc .mini .sm{color:#555}
+.doc .chip{background:#fff;border:1px solid #888;color:#333}
+.doc .chip.gold{background:#fff;border:1.4px solid #1c1c1c;color:#1c1c1c;font-weight:800}
+.doc .chip.navy{background:#1c1c1c;border-color:#1c1c1c;color:#fff}
+.doc .resv2{border:1.5px solid #1c1c1c;background:#fff}
+.doc .resv2 .rc.fav{background:#f4f3ef;border-left:1.5px solid #1c1c1c}
+.doc .resv2 .rc.fav .l{color:#555} .doc .resv2 .rc.fav .v{color:var(--neg)} .doc .resv2 .rc.fav .r{color:#666}
+.doc .resv2 .l{color:#555} .doc .resv2 .v{color:#1c1c1c} .doc .resv2 .r{color:#666}
+.doc .gradeline{background:#f7f6f2;border-left:3px solid #1c1c1c;color:#1c1c1c}
+.doc .gr i{background:#ccc} .doc .gr i.f{background:#1c1c1c}
+.doc .why{border:1px solid #999;margin-top:10px;page-break-inside:avoid}
+.doc .why-h{background:#f4f3ef;color:#1c1c1c;border-bottom:1px solid #999}
+.doc .why-h .n{background:#1c1c1c;color:#fff;border-radius:0}
+.doc .why-b{color:#1c1c1c}
+.doc .quote{background:#f7f6f2;border-left:3px solid #1c1c1c;color:#1c1c1c}
+.doc .quote .code,.doc .quote b{color:#1c1c1c}
+.doc .calc{background:#f7f6f2;color:#1c1c1c;border:1px solid #ccc}
+.doc .pos{color:var(--pos)} .doc .neg{color:var(--neg)}
+.doc .notice{background:#f4f3ef;color:#1c1c1c;border:1px solid #999}
+.doc .notice b{color:#1c1c1c}
+
+.doc-sign{margin-top:30px;padding-top:16px;border-top:1px solid #999;display:flex;
+   justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.doc-sign .who{font-size:12.5px;line-height:2}
+.doc-sign .stamp{width:96px;height:96px;border:1.5px dashed #999;border-radius:2px;
+   display:grid;place-items:center;text-align:center;font-size:10px;color:#999;line-height:1.5;flex-shrink:0}
+.doc-foot{margin-top:16px;padding-top:10px;border-top:3px double #1c1c1c;text-align:center;
+   font-size:10.5px;color:#666;letter-spacing:.02em}
+
+@media print{
+  .noprint,.mapwrap,header,.maptools,.legend{display:none!important}
+  body{background:#fff}
+  .doc{max-width:none}
+  @page{size:A4;margin:16mm 14mm}
+}
 </style>
 </head>
 <body>
@@ -187,14 +281,17 @@ table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
     </div></div>
     <div class="maptools">
       <button class="on" data-f="all">전체</button>
+      <button data-f="sale">일반분양</button>
+      <button data-f="rent">임대</button>
+      <button data-f="mix">분양·임대 혼합</button>
       <button data-f="noT">거래 0건 (감정평가 대상)</button>
-      <button data-f="lh">임대·분양전환 추정</button>
       <button data-f="future">입주 예정</button>
     </div>
     <div class="legend">
       <i style="background:var(--gold)"></i>거래 0건·희소 — 감정평가 필요<br>
       <i style="background:var(--navy)"></i>실거래 충분<br>
-      <span style="color:var(--gray-500);font-size:10px">마커 = 전용 84㎡ 환산 추정가</span>
+      <i style="background:var(--ink);border-radius:0"></i>점선 = 같은 위치에 단지 여럿(눌러서 선택)<br>
+      <span style="color:var(--gray-500);font-size:10px">마커 = 전용 84㎡ 환산 추정가 · 상단 버튼으로 분양/임대 구분</span>
     </div>
     <div id="pinNotice" style="display:none;position:absolute;top:11px;right:11px;z-index:10;
       background:var(--gold);color:#fff;padding:7px 12px;border-radius:2px;font-size:12px;font-weight:700;
@@ -435,6 +532,45 @@ function won(v){ // v: 원
 }
 function eok(v){ return (v/1e8).toFixed(1)+"억"; }
 function TODAY(){ return new Date().toISOString().slice(0,10); }
+
+/* ---------- 보고서 표지·서명란 ----------
+   실제 감정평가서는 본문 앞에 표지(대상물건 요약+결론)가 있고 끝에 작성자
+   서명란이 있다. 화면 패널에는 둘 다 없었다 — 화면을 그대로 인쇄하면
+   "캡처 화면"처럼 보이는 이유이기도 했다. 문서에만 붙인다. */
+function docNo(c){
+  return `JL-AVM-${TODAY().replace(/-/g,"")}-${String(c.nm).length}${(c.lat*1000|0)}`;
+}
+function docCover(opts){
+  const {title, c, purp, lease, baseDate, result, extraRows} = opts;
+  return `<div class="doc-cover">
+    <div class="brand">법 무 법 인 제 이 엘</div>
+    <div class="doctype">사내 업무 참고자료 · AI 추정 · 법정 감정평가 아님</div>
+    <h1>${title}</h1>
+    <div class="sub">${c.nm}</div>
+    <div class="docno">문서번호 ${docNo(c)} · 작성일 ${TODAY()}</div>
+    <table>
+      <tr><th>소재지</th><td>${c.addr||""}${c.road?` (도로명: ${c.road})`:""}</td></tr>
+      <tr><th>평가목적</th><td>${purp}${lease?` (${lease})`:""}</td></tr>
+      <tr><th>기준시점</th><td>${baseDate||TODAY()}</td></tr>
+      <tr><th>산정근거</th><td>${gate(c).why}</td></tr>
+      ${extraRows||""}
+    </table>
+    ${result?`<div class="result">
+      <div class="u"><div class="l">일반(중위) 추정</div><div class="v">${eok(result.mid)}</div></div>
+      <div class="u fav"><div class="l">${result.dir<0?"최저":result.dir>0?"최고":"참고"}(입주민 유리) 추정</div><div class="v">${eok(result.favorable)}</div></div>
+    </div>`:""}
+  </div>`;
+}
+function docSign(){
+  return `<div class="doc-sign">
+    <div class="who">작성&nbsp;&nbsp;법무법인제이엘<br>
+      작성일&nbsp;&nbsp;${TODAY()}<br>
+      <span style="color:#888">본 문서는 공공데이터를 감칙·실무기준이 정한 절차로 분석한 내부 참고자료이며,
+      감정평가사의 서명·날인이 없는 <b>비공식 자료</b>입니다.</span></div>
+    <div class="stamp">감정평가사<br>직인 없음<br>(법정 감정평가 아님)</div>
+  </div>
+  <div class="doc-foot">법무법인제이엘 · 사내 업무 참고자료 · 대외 제공 및 금융기관 제출 금지</div>`;
+}
 /* ---------- 감정 가능 여부 판정 (단일 게이트) ----------
    금액을 내는 경로가 지도핀·개요표·평형표·매트릭스·상세·보고서·통합보고서로
    흩어져 있어서, 조건을 한 군데 고쳐도 다른 데서 계속 새어나왔다. 판정을 여기
@@ -478,17 +614,47 @@ function initMap(){
   kakao.maps.event.addListener(map, "idle", draw);  // 팬/줌 끝나면 보이는 영역만 다시 그림
   draw();
 }
+/* 단지 유형 — 공부상 구분(saleType)이 있으면 그것을 쓰고, 없으면 단지명 정규식
+   추정(lh)으로 폴백한다. 지도에서 분양·임대를 섞어 보여주니 복잡하다는 지적 반영. */
+function ctype(c){
+  if(c.future) return "future";
+  const st = c.saleType || "";
+  if(st === "임대") return "rent";
+  if(st && st !== "분양") return "mix";     // 혼합 / 분양 및 임대 등
+  if(!st && c.lh) return "rent";            // 공부상 값이 없을 때만 이름 추정
+  return "sale";
+}
+const CTYPE_LABEL = {sale:"분양", rent:"임대", mix:"분양·임대 혼합", future:"입주예정"};
 function pass(c){
   if(!inRegion(c)) return false;
   if(filter==="noT")    return !c.hasT;
-  if(filter==="lh")     return !!c.lh;
   if(filter==="future") return !!c.future;
+  if(filter==="sale")   return ctype(c)==="sale";
+  if(filter==="rent")   return ctype(c)==="rent";
+  if(filter==="mix")    return ctype(c)==="mix";
   return true;
 }
 // 전국 14,798개를 한번에 다 찍으면(특히 축소된 전체지도에서) 렌더링이 멈춘다.
 // 실제 지도앱처럼 "현재 보이는 영역 안"만 그리고, 팬/줌 하면 다시 그린다.
 // 그래도 한 화면에 너무 많으면(도심 밀집지) 상한을 두고 안내한다.
 const MAX_PINS = 600;
+
+// 같은 지번(주로 대단지의 여러 하위단지·동군)이 카카오 지오코딩에서 같은 좌표로
+// 찍혀 핀이 완전히 겹치는 사례가 4,103곳(8,441건) 있었다 — 엘지메트로시티 1~5,
+// 레이카운티 1~5단지 등. 서로 다른 실체를 하나로 합치면 안 되므로(중복 제거 X),
+// 대신 좌표가 겹치는 것들을 하나의 클릭 가능한 스택 핀으로 묶어서 겹침만 없앤다.
+// 4자리(≈11m) 반올림 — 05_geocode 계열의 지오코딩 해상도와 맞춘 값.
+function clusterKey(c){ return Math.round(c.lat*1e4)+","+Math.round(c.lng*1e4); }
+function clusterPool(pool){
+  const m = new Map();
+  for(const c of pool){
+    const k = clusterKey(c);
+    if(!m.has(k)) m.set(k, []);
+    m.get(k).push(c);
+  }
+  return [...m.values()];
+}
+
 function draw(){
   ovs.forEach(o=>o.setMap(null)); ovs=[];
   let pool = C.filter(pass);
@@ -500,7 +666,8 @@ function draw(){
     const s = sw.getLat(), w = sw.getLng(), n = ne.getLat(), e = ne.getLng();
     pool = pool.filter(c => c.lat>=s && c.lat<=n && c.lng>=w && c.lng<=e);
   }
-  const total = pool.length;
+  let clusters = clusterPool(pool);
+  const total = clusters.length;
   let overflow = false;
   if(total > MAX_PINS){
     overflow = true;
@@ -510,33 +677,54 @@ function draw(){
     // "서울은 데이터가 없다"고 오해하게 된다.
     // 화면을 격자로 나눠 셀마다 상한을 두면 어느 지역도 통째로 사라지지 않는다.
     const GX=24, GY=16;
-    const lats=pool.map(c=>c.lat), lngs=pool.map(c=>c.lng);
+    const lats=clusters.map(g=>g[0].lat), lngs=clusters.map(g=>g[0].lng);
     const s=Math.min(...lats), n=Math.max(...lats), w=Math.min(...lngs), e=Math.max(...lngs);
     const dy=(n-s)||1e-9, dx=(e-w)||1e-9;
     const per = Math.max(1, Math.ceil(MAX_PINS/(GX*GY)));
     const cnt = new Map(); const kept=[];
-    for(const c of pool){
-      const gx=Math.min(GX-1, Math.floor((c.lng-w)/dx*GX));
-      const gy=Math.min(GY-1, Math.floor((c.lat-s)/dy*GY));
+    for(const g of clusters){
+      const gx=Math.min(GX-1, Math.floor((g[0].lng-w)/dx*GX));
+      const gy=Math.min(GY-1, Math.floor((g[0].lat-s)/dy*GY));
       const k=gy*GX+gx, v=cnt.get(k)||0;
-      if(v<per){ cnt.set(k,v+1); kept.push(c); if(kept.length>=MAX_PINS) break; }
+      if(v<per){ cnt.set(k,v+1); kept.push(g); if(kept.length>=MAX_PINS) break; }
     }
-    pool = kept;
+    clusters = kept;
   }
   if(notice){
     notice.style.display = overflow ? "block" : "none";
     if(overflow) notice.textContent =
-      `이 화면에 ${total.toLocaleString()}개 단지가 있어 ${pool.length}개만 지역별로 고르게 표시했습니다. 확대하면 전부 보입니다.`;
+      `이 화면에 단지 위치가 ${total.toLocaleString()}곳 있어 ${clusters.length}곳만 지역별로 고르게 표시했습니다. 확대하면 전부 보입니다.`;
   }
-  pool.forEach(c=>{
+  clusters.forEach(group=>{
+    const c = group[0];
     const d=document.createElement("div");
-    d.className="pin"+(c.rare?" rare":"")+(c.nm===selNm?" on":"");
-    const price=pin84(c);
-    d.innerHTML=`<div class="bx"><div class="nm">${c.nm}</div><div class="pr">${price||"감정평가 필요"}</div></div><div class="tail"></div>`;
-    d.onclick=()=>pick(c.id);
+    const isSel = group.some(x=>x.nm===selNm);
+    d.className="pin"+(c.rare?" rare":"")+(isSel?" on":"");
+    if(group.length===1){
+      const price=pin84(c);
+      d.innerHTML=`<div class="bx"><div class="nm">${c.nm}</div><div class="pr">${price||"감정평가 필요"}</div></div><div class="tail"></div>`;
+      d.onclick=()=>pick(c.id);
+    }else{
+      // 겹친 핀 — 이름 하나 대신 "여기 N개 단지"로 표시하고 클릭하면 목록에서 고른다.
+      d.innerHTML=`<div class="bx stack"><div class="nm">이 위치에 ${group.length}개 단지</div>
+        <div class="pr">${group.slice(0,3).map(x=>x.nm).join(" · ")}${group.length>3?" 외":""}</div></div><div class="tail"></div>`;
+      d.onclick=()=>openStackPicker(group);
+    }
     ovs.push(new kakao.maps.CustomOverlay({map,position:new kakao.maps.LatLng(c.lat,c.lng),
-      content:d,yAnchor:1,xAnchor:.5,zIndex:c.nm===selNm?30:5}));
+      content:d,yAnchor:1,xAnchor:.5,zIndex:isSel?30:(group.length>1?15:5)}));
   });
+}
+function openStackPicker(group){
+  const box=document.createElement("div");
+  box.className="stackpick";
+  box.innerHTML=`<div class="sp-h">이 위치에 단지 ${group.length}개 — 하나를 선택하세요
+      <button class="sp-x" onclick="this.closest('.stackpick').remove()">✕</button></div>
+    ${group.map(c=>`<button class="sp-item" data-id="${c.id}">
+        <span class="sp-nm">${c.nm}</span>
+        <span class="sp-tag">${CTYPE_LABEL[ctype(c)]}${c.hasT?` · 실거래${c.n}건`:' · 거래0건'}</span>
+      </button>`).join("")}`;
+  document.body.appendChild(box);
+  box.querySelectorAll(".sp-item").forEach(b=>b.onclick=()=>{ pick(b.dataset.id); box.remove(); });
 }
 document.querySelectorAll(".maptools button").forEach(b=>b.onclick=()=>{
   filter=b.dataset.f;
@@ -1285,50 +1473,36 @@ function detail(area,bi,purp,ltv){
 // 막히므로 쓰지 않는다. 같은 패널 안에서 인쇄전용 뷰로 전환하고, 저장은
 // (1)인쇄→PDF, (2)HTML 파일 다운로드(Blob, 팝업 아니라 차단 안 됨) 두 경로.
 function openReport(area,bi,purp,ltv){
-  const c=cur, opt=LAST_OPT, r=cell(c,area,bi,purp,opt);
+  const c=cur, opt=LAST_OPT, r=cell(c,area,bi,purp,opt), bf=bandFloors(c), isConv=purp==="분양전환";
   const wrap=document.createElement("div");
   wrap.innerHTML=document.querySelector(".panel .pbody").innerHTML;
+  // .dlbar(하단 버튼)는 문서에 필요 없고, 맨 위 .resv.resv2 결과 상자는
+  // 표지의 result 박스와 같은 값을 다시 보여주는 것이라 중복이라 뺀다.
   wrap.querySelectorAll(".dlbar").forEach(x=>x.remove());
+  wrap.querySelector(".resv.resv2")?.remove();
   const reportBody=wrap.innerHTML;
-  const title=`${c.nm} 예상감정평가 보고서 ${opt.lease?("("+opt.lease+") "):""}${(new Date()).toISOString().slice(0,10)}`;
-  window.__RPT_FNAME=title.replace(/\s+/g,"_")+".html";
+  const title=`${c.nm} 예상 감정평가액 검토보고서`;
+  window.__RPT_FNAME=`${c.nm}_예상감정평가_${opt.lease||purp}_${TODAY()}`.replace(/\s+/g,"_")+".html";
   window.__RPT_BACK=()=>detail(area,bi,purp,ltv);
   document.getElementById("panel").innerHTML=`
-  <div class="pbody rptview">
-    <div class="noprint" style="display:flex;gap:8px;margin-bottom:16px">
+  <div class="pbody rptview doc">
+    <div class="noprint" style="display:flex;gap:8px;margin-bottom:16px;font-family:var(--ff)">
       <button class="btn ghost sm" onclick="__RPT_BACK()">← 돌아가기</button>
       <button class="btn sm" onclick="window.print()">🖨 인쇄 / PDF로 저장</button>
       <button class="btn sm gold" onclick="saveReportHtml()">💾 HTML 파일로 저장</button>
     </div>
-    <h1 style="font-size:18px;margin-bottom:4px;color:var(--ink)">${c.nm} — 예상 감정평가 보고서</h1>
-    <div style="font-size:12px;color:var(--gray-700);margin-bottom:14px">
-      작성일 ${TODAY()} · 법무법인제이엘 사내 업무 참고자료 · 대외 제공·금융기관 제출 금지</div>
-    ${targetTable(c,area,bi,purp,opt)}
+    ${docCover({title, c, purp, lease:isConv?opt.lease:"", baseDate:TODAY(), result:r,
+      extraRows:`<tr><th>대상 전유부분</th><td>공동주택(아파트) 전용 <b>${area.toFixed(2)}㎡</b>
+          (${Math.round(area/3.3058)}평) · ${BANDS[bi][0]} <b>${bandLabel(bf[bi])}</b> 중 표준층 기준
+          ${c.yr?` · ${c.yr}년 준공(경과 ${new Date().getFullYear()-Number(c.yr)}년)`:""}${c.maxfl?` · 최고 ${c.maxfl}층`:""}</td></tr>
+        <tr><th>비고</th><td style="color:#555">실제 동·호수는 세대별 배치에 따라 층·라인이 달라 개별 확인이
+          필요하다. 이 표는 같은 평형·층대에 속하는 전 세대에 공통 적용되는 산정 기준을 표시한다.</td></tr>`})}
     ${reportBody}
+    ${docSign()}
   </div>`;
   document.querySelector(".panel").scrollTop=0;
 }
-// 대상물건의 표시 — 실제 감정평가서 표지 양식(소재지·전유부분·대지권) 준용.
-// openReport()에서 .pbody 만 복사할 때 .phead(전용면적·층대)가 함께 안 넘어와
-// 보고서에 평형이 아예 안 보이던 문제가 있었다 — 이 표로 명시적으로 채운다.
-function targetTable(c,area,bi,purp,opt){
-  const bf=bandFloors(c);
-  const isConv=purp==="분양전환";
-  return `<div class="sect" style="margin-top:0">
-    <h3>대상물건의 표시</h3>
-    <table class="kv" style="width:100%">
-      <tr><th>소재지</th><td>${c.addr||""}${c.road?` (도로명: ${c.road})`:""}</td></tr>
-      <tr><th>단지명</th><td>${c.nm}</td></tr>
-      <tr><th>전유부분</th><td>공동주택(아파트) · 전용면적 <b>${area.toFixed(2)}㎡</b>
-        (${Math.round(area/3.3058)}평) · ${BANDS[bi][0]} <b>${bandLabel(bf[bi])}</b>
-        중 표준층 기준${c.yr?` · ${c.yr}년 준공(경과 ${2026-Number(c.yr)}년)`:""}${c.maxfl?` · 최고 ${c.maxfl}층`:""}</td></tr>
-      <tr><th>평가목적</th><td>${purp}${isConv&&opt.lease?` (${opt.lease})`:""}</td></tr>
-      <tr><th>기준시점</th><td>${TODAY()}</td></tr>
-      <tr><th>비고</th><td style="color:var(--gray-700)">실제 동·호수는 세대별 배치에 따라 층·라인이 달라 개별 확인이
-        필요하다. 이 표는 같은 평형·층대에 속하는 전 세대에 공통 적용되는 산정 기준을 표시한다.</td></tr>
-    </table>
-  </div>`;
-}
+// (구) targetTable() — docCover()의 extraRows로 흡수됨(2026-08-11).
 // 통합 보고서 — 개별(§ openReport)은 평형·층대 1칸짜리, 이건 단지 전 평형×층대를
 // 한 문서에 모은 것(단체등기 세대별 배포용). 법적근거·방법론은 한 번만 서술하고
 // 평형별 결과는 표로 압축한다.
@@ -1359,34 +1533,21 @@ function openCombinedReport(purp,ltv){
       }
     });
   }
-  const title=`${c.nm} 통합 예상감정평가 보고서 ${opt.lease?("("+opt.lease+") "):""}${(new Date()).toISOString().slice(0,10)}`;
-  window.__RPT_FNAME=title.replace(/\s+/g,"_")+".html";
+  const title=`${c.nm} 통합 예상 감정평가액 검토보고서 (전 평형)`;
+  window.__RPT_FNAME=`${c.nm}_통합감정평가_${opt.lease||purp}_${TODAY()}`.replace(/\s+/g,"_")+".html";
   window.__RPT_BACK=()=>matrix(purp,ltv);
   document.getElementById("panel").innerHTML=`
-  <div class="pbody rptview">
-    <div class="noprint" style="display:flex;gap:8px;margin-bottom:16px">
+  <div class="pbody rptview doc">
+    <div class="noprint" style="display:flex;gap:8px;margin-bottom:16px;font-family:var(--ff)">
       <button class="btn ghost sm" onclick="__RPT_BACK()">← 돌아가기</button>
       <button class="btn sm" onclick="window.print()">🖨 인쇄 / PDF로 저장</button>
       <button class="btn sm gold" onclick="saveReportHtml()">💾 HTML 파일로 저장</button>
     </div>
-    <h1 style="font-size:18px;margin-bottom:4px;color:var(--ink)">${c.nm} — 통합 예상 감정평가 보고서 (전 평형)</h1>
-    <div style="font-size:12px;color:var(--gray-700);margin-bottom:18px">
-      작성일 ${TODAY()} · 평가목적 ${purp}${isConv?` (${opt.lease})`:""} · 법무법인제이엘 사내 업무 참고자료 ·
-      대외 제공·금융기관 제출 금지</div>
-
-    <div class="sect" style="margin-top:0">
-      <h3>대상물건의 표시</h3>
-      <table class="kv" style="width:100%">
-        <tr><th>소재지</th><td>${c.addr||""}${c.road?` (도로명: ${c.road})`:""}</td></tr>
-        <tr><th>단지명</th><td>${c.nm}${c.yr?` · ${c.yr}년 준공`:""}${c.maxfl?` · 최고 ${c.maxfl}층`:""}</td></tr>
-        <tr><th>대상평형</th><td>전용 ${c.areas.map(a=>a.a.toFixed(2)+"㎡").join(" · ")}
-          ${c.hasT?"(실거래로 확인된 평형)":'<span style="color:var(--gold)">(인근 단지 구성에서 차용 — 대상 단지 실측 아님)</span>'}</td></tr>
-        <tr><th>평가목적</th><td>${purp}${isConv&&opt.lease?` (${opt.lease})`:""}</td></tr>
-        <tr><th>기준시점</th><td>${TODAY()}</td></tr>
-        <tr><th>산정근거</th><td>${gate(c).why}</td></tr>
-      </table>
-      ${gradeBlock(c)}
-    </div>
+    ${docCover({title, c, purp, lease:isConv?opt.lease:"", baseDate:TODAY(),
+      extraRows:`<tr><th>대상평형</th><td>전용 ${c.areas.map(a=>a.a.toFixed(2)+"㎡").join(" · ")}
+          ${c.hasT?"(실거래로 확인된 평형)":'<span style="color:#a8332b">(인근 단지 구성에서 차용 — 대상 단지 실측 아님)</span>'}</td></tr>
+        ${c.yr?`<tr><th>준공</th><td>${c.yr}년${c.maxfl?` · 최고 ${c.maxfl}층`:""}</td></tr>`:""}`})}
+    <div class="sect" style="margin-top:0">${gradeBlock(c)}</div>
 
     <div class="why"><div class="why-h"><span class="n">1</span>적용 방법 · 법적 근거</div>
       <div class="why-b">대상은 집합건물법상 구분소유 부동산이므로 <b>거래사례비교법</b>이 법정 주방식이다.
@@ -1421,6 +1582,7 @@ function openCombinedReport(purp,ltv){
       감정평가법 제2조에 따른 감정평가는 감정평가법인등만 수행할 수 있으며,
       본 결과는 공공데이터를 감칙·실무기준이 정한 절차로 분석한 <b>사내 업무 참고자료</b>입니다.
       대외 제공·금융기관 제출 용도로 사용할 수 없습니다.</div>
+    ${docSign()}
   </div>`;
   document.querySelector(".panel").scrollTop=0;
 }
