@@ -590,6 +590,20 @@ function areaSrcLabel(c){
 }
 /* K-APT 면적구성은 버킷별 세대수라 '이 단지에 그 구간 세대가 실제로 존재한다'는
    사실이다. 정확한 전용면적은 아니지만 근거 있는 사실이므로 이건 표기해도 된다. */
+/* 추정 성격 경고. 예전에는 detail() 안에만 있어서, 정작 단체등기 세대별로
+   가장 널리 배포되는 통합보고서에는 경고가 하나도 없었다. 함수로 빼서 공유한다. */
+function gradeBlock(c){
+  const g=gate(c);
+  if(c.hasT) return `<div class="notice" style="margin-top:8px">
+    본 산정은 <b>대상 단지 실거래 ${c.n}건</b>에 근거한다.
+    ${c.areaSrc==="vworld"?"공급 평형은 세대별 공시가격으로 실측 확인하였다.":""}</div>`;
+  return `<div class="notice" style="margin-top:8px">
+    <b style="color:var(--gold)">본 단지는 자체 실거래가 0건이다.</b>
+    반경 3km 내 인근 ${(c.comps||[]).length}개 단지(최근접 ${(c.comps&&c.comps[0]?c.comps[0].d:"—")}m)의
+    ㎡단가로 비준한 <b>추정치</b>이며, 대상 단지에서 확인된 거래가 아니다.
+    전용면적 역시 인근 단지 구성에서 가져온 값으로 대상 단지 실측이 아니다.
+    확정 감정가는 감정평가법인의 평가가 필요하다.</div>`;
+}
 function areaMixTable(c){
   const b=[["60㎡ 이하",c.area60],["60~85㎡",c.area85],["85~135㎡",c.area135],["135㎡ 초과",c.area136]]
           .filter(x=>x[1]>0);
@@ -913,15 +927,17 @@ function detail(area,bi,purp,ltv){
       <span><b>신뢰등급 ${["","매우낮음","낮음","보통","높음","매우높음"][r.grade]}</b>
       — ${c.hasT?`단지 유효거래 ${c.n}건, 해당 평형 ${r.n}건`
         :`<b style="color:var(--gold)">자체 거래 0건</b> · 인근 ${(c.comps||[]).length}개 단지 비준
-          (최근접 ${c.comps[0].d}m). 확정 감정가는 감정평가법인 평가 필요`}</span></div>
+          (최근접 ${c.comps&&c.comps[0]?c.comps[0].d:"—"}m). 확정 감정가는 감정평가법인 평가 필요`}</span></div>
 
     ${isConv?`<div class="why" style="margin-top:8px">
       <div class="why-h"><span class="n">★</span>노후도·사용감 (임대 실사용 감가)</div>
       <div class="why-b">
-        ${c.yr? `${AGE_CURVE.region} 실거래 ${AGE_CURVE.n}건 회귀 결과 연식 1년당 약
-          ${((Math.exp(AGE_CURVE.coef)-1)*100).toFixed(2)}%(R²=${AGE_CURVE.r2}).`
-        : `<span style="color:var(--gold)">대상 준공년도가 확정되지 않아 연식 보정은 미적용하였다.
-           K-APT 단지정보로 확인 후 반영할 것.</span>`}
+        ${c.yr? `대상 준공 ${c.yr}년(경과 ${new Date().getFullYear()-(+c.yr)}년).
+           <span style="color:var(--gold)">연식에 따른 단가 보정은 적용하지 않았다.</span>
+           실거래 표본으로 연식-㎡단가 회귀를 내보면 지역별 설명력 편차가 커서
+           (서울 R²=0.002 — 입지가 연식을 압도, 세종 R²=0.673) 전국 일괄 계수를
+           쓰면 오히려 틀린다. 보정을 켜기 전 지역별 검증이 필요하다.`
+        : `<span style="color:var(--gold)">대상 준공년도가 확정되지 않아 연식 보정은 미적용하였다.</span>`}
         ${opt.ryears>0?`<div class="calc">임대 ${opt.ryears}년 사용분 추가감가 ${(r.wear*100).toFixed(1)}%
           → 중위값에 이미 반영됨</div>`:""}
         <div style="font-size:12.5px;color:var(--gray-700);margin-top:5px">
@@ -1057,7 +1073,29 @@ function detail(area,bi,purp,ltv){
         </div></div>`;
       })()
       :""}
+
+      <div class="why"><div class="why-h"><span class="n">7</span>감정평가액 결정 의견</div>
+        <div class="why-b">
+          본건은 구분소유 부동산으로서 감칙 제16조에 따라 거래사례비교법을 주방식으로 적용하였다.
+          ${c.hasT
+            ? `대상 단지의 유효거래 ${c.n}건에서 대상 평형의 ㎡단가 중위값을 기준단가로 채택하고,`
+            : `대상 단지에 거래사례가 없어 실무기준 [400-3.3.1.2] 제3호에 따라 인근
+               ${(c.comps||[]).length}개 단지 사례를 선정하여 기준단가를 비준하고,`}
+          실거래 회귀로 산출한 층별효용비율을 적용하였다.
+          <div class="calc" style="margin-top:6px">
+            이에 본건 전용 ${area.toFixed(2)}㎡ · ${BANDS[bi][0]}의 예상 감정평가액을
+            <b>일반(중위) ${won(r.mid)}원</b>,
+            <b style="color:var(--neg)">입주민 유리 기준 ${won(r.favorable)}원</b>으로 판단한다.
+          </div>
+          <div style="font-size:12.5px;color:var(--gray-700);margin-top:6px">
+            두 값은 사례 선정·보정의 정상 변동범위 안에 있으며 어느 쪽도 조작된 값이 아니다.
+            ${isConv?`분양전환 협의·이의신청 시에는 입주민 유리 기준값과 그 근거(§2~4)를 함께 제시한다.`:""}
+            ${!c.hasT?`다만 본건은 대상 단지 실거래가 없는 추정이므로, 확정에는 감정평가법인의 평가가 필요하다.`:""}
+          </div>
+        </div></div>
     </div>
+
+    ${gradeBlock(c)}
 
     <div class="notice"><b>본 산정액은 감정평가액이 아닙니다.</b>
       감정평가법 제2조에 따른 감정평가는 감정평가법인등만 수행할 수 있으며,
@@ -1170,10 +1208,13 @@ function openCombinedReport(purp,ltv){
       <table class="kv" style="width:100%">
         <tr><th>소재지</th><td>${c.addr||""}${c.road?` (도로명: ${c.road})`:""}</td></tr>
         <tr><th>단지명</th><td>${c.nm}${c.yr?` · ${c.yr}년 준공`:""}${c.maxfl?` · 최고 ${c.maxfl}층`:""}</td></tr>
-        <tr><th>대상평형</th><td>전용 ${c.areas.map(a=>a.a.toFixed(2)+"㎡").join(" · ")} (전 세대 유형)</td></tr>
+        <tr><th>대상평형</th><td>전용 ${c.areas.map(a=>a.a.toFixed(2)+"㎡").join(" · ")}
+          ${c.hasT?"(실거래로 확인된 평형)":'<span style="color:var(--gold)">(인근 단지 구성에서 차용 — 대상 단지 실측 아님)</span>'}</td></tr>
         <tr><th>평가목적</th><td>${purp}${isConv&&opt.lease?` (${opt.lease})`:""}</td></tr>
         <tr><th>기준시점</th><td>${TODAY()}</td></tr>
+        <tr><th>산정근거</th><td>${gate(c).why}</td></tr>
       </table>
+      ${gradeBlock(c)}
     </div>
 
     <div class="why"><div class="why-h"><span class="n">1</span>적용 방법 · 법적 근거</div>
