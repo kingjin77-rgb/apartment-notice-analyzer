@@ -226,7 +226,7 @@ table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
   </div>
 </div>
 
-<script src="data.js?v=20260811a"></script>
+<script src="data.js?v=20260811b"></script>
 <script>
 const KAKAO_KEY="6dd941689e3c39956d9ba809f127c947";
 let map=null, ovs=[], selNm=null, filter="all", cur=null;
@@ -289,20 +289,20 @@ const FACTOR_LAYERS = [
    {it:"자연환경(조망·풍치·경관 등)", s:"manual", note:"로드뷰·스카이뷰로 개별단지 보조판단은 가능(온디맨드), 확정은 임장"},
  ]},
  {layer:"단지내부요인", items:[
-   {it:"시공업체의 브랜드", s:"auto", src:"detect_brand() 단지명 매칭"},
-   {it:"단지내 총세대수 및 최고층수", s:"auto", src:"K-APT AptBasisInfoServiceV4"},
+   {it:"시공업체의 브랜드", s:"linked", src:"K-APT kaptBcompany로 시공사는 확인되나 브랜드 프리미엄을 가액에 곱하지는 않는다"},
+   {it:"단지내 총세대수 및 최고층수", s:"linked", src:"K-APT 실측값을 개요에 표기 — 다만 세대수·층수를 가액에 직접 반영하지는 않는다"},
    {it:"건물의 구조 및 마감상태", s:"linked", src:"건축HUB strctCdNm(구조)는 자동가능, 마감재 품질만 임장"},
-   {it:"경과연수에 따른 노후도", s:"auto", src:"실거래 연식회귀(fit_age_curve)"},
-   {it:"단지내 면적구성(대형·중형·소형)", s:"auto", src:"단지 areas[] 분포"},
-   {it:"단지내 통로구조(복도식/계단식)", s:"linked", src:"K-APT hall_type(codeHallNm) — 이미 확보된 필드, JS 미연결"},
+   {it:"경과연수에 따른 노후도", s:"linked", src:"준공년은 K-APT로 확보. 연식보정은 지역별 설명력 편차가 커(서울 R²=0.002·세종 0.673) 검증 전까지 미적용"},
+   {it:"단지내 면적구성(대형·중형·소형)", s:"linked", src:"K-APT 구간별 세대수를 사실로 표기 — 가액 보정에는 미반영"},
+   {it:"단지내 통로구조(복도식/계단식)", s:"linked", src:"K-APT codeHallNm 실측값을 개요에 표기 — 가액 보정에는 미반영"},
    {it:"공용시설의 규모·구성·상태", s:"linked", src:"규모(면적)는 건축HUB 자동가능, 청결·관리상태만 임장"},
    {it:"전용률", s:"linked", src:"건축HUB 전유/공급면적 비율 계산 — 아직 미연결"},
  ]},
  {layer:"호별요인", items:[
-   {it:"층별 효용", s:"auto", src:"단지 자체거래 층수 회귀"},
+   {it:"층별 효용", s:"auto", src:"단지 자체거래 층수 회귀 — 이 앱이 유일하게 가액에 직접 곱하는 개별요인이다"},
    {it:"향별 효용", s:"linked", note:"동단위 추정(building_orientation.py)까지만 가능, 세대 라인별 확정은 임장"},
    {it:"위치별 효용(동별 및 라인별)", s:"linked", note:"동단위는 연동가능, 라인별은 공시가격 역산 시도(정확도 낮음)"},
-   {it:"전유부분의 면적 및 대지사용권의 크기", s:"auto"},
+   {it:"전유부분의 면적 및 대지사용권의 크기", s:"auto", src:"㎡단가 × 전용면적으로 가액에 직접 반영"},
    {it:"내부 평면방식(베이)", s:"linked", src:"분양 당시 입주자모집공고문 첨부 평면도 있으면 공고문분석기로 확인 — 없으면 임장. 포털 평면도 이미지(네이버 등)는 스크래핑 ToS 문제로 미사용"},
    {it:"베란다의 유무 및 면적의 대소", s:"linked", src:"위와 동일 — 공고문 평면도 첨부시만 가능"},
    {it:"주차장 등의 유무", s:"linked", src:"K-APT getAphusDtlInfoV4 주차대수 — 이미 확보된 필드, JS 미연결"},
@@ -318,8 +318,16 @@ function statusBadge(x){
 }
 // 실시간 정밀조사 — 유저 제안(2026-08-06): 4,860개 전체를 배치로 미리 돌리는 대신,
 // 사용자가 특정 단지를 "클릭하는 순간" 카카오 로컬 API로 그 단지만 실시간 조사한다.
-// KAKAO_REST_API_KEY는 이 앱이 사내 전용(외부 미배포)이라 클라이언트에 노출해도
-// 되는 수준으로 판단 — keys.public.txt에 이미 커밋된 공개데이터 키와 동일한 원칙.
+// ⚠️ 2026-08-11 정정: 아래 주석의 전제가 틀렸었다.
+//   기존 주석: "사내 전용(외부 미배포)이라 클라이언트에 노출해도 되는 수준 —
+//   keys.public.txt에 이미 커밋된 공개데이터 키와 동일한 원칙"
+//   실제로는 이 리포가 public이고 해당 커밋이 origin에 푸시돼 있어 키 값을
+//   그대로 되받을 수 있는 상태였다. REST 키는 JS 키와 달리 도메인 화이트리스트
+//   대상이 아니고 브라우저에서는 IP 제한도 못 걸어서 아무 제한을 둘 수 없다.
+//   조치: keys.public.txt 추적 해제 + .gitignore 추가.
+//   ⚠️ 남은 조치(사용자): 이 키를 카카오 개발자콘솔에서 재발급할 것.
+//      git 이력에 남아 있으므로 파일을 지워도 과거 커밋에서 복구된다.
+//      재발급 후 아래 상수를 지우고 서버 프록시나 빌드시 주입으로 바꿀 것.
 const KAKAO_REST = "05e389f436950940951c2df266c6ec1d";
 const LIVE_CATS = [
   {code:"SW8", label:"지하철역", radius:1200},

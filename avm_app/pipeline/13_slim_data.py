@@ -30,6 +30,10 @@ data = json.loads(arr)
 before = len(arr)
 print(f"기존 {len(data)}건 / {before/1048576:.2f}MB")
 
+# comps 안에서만 자르는 것이다. 부모 레코드의 seq·nRaw·regRate는 건드리지 않는다
+# — 이전에 그걸 같이 지우는 바람에 개요표에 "단지코드 undefined / 등기완료 NaN%"가
+# 14,200건에서 출력됐다. 부모 필드는 index.html이 옵셔널 렌더링으로 방어하지만,
+# 애초에 지우지 않는 것이 맞다.
 KEEP = ("nm", "d", "yr", "n", "unit")
 for c in data:
     cs = c.get("comps")
