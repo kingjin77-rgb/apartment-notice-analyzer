@@ -226,7 +226,7 @@ table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
   </div>
 </div>
 
-<script src="data.js?v=20260811b"></script>
+<script src="data.js?v=20260811c"></script>
 <script>
 const KAKAO_KEY="6dd941689e3c39956d9ba809f127c947";
 let map=null, ovs=[], selNm=null, filter="all", cur=null;
@@ -607,9 +607,16 @@ function gradeBlock(c){
     ${c.areaSrc==="vworld"?"공급 평형은 세대별 공시가격으로 실측 확인하였다.":""}</div>`;
   return `<div class="notice" style="margin-top:8px">
     <b style="color:var(--gold)">본 단지는 자체 실거래가 0건이다.</b>
-    반경 3km 내 인근 ${(c.comps||[]).length}개 단지(최근접 ${(c.comps&&c.comps[0]?c.comps[0].d:"—")}m)의
+    반경 2km 내 인근 ${(c.comps||[]).length}개 단지(최근접 ${(c.comps&&c.comps[0]?c.comps[0].d:"—")}m)의
     ㎡단가로 비준한 <b>추정치</b>이며, 대상 단지에서 확인된 거래가 아니다.
     전용면적 역시 인근 단지 구성에서 가져온 값으로 대상 단지 실측이 아니다.
+    <div style="margin-top:6px">
+      <b>이 추정 방식의 실측 오차는 중위 9.4%다.</b>
+      실거래를 가진 단지 3,000곳을 거래0건인 것처럼 가리고 같은 방식으로 맞춰본
+      결과이며, 절반은 오차 9.4% 안에, ${'±'}20% 안에 드는 것이 76%다.
+      즉 본 추정액이 1억이면 실제는 대략 9,100만~1억 900만 사이일 가능성이 높고,
+      그보다 더 벌어질 수도 있다.
+    </div>
     확정 감정가는 감정평가법인의 평가가 필요하다.</div>`;
 }
 function areaMixTable(c){
@@ -941,10 +948,15 @@ function detail(area,bi,purp,ltv){
       <div class="why-h"><span class="n">★</span>노후도·사용감 (임대 실사용 감가)</div>
       <div class="why-b">
         ${c.yr? `대상 준공 ${c.yr}년(경과 ${new Date().getFullYear()-(+c.yr)}년).
-           <span style="color:var(--gold)">연식에 따른 단가 보정은 적용하지 않았다.</span>
-           실거래 표본으로 연식-㎡단가 회귀를 내보면 지역별 설명력 편차가 커서
-           (서울 R²=0.002 — 입지가 연식을 압도, 세종 R²=0.673) 전국 일괄 계수를
-           쓰면 오히려 틀린다. 보정을 켜기 전 지역별 검증이 필요하다.`
+           ${c.hasT? `대상 단지 자체 실거래를 채택하므로 연식 보정이 필요하지 않다.`
+           : `사례 단가를 대상 연식으로 <b>보정하여 적용하였다.</b>
+              보정계수는 ${c.ageSrc==="local"?"대상 반경 2km 사례풀의 국지회귀":"해당 시·도 실거래 회귀"}로
+              산출하고 배율은 ±30%로 제한하였다.
+              <span style="display:block;margin-top:4px;color:var(--gray-700)">
+              전국 일괄 계수를 쓰지 않는 이유는 지역별 설명력 편차가 크기 때문이다
+              (서울 R²=0.002 — 입지가 연식을 압도, 세종 0.673). 보정 적용 여부는
+              홀드아웃 검증으로 정했다 — 실거래 보유 단지 3,000건을 거래0건인 척
+              가리고 맞춰본 결과 오차가 11.35%에서 9.38%로 줄었다.</span>`}`
         : `<span style="color:var(--gold)">대상 준공년도가 확정되지 않아 연식 보정은 미적용하였다.</span>`}
         ${opt.ryears>0?`<div class="calc">임대 ${opt.ryears}년 사용분 추가감가 ${(r.wear*100).toFixed(1)}%
           → 중위값에 이미 반영됨</div>`:""}

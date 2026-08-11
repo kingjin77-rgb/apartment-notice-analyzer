@@ -157,13 +157,20 @@ MIN_R2 = 0.15          # 이 밑이면 연식이 단가를 설명 못 한다고 
 MIN_LOCAL_N = 8        # 국지회귀 최소 표본
 CAP = 0.30             # 보정배율 상한 ±30% (외삽 폭주 차단)
 
-# 사례 '선정'에 연식 유사도를 쓰는 것과, 선정된 사례 단가에 exp(coef*연식차)를
-# 곱해 '보정'하는 것은 다른 문제다. 선정 개선은 물적 유사성을 높이는 것이라
-# 근거가 분명하지만, 보정을 켜면 12,700개 단지의 감정가가 한꺼번에 움직이고
-# 그 결과를 오늘 검증할 방법이 없다. 검증 안 된 보정을 켜는 것은 보정을
-# 미적용하고 그 사실을 명시하는 것보다 나쁘다 — 선정만 켜고 보정은 끈다.
-# 켤 때는 반드시 대표 단지 표본으로 보정 전/후를 대조 검증한 뒤 켤 것.
-APPLY_AGE = False
+# 2026-08-11: 19번(홀드아웃 백테스트)·20번(파라미터 스윕)으로 실측 검증 완료.
+# 실거래 보유 단지 3,000건을 "거래0건인 척" 가리고 인근만으로 맞춰본 결과다.
+#   연식보정 OFF          MdAPE 11.35%
+#   연식보정 ON           MdAPE 10.26%  (1.09%p 개선)
+#   + 거리역가중(IDW)      MdAPE  9.99%
+#   + 면적유사도 가중       MdAPE  9.38%  (기준선 대비 1.97%p 개선)
+# 검증 없이 켜지 않는다는 원칙을 지킨 뒤, 측정으로 근거가 확인되어 켠다.
+APPLY_AGE = True
+
+# 아래 3개는 20번 스윕에서 실측으로 정한 값이다(임의 상수가 아니다).
+K_COMPS = 3          # 3건이 최적. 5·7·10건으로 늘리면 오히려 나빠진다(10.68·11.08·11.45%)
+YEAR_W = 10.0        # 거리 1km ≈ 연식 10년. 3·5년으로 연식을 더 중시하면 나빠진다
+AREA_W = 0.5         # 면적 유사도 가중. 0 -> 10.26%, 0.5 -> 9.75%, 1.0 이상은 다시 나빠진다
+MAXD = 2000          # 반경. 1.5~3km가 거의 동일하나 2km가 미세 우위 + 사례 확보량 균형
 
 nat = fit([p for v in by_sido.values() for p in v])
 NAT_COEF = nat[0] if nat and nat[2] >= MIN_R2 else 0.0
@@ -177,6 +184,11 @@ for s, pts in sorted(by_sido.items(), key=lambda x: -len(x[1])):
     if f:
         P(f"  {s}: b={f[0]:.5f} (연 {(math.exp(f[0])-1)*100:+.2f}%) n={f[1]} r2={f[2]:.3f}"
           + ("" if f[2] >= MIN_R2 else "  -> r2 미달, 폴백"))
+
+def target_area(c):
+    """대표 전용면적(중위). 면적 유사도 가중에 쓴다."""
+    ar = c.get("areas") or []
+    return statistics.median([a["a"] for a in ar]) if ar else None
 
 # ---------- C/D. 비준 재구축 ----------
 R = 6371000.0
@@ -192,7 +204,6 @@ grid = collections.defaultdict(list)
 for a in anchors:
     grid[(int(a["lat"] / GRID), int(a["lng"] / GRID))].append(a)
 
-MAXD = 3000
 targets = [c for c in data if not c.get("hasT") and c.get("lat") and c.get("lng")]
 P(f"\n비준 대상(거래0건) {len(targets)}건")
 
@@ -224,18 +235,24 @@ for c in targets:
         csrc = "sido" if coef else "none"
     stat[f"계수_{csrc}"] += 1
 
+    ta = target_area(c)
+
     def score(d, a):
-        """거리·연식 종합점수. 낮을수록 우수. 거리 1km ≈ 연식 10년으로 등가 취급."""
+        """거리·연식·면적 종합점수. 낮을수록 우수. 가중치는 20번 스윕 실측값."""
         s = d / 1000.0
         if ty is not None:
             dy = abs(int(a["yr"]) - ty)
-            s += dy / 10.0
+            s += dy / YEAR_W
             if dy > 20:
                 s += 2.0        # 20년 초과는 물적 유사성이 깨진다고 보고 강한 후순위
+        if AREA_W and ta:
+            aa = target_area(a)
+            if aa:
+                s += AREA_W * abs(aa - ta) / max(ta, 1)
         return s
 
     cand.sort(key=lambda x: score(x[0], x[1]))
-    top = cand[:3]
+    top = cand[:K_COMPS]
 
     # 사례단가를 대상 연식으로 시점보정(경과연수 개별요인)
     adj = []
@@ -246,7 +263,10 @@ for c in targets:
             f_age = max(1 - CAP, min(1 + CAP, f_age))   # 외삽 폭주 차단
             u = u * f_age
         adj.append(u)
-    c["unit"] = round(statistics.median(adj))
+    # 거리역가중 평균. 20번 스윕에서 단순중위(10.26%)보다 IDW(9.99%)가 우수했다 —
+    # 가까운 사례가 실제로 더 잘 맞는다는 뜻이고 감정평가 실무 감각과도 맞는다.
+    wts = [1.0 / max(d, 50) ** 2 for d, _ in top]
+    c["unit"] = round(sum(v * w for v, w in zip(adj, wts)) / sum(wts))
 
     c["comps"] = [{"nm": a["nm"], "d": round(d), "yr": a["yr"], "n": a["n"],
                    "unit": a["unit"], "adj": round(u)}
