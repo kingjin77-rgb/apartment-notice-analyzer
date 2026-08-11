@@ -112,8 +112,11 @@ for ci, code in enumerate(MISSING):
                 if r.status_code != 200:
                     time.sleep(1.0 * (t + 1)); continue
                 # 01번은 여기서 에러본문도 그냥 넘겼다. 결과코드를 명시적으로 본다.
+                # 주의: 이 API의 성공코드는 자릿수가 일정하지 않다("000"/"00"/"0"이
+                # 모두 관측된다). 처음에 ("00","0")만 성공으로 받았다가 "000"을
+                # 실패로 오판해 정상 지역을 12개월 내내 버렸다 — 숫자로 비교한다.
                 rc = re.search(r"<resultCode>(\d+)</resultCode>", r.text)
-                if rc and rc.group(1) not in ("00", "0"):
+                if rc and int(rc.group(1)) != 0:
                     time.sleep(1.0 * (t + 1)); continue
                 for it in re.findall(r"<item>(.*?)</item>", r.text, re.S):
                     d = {m_.group(1): m_.group(2) for m_ in re.finditer(r"<(\w+)>([^<]*)</\1>", it)}
