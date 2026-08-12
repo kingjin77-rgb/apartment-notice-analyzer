@@ -1379,6 +1379,69 @@ function detail(area,bi,purp,ltv){
             커서 특정 수치를 자동 곱하지 않았다. 현장에서 세대 향을 확인해 위 범위 안에서 가감할 것.
           </div></div></div>
 
+      ${(()=>{
+        /* 2026-08-12: 유저 지적 — "산출근거 설명이 빈약하다". 실제로 확인해보니
+           §2 표는 채택거래 원단가(예 276만/㎡)를, §4-1 calc 줄은 층별효용 보정 후
+           단가(287만/㎡)를 각각 따로 보여주고, 그 사이의 곱셈(276만×1.038=287만)이
+           어디에도 문장으로 연결돼 있지 않았다. 산출근거를 하나의 계산 체인으로
+           명시적으로 풀어써서, 표 두 개를 대조해야만 알 수 있던 걸 문서 안에서
+           바로 확인되게 한다. 계산 로직(cell())은 손대지 않는다 — 이미 나온 값을
+           서술로 펼치는 것뿐이다. */
+        const rec = c.areas.find(x=>Math.abs(x.a-area)<0.01) || {};
+        const f = c.fadj[bi];
+        const au = rec.u || c.unit;
+        const afterFloor = au * f;
+        const wearPct = (r.wear*100).toFixed(1);
+        const rawArea = au*f*area;
+        const bandTierText = c.hasT
+          ? (c.n>=100?`유효거래 100건 이상 — 신뢰등급 5(매우높음), 변동폭 ±2.8%`
+             :c.n>=20?`유효거래 20~99건 — 신뢰등급 3~4, 변동폭 ±3.8%`
+             :`유효거래 3~19건 — 신뢰등급 2, 변동폭 ±5.8%`)
+          : (c.comps[0].d<=800?`최근접 사례 800m 이내 — 신뢰등급 2, 변동폭 ±7.5%`
+             :c.comps[0].d<=1500?`최근접 사례 800~1500m — 신뢰등급 1~2, 변동폭 ±9.5%`
+             :`최근접 사례 1500m 초과 — 신뢰등급 1, 변동폭 ±12.5%`);
+        return `<div class="why"><div class="why-h"><span class="n">4-2</span>감정가 산출 계산 — 단계별 전개</div>
+        <div class="why-b">
+          §2~4-1에서 확정한 값들을 실제로 곱해나가는 과정이다. 사정보정·지역요인·개별요인 중
+          이 단계에서 1.000이 아닌 항목은 <b>층별효용비율</b> 하나뿐이며, 나머지가 왜 1.000인지도
+          함께 밝힌다.
+          <table class="mini" style="margin-top:8px">
+            <thead><tr><th>단계</th><th>적용치</th><th>근거</th></tr></thead>
+            <tbody>
+              <tr><td>① 사정보정</td><td>1.000</td><td>§2에서 계약해제·직거래를 이미 제외한 사례만 채택 — 추가 보정 불요</td></tr>
+              <tr><td>② 시점수정</td><td>1.000</td><td>§3 — 사례 수집기간과 기준시점이 동일 구간</td></tr>
+              <tr><td>③ 지역요인</td><td>1.000</td><td>${c.hasT?"사례가 대상과 동일 단지 내 거래 — 입지가 완전히 같아 격차 없음"
+                    :`사례가 인근(최근접 ${c.comps[0].d}m) 별개 단지 — 지역요인 격차는 ④의 신뢰구간 확대로 반영(개별 산출은 미실시)`}</td></tr>
+              <tr class="sum"><td>④ 개별요인(층별효용)</td><td>${f.toFixed(3)}</td>
+                  <td>대상 층대 ${BANDS[bi][0]}(${bandLabel(bf[bi])}) — §4-1 표에서 채택</td></tr>
+            </tbody>
+          </table>
+          <div class="calc" style="margin-top:8px;line-height:2.0">
+            기준단가 ${c.hasT?"(대상 평형 채택거래 중위)":"(인근 비준)"} &nbsp;<b>${Math.round(au/1e4).toLocaleString()}만원/㎡</b><br>
+            × 층별효용비율(③) &nbsp;<b>${f.toFixed(3)}</b><br>
+            = 적용단가 &nbsp;<b>${Math.round(afterFloor/1e4).toLocaleString()}만원/㎡</b>
+            &nbsp;<span style="color:var(--gray-500);font-size:12px">(${Math.round(au/1e4).toLocaleString()} × ${f.toFixed(3)} = ${Math.round(afterFloor/1e4).toLocaleString()})</span><br>
+            × 전용면적 &nbsp;<b>${area.toFixed(2)}㎡</b><br>
+            = ${won(Math.round(rawArea))}
+            ${r.wear>0?`<br>× (1 − 임대사용마모 ${wearPct}%) &nbsp;<span style="color:var(--gray-500);font-size:12px">— §4 "★ 노후도·사용감" 참조</span><br>`:'<br>'}
+            <span style="border-top:2px solid var(--slate,#23384f);display:inline-block;margin-top:6px;padding-top:6px">
+            = <b style="font-size:15px">${won(r.mid)}</b> &nbsp;<span style="color:var(--gray-500);font-size:12px">(만원 단위 반올림)</span></span>
+          </div>
+          <div style="font-size:12.5px;color:var(--gray-700);margin-top:10px">
+            <b>변동범위(방어가능 범위) 산출 근거</b> — ${bandTierText}.
+            ${c.hasT?"표본이 많을수록 사례 간 편차가 통계적으로 줄어든다는 원칙":
+                     "인근 사례와의 거리가 가까울수록 물적 유사성이 높아 편차가 줄어든다는 원칙"}에
+            따라 이 앱이 내부적으로 정한 구간이며, 법령·실무기준이 정한 고정 수치가 아니다(참고용 신뢰구간).
+            <div class="calc" style="margin-top:6px">
+              ${won(r.mid)} × (1 − ${(r.band*100).toFixed(1)}%) = <b>${won(r.lo)}</b> (하단)<br>
+              ${won(r.mid)} × (1 + ${(r.band*100).toFixed(1)}%) = <b>${won(r.hi)}</b> (상단)
+            </div>
+            분양전환 목적에서는 <b>낮을수록 입주민에게 유리</b>하므로 하단(${won(r.lo)})을
+            "입주민 유리" 값으로 채택한다(반대로 담보평가·경매참고 등 목적에서는 방향이 바뀐다 — §1 참조).
+          </div>
+        </div></div>`;
+      })()}
+
       <div class="why"><div class="why-h"><span class="n">5</span>시산가액 조정 — 감칙 제12조②</div>
         <div class="why-b">본건은 구분소유 부동산으로 감칙 제16조가 거래사례비교법을 주방식으로
           정하고 있고, 이 앱은 <b>주방식 단일 적용</b>이다.

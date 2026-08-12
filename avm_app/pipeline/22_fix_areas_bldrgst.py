@@ -61,7 +61,7 @@ _RATE_LK = threading.Lock()
 _last_call = [0.0]
 MIN_GAP = 0.45   # 실측 안전값(0.5s는 8/8 성공, 1.0s 간격도 앞선 부하가 안 식으면 실패)
 def rate_limited_get(url, params, timeout):
-    for attempt in range(6):
+    for attempt in range(3):   # 6->3: 페이지당 최대 대기를 줄여 한 단지에 발이 묶이는 걸 막는다
         with _RATE_LK:
             wait = MIN_GAP - (time.time() - _last_call[0])
             if wait > 0:
@@ -146,6 +146,8 @@ def work(c):
         for page in range(1, 91):   # 최대 관측 totalCount 8,046건(81페이지) 커버. 60이면
                                      # 그보다 큰 단지가 페이지 중간에 잘려 K-APT 세대수
                                      # 검증에서 자동 기각된다(안전하지만 커버리지 손실).
+            if page % 20 == 0:
+                P(f"    ...{c['nm']} 페이지네이션 {page}p 진행중 (누적 {len(rows)}건)")
             r = rate_limited_get(HUB, {"serviceKey": BKEY, "sigunguCd": bc[:5],
                 "bjdongCd": bc[5:], "bun": bun, "ji": ji, "numOfRows": "100",
                 "pageNo": str(page), "_type": "json"}, 40)
