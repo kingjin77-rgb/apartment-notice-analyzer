@@ -20,10 +20,18 @@
 - getBrHsprcInfo       : 호수/전유공용면적
 """
 import os
+import time
 import requests
 import xml.etree.ElementTree as ET
 
 BASE_URL = "https://apis.data.go.kr/1613000/BldRgstHubService"
+
+
+def _to_int(v) -> int:
+    try:
+        return int(float(v))
+    except (TypeError, ValueError):
+        return 0
 
 
 class BuildingRegistryClient:
@@ -44,7 +52,11 @@ class BuildingRegistryClient:
             "pageNo": params.pop("pageNo", 1),
             **params,
         }
-        resp = requests.get(f"{BASE_URL}/{operation}", params=query, timeout=20)
+        for attempt in range(3):
+            resp = requests.get(f"{BASE_URL}/{operation}", params=query, timeout=20)
+            if resp.status_code < 500:
+                break
+            time.sleep(0.8 * (attempt + 1))  # data.go.kr는 502/503이 간헐적으로 발생함
         resp.raise_for_status()
 
         # JSON 우선 시도, 실패하면 XML 파싱 (API가 파라미터 오류 시 XML 에러를 반환하는 경우가 있음)
@@ -84,6 +96,100 @@ class BuildingRegistryClient:
             "bun": bun.zfill(4),
             "ji": ji.zfill(4),
         })
+
+    def get_unit_areas(self, sigungu_cd: str, bjdong_cd: str, bun: str, ji: str = "0000") -> list[dict]:
+        """전유공용면적 조회(getBrExposPubuseAreaInfo) — 세대별 실제 전유면적 원부.
+
+        거래사례가 없는 단지의 '평형(타입) 구성'을 인근 단지에서 빌려오는 임시방편 대신,
+        이 단지 자체의 건축물대장 공부에서 직접 가져오기 위한 것이다.
+        (getBrHsprcInfo는 이름과 달리 동별 주택가격 공시이력이라 전유면적이 없다 — 실측 확인함)
+        """
+        return self._call("getBrExposPubuseAreaInfo", {
+            "sigunguCd": sigungu_cd,
+            "bjdongCd": bjdong_cd,
+            "platGbCd": "0",
+            "bun": bun.zfill(4),
+            "ji": ji.zfill(4),
+            "numOfRows": 3000,
+        })
+
+    def summarize_unit_areas(self, hsprc_info: list[dict]) -> list[dict]:
+        """get_unit_areas() 원본(호별 1행)을 전유면적 타입별로 집계.
+
+        exposPubuseGbCdNm(전유/공용 구분)이 '전유'인 행만 세대로 간주하고,
+        area 필드(exclusPrvatArea, ㎡)를 반올림해 타입으로 묶는다.
+        """
+        units = [r for r in hsprc_info if "전유" in (r.get("exposPubuseGbCdNm") or "")]
+        raw: list[float] = []
+        for r in units:
+            a = r.get("area")
+            try:
+                a = float(a)
+            except (TypeError, ValueError):
+                continue
+            if a > 0:
+                raw.append(a)
+        if not raw:
+            return []
+
+        # 같은 타입이라도 세대마다 대장상 전유면적이 소수점 이하 몇 g 단위로
+        # 흔들려서(59.94 vs 59.70 등) 그대로 세면 진짜 타입 하나가 두세 개
+        # 잡음값으로 쪼개지고, 그 틈에 희소한 특수세대(펜트하우스 등)가
+        # "주요 타입"으로 잘못 끼어든다. ±0.6㎡ 이내는 같은 타입으로 묶는다.
+        raw.sort()
+        clusters: list[list[float]] = []
+        for a in raw:
+            if clusters and a - clusters[-1][-1] <= 0.6:
+                clusters[-1].append(a)
+            else:
+                clusters.append([a])
+        out = [{"a": round(sum(c) / len(c), 2), "n": len(c)} for c in clusters]
+        return sorted(out, key=lambda x: -x["n"])
+
+    def summarize_complex(self, title_info: list[dict]) -> dict:
+        """
+        get_title_info() 원본(동별 1행)을 단지 단위 통계로 집계.
+
+        표제부는 경로당·관리사무소·기계실·지하주차장 등 비주거 동도 함께 내려오므로
+        hhldCnt(세대수) > 0 인 행만 "주거동"으로 간주해 집계 대상으로 삼는다.
+        평가 실무상 개별요인(감칙 610-3.1.3②) 판단에 쓰이는 단지 특성치가 여기서 나온다.
+        """
+        if not title_info:
+            return {}
+        dongs = [r for r in title_info if _to_int(r.get("hhldCnt")) > 0]
+        if not dongs:
+            dongs = title_info  # 세대수 필드가 비어있는 예외 케이스 대비
+
+        def isum(field):
+            return sum(_to_int(r.get(field)) for r in dongs)
+
+        def imax(field):
+            vals = [_to_int(r.get(field)) for r in dongs]
+            return max(vals) if vals else 0
+
+        grades = [r.get("engrGrade") for r in dongs if (r.get("engrGrade") or "").strip()]
+        quake = [r.get("rserthqkDsgnApplyYn") for r in dongs]
+
+        return {
+            "동수": len(dongs),
+            "총세대수": isum("hhldCnt"),
+            "최고층": imax("grndFlrCnt"),
+            "최저동층수": min((_to_int(r.get("grndFlrCnt")) for r in dongs if _to_int(r.get("grndFlrCnt"))), default=0),
+            "승강기_승용": isum("rideUseElvtCnt"),
+            "승강기_비상": isum("emgenUseElvtCnt"),
+            "내진설계여부": "Y" in quake,
+            "내진설계등급": next((r.get("rserthqkAblty") for r in dongs if r.get("rserthqkAblty")), ""),
+            "에너지효율등급": grades[0] if grades else "",
+            "친환경인증등급": next((r.get("gnBldGrade") for r in dongs if r.get("gnBldGrade")), ""),
+            "주구조": next((r.get("strctCdNm") for r in dongs if r.get("strctCdNm")), ""),
+            "사용승인일": next((r.get("useAprDay") for r in dongs if r.get("useAprDay")), ""),
+            "연면적_합계": round(isum("totArea"), 1),
+            "옥내기계식주차": isum("indrMechUtcnt"),
+            "옥내자주식주차": isum("indrAutoUtcnt"),
+            "옥외기계식주차": isum("oudrMechUtcnt"),
+            "옥외자주식주차": isum("oudrAutoUtcnt"),
+            "raw_동목록": [r.get("dongNm") for r in dongs],
+        }
 
     def cross_check_notice_claims(self, notice_claims: dict, title_info: list[dict]) -> dict:
         """

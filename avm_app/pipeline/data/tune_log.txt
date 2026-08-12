@@ -1,0 +1,47 @@
+표본 2990건 (사례 3건 이상 확보)
+
+■ 기준선 (현재 15번 설정: k=3, 연식가중 10년/km, 3km, median)
+   MdAPE 10.26%  n=2983
+
+■ 사례 개수 k
+   k=3   MdAPE 10.26%  <-- 기준
+   k=4   MdAPE 10.50%  
+   k=5   MdAPE 10.68%  
+   k=7   MdAPE 11.08%  
+   k=10  MdAPE 11.45%  
+
+■ 연식 가중 (작을수록 연식을 더 중시)
+   1km≈3년  MdAPE 10.80%
+   1km≈5년  MdAPE 10.60%
+   1km≈10년  MdAPE 10.26%
+   1km≈20년  MdAPE 10.23%
+   1km≈∞년  MdAPE 11.45%
+
+■ 반경
+   1500m  MdAPE 10.17%  n=2936
+   2000m  MdAPE 10.20%  n=2963
+   3000m  MdAPE 10.26%  n=2983
+   4000m  MdAPE 10.31%  n=2990
+
+■ 집계 방식
+   median  MdAPE 10.26%
+   mean    MdAPE 10.20%
+   idw     MdAPE 9.99%
+
+■ 면적 유사도 가중
+   aw=0    MdAPE 10.26%
+   aw=0.5  MdAPE 9.75%
+   aw=1.0  MdAPE 9.89%
+   aw=2.0  MdAPE 9.93%
+
+■ 조합 탐색 (상위 후보)
+   MdAPE 9.38%  k=3 yw=10 r=2000m idw n=2963
+   MdAPE 9.38%  k=3 yw=10 r=3000m idw n=2983
+   MdAPE 9.52%  k=3 yw=10 r=1500m idw n=2936
+   MdAPE 9.57%  k=3 yw=5 r=2000m idw n=2963
+   MdAPE 9.57%  k=3 yw=5 r=3000m idw n=2983
+   MdAPE 9.59%  k=3 yw=5 r=1500m idw n=2936
+   MdAPE 9.63%  k=5 yw=5 r=2000m idw n=2963
+   MdAPE 9.69%  k=3 yw=10 r=2000m median n=2963
+
+   기준선 10.26% -> 최적 9.38% (개선 0.88%p)

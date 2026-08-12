@@ -3,6 +3,10 @@
 .env.local
 .env.*.local
 *.env
+# 2026-08-11: keys.public.txt는 "공개데이터 키라 괜찮다"는 판단으로 커밋돼 있었으나
+# 리포가 public이라 실제 키 값이 그대로 노출됐다. *.env 패턴에 안 걸린다.
+keys.public.txt
+keys*.txt
 
 # 폰트 파일 - 일부(210 옴니고딕)는 유료/라이선스 폰트라 공개 저장소에 재배포 불가 가능성.
 # secrets/와 동일한 이유로 로컬(각 PC/세션)에만 두고 git에는 안 올림. brand/fonts/README.md 참고.
@@ -27,3 +31,6 @@ Thumbs.db
 
 # claude local
 .claude/settings.local.json
+
+# 프론트엔드 키 분리 (2026-08-11)
+keys.js
