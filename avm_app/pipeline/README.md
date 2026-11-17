@@ -40,6 +40,8 @@ Claude가 관여하는 부분이 없다 — 그동안 `preview_start` 도구로 
 | `16_collect_jeju.py` | 제주 누락분 수집·집계·지오코딩 (그 뒤 `09_merge_region.py 제주`) | ~5분 |
 | `17_collect_missing_sgg.py` | **결손 시군구 자동탐지 후 재수집** (수집·집계·지오코딩 일괄, 시군구 단위 재개 O) | ~60분 |
 | `18_merge_upgrade.py` | 17번 결과 병합. 09번과 달리 **est=1 → hasT=1 승격** (스킵하면 추정이 실측을 이긴다) | ~2분 |
+| `22_fix_areas_bldrgst.py` | 거래0건 단지 평형을 건축HUB 전유부로 실측 보정. 일일한도 소진 시 30연속 오류에서 자동정지·성공분만 반영 → 다음날 재실행 | 수일(한도) |
+| `23_time_index.py` | **시점수정** — 부동산원 (월) 아파트 매매가격지수로 시군구별 `기준월 지수 ÷ 수집기간 12개월 평균` → `../time_index.js`. 매월 지수 발표 후 재실행 | ~1분 |
 
 `05b_fix_areas_bldrgst_SUPERSEDED.py`, `xx_verify_rental_FAILED_kapt_list_bug.py`는
 실패/대체된 시도 기록 — 재실행하지 말 것 (아래 "실패한 시도" 참고).
