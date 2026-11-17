@@ -123,8 +123,11 @@ def cluster(vals, tol=0.6):
 stat = collections.Counter()
 errs = collections.Counter()
 
+STREAK = [0]   # 연속 한도오류 수. 일일한도 소진 뒤엔 남은 수천 건을 헛돌며 실패 처리하므로 멈춘다(11.09 실행: 5,000건 낭비)
 def work(c):
     k = KEY(c)
+    if STREAK[0] >= 30:
+        return
     if done.get(k) is not None:
         # 성공(None이 아닌 값)만 캐시로 스킵한다. 실패는 done[k]=None으로 기록되는데,
         # 이걸 "처리 완료"로 오판해 재시도를 막으면 안 된다 — 실제로 첫 실행에서
@@ -165,7 +168,11 @@ def work(c):
             done[k] = None
             stat["실패_API"] += 1
             errs[type(e).__name__ + ": " + str(e)[:80]] += 1
+            STREAK[0] = STREAK[0] + 1 if isinstance(e, RuntimeError) else 0
+            if STREAK[0] == 30:
+                P("  !! 한도오류 30연속 — 일일한도 소진으로 판단, 조회 중단 후 성공분만 반영")
         return
+    STREAK[0] = 0
     if not rows:
         with _lk: done[k]=None; stat["대장자료없음"]+=1
         return

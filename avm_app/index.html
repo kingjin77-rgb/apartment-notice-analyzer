@@ -324,6 +324,7 @@ table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
 </div>
 
 <script src="keys.js"></script>
+<script src="time_index.js?v=20261117"></script>
 <script src="data.js?v=20260811e"></script>
 <script>
 const _K = window.AVM_KEYS || {};
@@ -603,7 +604,7 @@ function gate(c){
 // 애초에 "시세"가 존재하지 않으므로 지도 단계에서 추정치를 먼저 내밀지 않는다
 // (유저 지시: "없으면 표기하지마라, 니가 추정하지 마라, 감정할때만 보고하라").
 function pin84(c){
-  return gate(c).level==="full" ? eok(c.unit*84.98) : null;
+  return gate(c).level==="full" ? eok(c.unit*84.98*(timeAdj(c)?.t||1)) : null;
 }
 
 /* ---------- 지도 ---------- */
@@ -1122,11 +1123,11 @@ function installmentSchedule(initialPrice, earlyAppraised, lhRate, earlyYear){
 }
 
 /* ---------- 감정평가 실행 ---------- */
-// 실제로 수행하는 단계만 적는다. 예전 목록에는 "부동산원 가격지수 시점수정"과
-// "시산가액 합리성 검토"가 있었는데 둘 다 이 앱이 하지 않는 작업이다
-// (전자는 미연동, 후자는 근거자료 없어 §5에서 미수행으로 명시).
+// 실제로 수행하는 단계만 적는다. 시점수정은 time_index.js가 실렸을 때만 넣는다.
+// "시산가액 합리성 검토"는 근거자료가 없어 하지 않는다(§5에 미수행으로 명시).
 const LOGS=["국토부 실거래가 조회 (2025.09~2026.08)","계약해제·직거래 제외",
  "단지별 MAD 이상치 제거","공부상 공급유형·평형 검증",
+ ...(typeof TIME_INDEX!=="undefined"?[`부동산원 아파트 매매가격지수 시점수정 (기준 ${ymDot(TIME_INDEX.base)})`]:[]),
  "층별효용비율 회귀 추정","거래사례비교법 비준가액 산출"];
 function run(){
   const purp=document.getElementById("s_purp").value, ltv=0;  // ltv: 대출섹션 폐지 후 남은 시그니처 호환용
@@ -1147,9 +1148,19 @@ function run(){
   },240);
 }
 
+/* 시점수정 — time_index.js(pipeline/23_time_index.py)의 시군구별 부동산원 지수비.
+   regKey는 23번 reg_key()와 같은 규칙이어야 한다. 표가 없거나 못 찾으면 1.000. */
+function regKey(a){ const t=(a||"").trim().split(/\s+/), o=t.slice(0,1);
+  for(const w of t.slice(1)){ if(!/[시군구도]$/.test(w)) break; o.push(w); } return o.join(" "); }
+function timeAdj(c){
+  const x = typeof TIME_INDEX!=="undefined" && TIME_INDEX.r[regKey(c.addr)];
+  return x ? {t:x[0], region:x[1].replace(/>/g," › "), deal:x[2], base:x[3]} : null;
+}
+function ymDot(s){ return s ? `${s.slice(0,4)}.${s.slice(4,6)}` : ""; }  // 선언형: LOGS가 먼저 호출
 function cell(c,area,bi,purp,opt){
   purp = purp || "분양전환"; opt = opt || {ryears:0};
   const f=c.fadj[bi];
+  const ti=timeAdj(c), t=ti?ti.t:1;
   if(f==null) return null;
   const rec=c.areas.find(x=>Math.abs(x.a-area)<0.01)||{};
   const au=rec.u||c.unit, n=rec.n||0;
@@ -1170,12 +1181,12 @@ function cell(c,area,bi,purp,opt){
   // 임대 사용 마모 — 분양전환 목적일 때만 적용. 실사용에 따른 실질 감가이므로
   // 입주민유리/상대유리 구분과 무관하게 mid/low/high 전체에 동일 적용한다.
   const wear = purp==="분양전환" ? rentalWear(opt.ryears||0) : 0;
-  const mid=Math.round(au*f*area*(1-wear)/1e6)*1e6;
+  const mid=Math.round(au*t*f*area*(1-wear)/1e6)*1e6;
   const lo=Math.round(mid*(1-band)/1e6)*1e6, hi=Math.round(mid*(1+band)/1e6)*1e6;
   const dir=PURPOSE_DIR[purp]!==undefined?PURPOSE_DIR[purp]:0;
   const favorable = dir<0?lo:(dir>0?hi:mid);
   const adverse   = dir<0?hi:(dir>0?lo:mid);
-  return {est:mid,mid,lo,hi,band,grade,n,unit:au*f,proxy:!c.hasT,wear,dir,favorable,adverse};
+  return {est:mid,mid,lo,hi,band,grade,n,unit:au*t*f,t,ti,proxy:!c.hasT,wear,dir,favorable,adverse};
 }
 
 let LAST_OPT={ryears:0,lease:"10년",bcost:0,initPrice:0};
@@ -1339,11 +1350,23 @@ function detail(area,bi,purp,ltv){
           </div></div></div>
 
       <div class="why"><div class="why-h"><span class="n">3</span>시점수정 — [400-3.3.1.4]</div>
-        <div class="why-b">채택 사례의 수집기간과 본건 기준시점이 동일 구간이므로
-          <b>시점수정을 적용하지 않았다</b>(보정률 1.000).
-          <div style="font-size:12.5px;color:var(--gray-700);margin-top:5px">
-            한국부동산원 공동주택 실거래가격지수를 적용한 기간 보정은 본 앱에 아직 연동되어 있지 않다.
-            사례 수집기간을 벗어난 시점의 가액이 필요하면 별도 보정이 필요하다.</div></div></div>
+        <div class="why-b">${r.ti?`
+          사례 수집기간(${TIME_INDEX.win.replace(/(\d{4})(\d{2})/g,"$1.$2")})의 가격을
+          기준시점 현재로 끌어올리기 위해 <b>한국부동산원 아파트 매매가격지수</b>를 적용하였다.
+          <table class="mini" style="margin-top:8px">
+            <tbody>
+              <tr><td>적용 지역</td><td>${r.ti.region}</td></tr>
+              <tr><td>거래시점 지수</td><td>${r.ti.deal.toFixed(2)} (수집기간 12개월 월별 지수 평균)</td></tr>
+              <tr><td>기준시점 지수</td><td>${r.ti.base.toFixed(2)} (${ymDot(TIME_INDEX.base)} — 발표된 가장 최근 지수)</td></tr>
+              <tr class="sum"><td>시점수정치</td><td><b>${r.ti.base.toFixed(2)} ÷ ${r.ti.deal.toFixed(2)} ≒ ${r.t.toFixed(5)}</b></td></tr>
+            </tbody>
+          </table>
+          <div style="font-size:12.5px;color:var(--gray-700);margin-top:6px">
+            기준단가는 거래별 단가의 중위값이라 개별 거래월이 남아 있지 않다.
+            그래서 거래가 수집기간에 고르게 분포한 것으로 보고 기간 평균 지수를 거래시점 지수로 썼다.
+            해당 시군구 지수가 발표되지 않는 지역은 시도 지수를 적용하였다.</div>`
+          :`시점수정 지수표(time_index.js)를 찾지 못해 <b>시점수정을 적용하지 않았다</b>(보정률 1.000).
+          산출가액은 사례 수집기간 기준이다.`}</div></div>
 
       <div class="why"><div class="why-h"><span class="n">4</span>가치형성요인 비교 — 단지외부·단지내부·호별·기타 4계층</div>
         <div class="why-b">
@@ -1390,9 +1413,11 @@ function detail(area,bi,purp,ltv){
         const rec = c.areas.find(x=>Math.abs(x.a-area)<0.01) || {};
         const f = c.fadj[bi];
         const au = rec.u || c.unit;
-        const afterFloor = au * f;
+        const t = r.t || 1;
+        const afterTime = au * t;
+        const afterFloor = afterTime * f;
         const wearPct = (r.wear*100).toFixed(1);
-        const rawArea = au*f*area;
+        const rawArea = afterFloor*area;
         const bandTierText = c.hasT
           ? (c.n>=100?`유효거래 100건 이상 — 신뢰등급 5(매우높음), 변동폭 ±2.8%`
              :c.n>=20?`유효거래 20~99건 — 신뢰등급 3~4, 변동폭 ±3.8%`
@@ -1402,14 +1427,16 @@ function detail(area,bi,purp,ltv){
              :`최근접 사례 1500m 초과 — 신뢰등급 1, 변동폭 ±12.5%`);
         return `<div class="why"><div class="why-h"><span class="n">4-2</span>감정가 산출 계산 — 단계별 전개</div>
         <div class="why-b">
-          §2~4-1에서 확정한 값들을 실제로 곱해나가는 과정이다. 사정보정·지역요인·개별요인 중
-          이 단계에서 1.000이 아닌 항목은 <b>층별효용비율</b> 하나뿐이며, 나머지가 왜 1.000인지도
+          §2~4-1에서 확정한 값들을 실제로 곱해나가는 과정이다. 이 단계에서 1.000이 아닌 항목은
+          <b>${r.ti?"시점수정치와 층별효용비율":"층별효용비율"}</b>이며, 나머지가 왜 1.000인지도
           함께 밝힌다.
           <table class="mini" style="margin-top:8px">
             <thead><tr><th>단계</th><th>적용치</th><th>근거</th></tr></thead>
             <tbody>
               <tr><td>① 사정보정</td><td>1.000</td><td>§2에서 계약해제·직거래를 이미 제외한 사례만 채택 — 추가 보정 불요</td></tr>
-              <tr><td>② 시점수정</td><td>1.000</td><td>§3 — 사례 수집기간과 기준시점이 동일 구간</td></tr>
+              <tr${r.ti?' class="sum"':''}><td>② 시점수정</td><td>${t.toFixed(5)}</td><td>${r.ti
+                    ?`§3 — 부동산원 아파트 매매가격지수 ${r.ti.region}, ${ymDot(TIME_INDEX.base)} 기준`
+                    :"§3 — 지수표 미적재로 미적용"}</td></tr>
               <tr><td>③ 지역요인</td><td>1.000</td><td>${c.hasT?"사례가 대상과 동일 단지 내 거래 — 입지가 완전히 같아 격차 없음"
                     :`사례가 인근(최근접 ${c.comps[0].d}m) 별개 단지 — 지역요인 격차는 ④의 신뢰구간 확대로 반영(개별 산출은 미실시)`}</td></tr>
               <tr class="sum"><td>④ 개별요인(층별효용)</td><td>${f.toFixed(3)}</td>
@@ -1418,9 +1445,10 @@ function detail(area,bi,purp,ltv){
           </table>
           <div class="calc" style="margin-top:8px;line-height:2.0">
             기준단가 ${c.hasT?"(대상 평형 채택거래 중위)":"(인근 비준)"} &nbsp;<b>${Math.round(au/1e4).toLocaleString()}만원/㎡</b><br>
-            × 층별효용비율(③) &nbsp;<b>${f.toFixed(3)}</b><br>
+            × 시점수정치(②) &nbsp;<b>${t.toFixed(5)}</b><br>
+            × 층별효용비율(④) &nbsp;<b>${f.toFixed(3)}</b><br>
             = 적용단가 &nbsp;<b>${Math.round(afterFloor/1e4).toLocaleString()}만원/㎡</b>
-            &nbsp;<span style="color:var(--gray-500);font-size:12px">(${Math.round(au/1e4).toLocaleString()} × ${f.toFixed(3)} = ${Math.round(afterFloor/1e4).toLocaleString()})</span><br>
+            &nbsp;<span style="color:var(--gray-500);font-size:12px">(${Math.round(au/1e4).toLocaleString()} × ${t.toFixed(5)} × ${f.toFixed(3)} = ${Math.round(afterFloor/1e4).toLocaleString()})</span><br>
             × 전용면적 &nbsp;<b>${area.toFixed(2)}㎡</b><br>
             = ${won(Math.round(rawArea))}
             ${r.wear>0?`<br>× (1 − 임대사용마모 ${wearPct}%) &nbsp;<span style="color:var(--gray-500);font-size:12px">— §4 "★ 노후도·사용감" 참조</span><br>`:'<br>'}
